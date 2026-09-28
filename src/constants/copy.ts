@@ -19,6 +19,30 @@
  * Reviewing this one file proves the whole app's wording.
  */
 
+/** Lengths of time, for free trials. */
+type PeriodUnit = 'day' | 'week' | 'month' | 'year';
+
+/** The billing periods of the plans. */
+type BillingPlan = 'weekly' | 'monthly' | 'annual';
+
+const PERIOD_NAMES: Record<PeriodUnit, readonly [singular: string, plural: string]> = {
+  day: ['day', 'days'],
+  week: ['week', 'weeks'],
+  month: ['month', 'months'],
+  year: ['year', 'years'],
+};
+
+const BILLING_PERIODS: Record<BillingPlan, string> = {
+  weekly: 'week',
+  monthly: 'month',
+  annual: 'year',
+};
+
+/** "1 day", "3 days". */
+function periodCount(count: number, unit: PeriodUnit): string {
+  return `${count} ${PERIOD_NAMES[unit][count === 1 ? 0 : 1]}`;
+}
+
 export const copy = {
   common: {
     retry: 'Try again',
@@ -180,6 +204,8 @@ export const copy = {
       continue: 'Continue',
       notNow: 'Not now',
     },
+    /** Screen reader label while the camera waits to learn whether a scan needs a subscription. */
+    checkingAccess: 'Checking your subscription',
     permission: {
       title: 'Camera access',
       body: 'GlowTrack needs your camera to take your scan photo. Photos are never saved to your gallery.',
@@ -346,6 +372,12 @@ export const copy = {
       cta: 'Take a scan',
     },
     loadFailed: "Your progress didn't load. Check your connection and try again.",
+    /** In place of the trend and comparisons, for someone who has never subscribed. */
+    locked: {
+      title: 'Your trend and comparisons',
+      body: 'Subscribe to see how each score moves over time and to compare any two scans side by side.',
+      cta: 'See plans',
+    },
     chart: {
       title: 'Over time',
       noiseBand: 'Small shifts inside the shaded band are normal photo-to-photo variation.',
@@ -455,15 +487,29 @@ export const copy = {
     },
   },
 
+  /**
+   * HONESTY RULES for the paywall. Store approval depends on them.
+   * - Show the amount actually billed, never a per-week equivalent of it.
+   * - State what is charged, when, and that it renews until cancelled,
+   *   right under the purchase button, not behind a link.
+   * - No countdowns, no scarcity, no invented discounts. The saving shown is
+   *   worked out from the real prices and rounded down.
+   * Prices always come from the store, formatted in the local currency.
+   */
   paywall: {
     title: 'See your progress, week by week',
     valuePoints: [
       'A new scan whenever you want one',
-      'Your full history and trend over time',
-      'Before-and-after comparisons',
-      'A daily routine you can tick off',
+      'Your trend over time, score by score',
+      'Before-and-after comparisons of any two scans',
+      'A fresh routine with every scan',
     ],
-    bestValue: (percent: number) => `Best value, save ${percent}% vs weekly`,
+    lapsed:
+      'Your subscription has ended. Your history is still here, and you can subscribe again to keep scanning.',
+    plansLabel: 'Choose a plan',
+    loadingPlans: 'Loading plans',
+    plansFailed: "The plans didn't load. Check your connection and try again.",
+    unavailable: "Subscriptions aren't available on this phone right now.",
     plans: {
       weekly: 'Weekly',
       monthly: 'Monthly',
@@ -474,28 +520,47 @@ export const copy = {
       monthly: (price: string) => `${price} per month`,
       annual: (price: string) => `${price} per year`,
     },
-    startTrial: (days: number) => `Start ${days}-day free trial`,
+    bestValue: (percent: number) => `Best value, save ${percent}% vs weekly`,
+    trialBadge: (count: number, unit: PeriodUnit) => `${count}-${PERIOD_NAMES[unit][0]} free trial`,
+    /** Screen reader name for a plan card: its name, price and notes, in order. */
+    planLabel: (parts: readonly string[]) => parts.join(', '),
+    startTrial: (count: number, unit: PeriodUnit) =>
+      `Start ${count}-${PERIOD_NAMES[unit][0]} free trial`,
     subscribe: 'Subscribe',
-    trialTerms: (days: number, price: string, period: string) =>
-      `Free for ${days} days, then ${price} per ${period}. Renews automatically until you cancel. Cancel any time in Google Play.`,
-    terms: (price: string, period: string) =>
-      `${price} per ${period}. Renews automatically until you cancel. Cancel any time in Google Play.`,
+    /** The terms under the button for a plan without a trial. */
+    terms: (price: string, plan: BillingPlan) =>
+      `You pay ${price} today. It renews automatically at ${price} per ${BILLING_PERIODS[plan]} until you cancel. Cancel any time in Google Play.`,
+    /** The terms under the button for a plan with a free trial. `date` is when the trial ends. */
+    trialTerms: (count: number, unit: PeriodUnit, price: string, plan: BillingPlan, date: string) =>
+      `Free for ${periodCount(count, unit)}. From ${date} you pay ${price} per ${BILLING_PERIODS[plan]}, renewing automatically until you cancel. Cancel any time in Google Play.`,
     restore: 'Restore purchases',
     termsLink: 'Terms',
     privacyLink: 'Privacy Policy',
+    linkFailed: "That page didn't open. Try again later.",
     close: 'Close',
     outcomes: {
-      success: "You're subscribed. Welcome in.",
       cancelled: 'Purchase cancelled. Nothing was charged.',
-      pending: "Your payment is pending. We'll unlock everything as soon as it goes through.",
-      alreadySubscribed: "You're already subscribed.",
+      pending:
+        'Your payment is waiting on Google Play. Everything unlocks as soon as it goes through.',
+      alreadySubscribed:
+        'You already have this subscription on Google Play. Tap Restore purchases to use it here.',
       storeUnavailable: "Google Play isn't available right now. Try again in a moment.",
-      failed: "The purchase didn't go through. Nothing was charged.",
-      restored: 'Your subscription has been restored.',
-      nothingToRestore: "We couldn't find a previous subscription on this account.",
+      network:
+        "We couldn't reach Google Play. Check your connection and try again. If you were charged, tap Restore purchases.",
+      failed: "The purchase didn't go through. If you were charged, tap Restore purchases.",
+      unconfirmed:
+        "Your purchase went through but hasn't unlocked yet. Tap Restore purchases in a moment.",
+      nothingToRestore: "We couldn't find a subscription on this Google Play account.",
+      inUseElsewhere:
+        'This subscription belongs to another GlowTrack account. Sign in with that account to use it.',
+      restoreFailed: "Restoring didn't work. Check your connection and try again.",
     },
-    lapsed:
-      'Your subscription has ended. Your history is still here, and you can subscribe again to keep scanning.',
+    subscribed: {
+      title: "You're subscribed",
+      restoredTitle: 'Your subscription is restored',
+      body: 'Everything is unlocked. Welcome in.',
+      continue: 'Continue',
+    },
   },
 
   tabs: {

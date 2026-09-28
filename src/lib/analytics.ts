@@ -1,4 +1,9 @@
 import type { ShareFormat } from '@/constants/share';
+import type { PaywallTrigger, PlanId } from '@/constants/subscription';
+
+/** Why a purchase didn't go through, other than being cancelled. */
+export type PurchaseFailureReason =
+  'payment_pending' | 'already_subscribed' | 'store_unavailable' | 'network' | 'unknown';
 
 /**
  * Every analytics event and its properties. A typo in an event name is a
@@ -9,6 +14,12 @@ import type { ShareFormat } from '@/constants/share';
  */
 export interface AnalyticsEvents {
   share_initiated: { surface: 'results' | 'compare'; format: ShareFormat };
+  paywall_viewed: { trigger: PaywallTrigger };
+  plan_selected: { plan_id: PlanId };
+  purchase_started: { plan_id: PlanId };
+  purchase_completed: { plan_id: PlanId; price: number; currency: string; is_trial: boolean };
+  purchase_failed: { plan_id: PlanId; reason: PurchaseFailureReason };
+  purchase_cancelled: { plan_id: PlanId };
 }
 
 export type EventName = keyof AnalyticsEvents;

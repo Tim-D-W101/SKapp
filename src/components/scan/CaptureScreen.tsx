@@ -19,6 +19,7 @@ import { CameraMessage, ControlButton, ControlPill, ShutterButton } from './Came
 import { CameraPermissionGate } from './CameraPermissionGate';
 import { FaceOval } from './FaceOval';
 import { GhostOverlay } from './GhostOverlay';
+import { ScanAccessGate } from './ScanAccessGate';
 import { TipsSheet } from './TipsSheet';
 import { useAppActive, useLightMeter, useSteadiness } from './useCaptureChecks';
 
@@ -34,9 +35,11 @@ function leave() {
  */
 export function CaptureScreen() {
   return (
-    <CameraPermissionGate>
-      <CaptureView />
-    </CameraPermissionGate>
+    <ScanAccessGate>
+      <CameraPermissionGate>
+        <CaptureView />
+      </CameraPermissionGate>
+    </ScanAccessGate>
   );
 }
 

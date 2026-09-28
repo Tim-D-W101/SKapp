@@ -1,10 +1,11 @@
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { EmptyState, ErrorState, LoadingState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { EVENING_FROM_HOUR, MIDNIGHT_GRACE_MS } from '@/constants/routine';
+import { startScan } from '@/lib/access';
 import { msUntilLocalMidnight } from '@/lib/dates';
 import { tickKey } from '@/lib/routine';
 import { useReminderStore } from '@/stores/useReminderStore';
@@ -65,7 +66,7 @@ export function RoutineScreen() {
             body={copy.routine.empty.body}
             action={{
               label: copy.routine.empty.cta,
-              onPress: () => router.push('/scan/capture'),
+              onPress: startScan,
             }}
           />
         ) : (

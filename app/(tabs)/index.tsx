@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button, EmptyState, Screen } from '@/components/ui';
 import { copy } from '@/constants/copy';
+import { startScan } from '@/lib/access';
 import { spacing } from '@/theme/tokens';
 
 /**
@@ -18,7 +19,7 @@ export default function Home() {
           body={copy.progress.noScans.body}
           action={{
             label: copy.progress.noScans.cta,
-            onPress: () => router.push('/scan/capture'),
+            onPress: startScan,
           }}
         />
       </View>

@@ -100,6 +100,54 @@ the Gemini key exists. To set it up:
 3. Run the calibration harness before trusting the scores:
    `npm run calibrate` (see `scripts/README.md`).
 
+## Subscriptions
+
+The first scan is free. After it, scanning needs a subscription, sold through
+Google Play and managed with RevenueCat. The trend and comparisons need one
+too, while results and scan history stay open to everyone. Someone whose
+subscription lapses keeps reading their history but can't scan.
+
+Set the products up by hand, in this order, before testing any purchase:
+
+1. **Play Console → Monetise → Subscriptions:** create one subscription,
+   `glowtrack_premium`, with three base plans: `weekly`, `monthly` and
+   `annual`.
+2. On the `weekly` base plan, add a free-trial offer of 3 days.
+3. Set prices for your main markets, then override them for lower-priced
+   regions.
+4. **RevenueCat:** create a project, add the Android app, and upload the Google
+   Play service account JSON credentials.
+5. Create an entitlement with the identifier `premium` and attach all three
+   base plans to it. The app and the `analyze-scan` Edge Function both check
+   this exact name.
+6. Create an offering, `default`, and make it the current offering. Give it
+   three packages using RevenueCat's standard Weekly, Monthly and Annual
+   package types. The app matches plans by package type, and leaves out any
+   plan that is missing.
+7. **RevenueCat → Project settings → Restore behavior:** choose **Transfer to
+   new App User ID**. A fresh install starts as a new anonymous user, so
+   restoring on it has to move the subscription to that user.
+
+Then put the Android **public** SDK key (`goog_...`, under API keys) in `.env`
+as `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`. It is designed to be public. The
+**secret** key (`sk_...`) is different: it belongs only in the Edge Function's
+secrets (see `supabase/functions/analyze-scan/README.md`) and never in the app.
+
+The paywall links to the Terms and the Privacy Policy, which the stores
+require. Put their web addresses in `EXPO_PUBLIC_TERMS_URL` and
+`EXPO_PUBLIC_PRIVACY_URL`. For cloud builds, set all of these in EAS as well.
+
+Testing purchases:
+
+- Products can take several hours to appear after they're created.
+- Purchases only work in a build installed from a Play testing track, signed
+  with the same key, by a licence-tested account. Expo Go runs RevenueCat in a
+  browser preview mode without Google Play, so it can't make real purchases.
+- To try the free scan again without subscribing, clear the app's storage in
+  Android settings: the app starts over as a new anonymous user with a fresh
+  free scan. Or reset it for your own user in the SQL editor:
+  `update public.profiles set free_scan_used = false where id = 'YOUR_USER_ID';`
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.

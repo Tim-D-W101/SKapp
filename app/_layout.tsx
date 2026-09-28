@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { StartupScreen } from '@/components/auth/StartupScreen';
 import { isOnboarded } from '@/lib/onboarding';
+import { useSubscriptionSync } from '@/lib/useSubscriptionSync';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useColors } from '@/theme/tokens';
 
@@ -15,6 +16,9 @@ import { useColors } from '@/theme/tokens';
  * Nothing routes until a session exists: on launch the auth store restores the
  * stored session or signs in anonymously, and until that resolves this shows
  * the startup screen (with a retry if it fails).
+ *
+ * Once a user exists, RevenueCat is configured with the same user id, so a
+ * subscription and the account stay linked across reinstalls.
  *
  * The guards then decide what is reachable. Until onboarding is complete only
  * the onboarding flow is; afterwards only the tabs are. When a guard flips, the
@@ -31,6 +35,8 @@ export default function RootLayout() {
   useEffect(() => {
     void initialise();
   }, [initialise]);
+
+  useSubscriptionSync();
 
   let content;
   if (startupError) {
@@ -52,6 +58,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="scan" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="progress" />
+          <Stack.Screen name="paywall" options={{ animation: 'slide_from_bottom' }} />
         </Stack.Protected>
         <Stack.Screen name="(auth)" />
       </Stack>

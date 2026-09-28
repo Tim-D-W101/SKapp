@@ -1,9 +1,9 @@
-import { router } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { Button, Card, ScoreRing, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { SUGGESTED_SCAN_INTERVAL_DAYS } from '@/constants/progress';
+import { startScan } from '@/lib/access';
 import { calendarDaysBetween, formatShortDate } from '@/lib/dates';
 import type { ScanRecord } from '@/lib/progress';
 import { spacing } from '@/theme/tokens';
@@ -46,13 +46,7 @@ export function ProgressHero({ records }: ProgressHeroProps) {
         <Text variant="label" align="center">
           {next ? copy.progress.oneScan.nextScan(next) : copy.progress.oneScan.nextScanNow}
         </Text>
-        {next ? null : (
-          <Button
-            label={copy.progress.oneScan.cta}
-            onPress={() => router.push('/scan/capture')}
-            fullWidth
-          />
-        )}
+        {next ? null : <Button label={copy.progress.oneScan.cta} onPress={startScan} fullWidth />}
       </Card>
     );
   }

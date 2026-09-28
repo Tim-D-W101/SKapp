@@ -1,4 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -12,10 +12,12 @@ import {
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
+import { startScan, useTrendsAccess } from '@/lib/access';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { spacing } from '@/theme/tokens';
 
 import { CompareEntry } from './CompareEntry';
+import { LockedProgress } from './LockedProgress';
 import { ProgressHero } from './ProgressHero';
 import { ProgressTrend } from './ProgressTrend';
 import { ScanHistory } from './ScanHistory';
@@ -24,6 +26,10 @@ import { StreakCard } from './StreakCard';
 /**
  * The product: how the skin's appearance has moved over weeks. Refreshes
  * each time the tab is opened, keeping what's shown while it does.
+ *
+ * The trend and comparisons need a subscription (or a lapsed one: nothing
+ * already built up is taken away). The latest score and the scan history
+ * stay open to everyone, so the free scan's result is always reachable.
  */
 export function ProgressScreen() {
   const status = useProgressStore((state) => state.status);
@@ -31,6 +37,7 @@ export function ProgressScreen() {
   const refreshFailed = useProgressStore((state) => state.refreshFailed);
   const load = useProgressStore((state) => state.load);
   const loadPhotos = useProgressStore((state) => state.loadPhotos);
+  const trends = useTrendsAccess();
 
   useFocusEffect(
     useCallback(() => {
@@ -56,7 +63,7 @@ export function ProgressScreen() {
             body={copy.progress.noScans.body}
             action={{
               label: copy.progress.noScans.cta,
-              onPress: () => router.push('/scan/capture'),
+              onPress: startScan,
             }}
           />
         ) : (
@@ -82,8 +89,16 @@ export function ProgressScreen() {
       ) : null}
 
       <ProgressHero records={records} />
-      <ProgressTrend records={records} />
-      <CompareEntry scanCount={records.length} />
+      {trends === 'open' ? (
+        <>
+          <ProgressTrend records={records} />
+          <CompareEntry scanCount={records.length} />
+        </>
+      ) : trends === 'checking' ? (
+        <LoadingState lines={3} />
+      ) : (
+        <LockedProgress />
+      )}
       <StreakCard scanDates={records.map((record) => record.result.createdAt)} />
       <ScanHistory records={records} />
       <Disclaimer />

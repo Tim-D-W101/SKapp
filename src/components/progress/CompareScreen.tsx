@@ -1,4 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
+import { Redirect, router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PixelRatio, StyleSheet, Switch, View } from 'react-native';
 import { releaseCapture } from 'react-native-view-shot';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { SHARE_FORMATS } from '@/constants/share';
+import { useTrendsAccess } from '@/lib/access';
 import { track } from '@/lib/analytics';
 import { logInDevelopment } from '@/lib/errors';
 import type { ScanRecord } from '@/lib/progress';
@@ -29,12 +30,14 @@ import { ScanPicker } from './ScanPicker';
 /**
  * Two scans side by side: a wipe between the photos, every score with its
  * change, and the time between them. "Before" starts as the first scan and
- * "after" as the latest; either can be changed.
+ * "after" as the latest; either can be changed. Needs a subscription, now or
+ * in the past; without one, the paywall opens instead.
  */
 export function CompareScreen() {
   const status = useProgressStore((state) => state.status);
   const records = useProgressStore((state) => state.records);
   const load = useProgressStore((state) => state.load);
+  const trends = useTrendsAccess();
 
   useFocusEffect(
     useCallback(() => {
@@ -44,7 +47,11 @@ export function CompareScreen() {
 
   const close = () => router.back();
 
-  if (records.length < 2) {
+  if (trends === 'locked') {
+    return <Redirect href={{ pathname: '/paywall', params: { trigger: 'compare' } }} />;
+  }
+
+  if (records.length < 2 || trends === 'checking') {
     return (
       <Screen contentStyle={styles.content}>
         <View style={styles.topBar}>
@@ -57,7 +64,9 @@ export function CompareScreen() {
           />
         </View>
         <View style={styles.centered}>
-          {status === 'error' ? (
+          {trends === 'checking' ? (
+            <LoadingState lines={4} />
+          ) : status === 'error' ? (
             <ErrorState message={copy.progress.loadFailed} onRetry={() => void load()} />
           ) : status === 'ready' ? (
             <EmptyState title={copy.progress.compare.title} body={copy.progress.compare.needTwo} />
