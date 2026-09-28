@@ -4,10 +4,12 @@
  * Contract
  *   POST { scanId }  with the user's access token in the Authorization header.
  *   200 { ok: true } once the scan is finished, or 4xx/5xx { ok: false, code }.
+ *   402 SUBSCRIPTION_REQUIRED when the free scan is used and there's no
+ *   active subscription; the scan stays pending.
  *   The app follows the scan row through Realtime, not through this response.
  *
- * The Gemini key and the service role key exist only here, as Edge Function
- * secrets. See README.md for setup and deployment.
+ * The Gemini key, the service role key and the RevenueCat secret key exist
+ * only here, as Edge Function secrets. See README.md for setup and deployment.
  */
 import { Buffer } from 'node:buffer';
 
@@ -15,6 +17,7 @@ import { createClient, isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 import { AnalysisError, analyseImage, type Attempt, type ScoredAnalysis } from './analysis.ts';
+import { hasActiveEntitlement } from './entitlement.ts';
 import { MODEL } from './model.ts';
 import { PROMPT_VERSION } from './prompt.ts';
 
@@ -24,10 +27,12 @@ type ErrorCode =
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'METHOD_NOT_ALLOWED'
+  | 'SUBSCRIPTION_REQUIRED'
   | 'ALREADY_PROCESSED'
   | 'IMAGE_TOO_LARGE'
   | 'MODEL_TIMEOUT'
   | 'MODEL_INVALID_RESPONSE'
+  | 'ENTITLEMENT_UNAVAILABLE'
   | 'INTERNAL';
 
 const HTTP_STATUS: Record<ErrorCode, number> = {
@@ -36,10 +41,12 @@ const HTTP_STATUS: Record<ErrorCode, number> = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   METHOD_NOT_ALLOWED: 405,
+  SUBSCRIPTION_REQUIRED: 402,
   ALREADY_PROCESSED: 409,
   IMAGE_TOO_LARGE: 413,
   MODEL_TIMEOUT: 504,
   MODEL_INVALID_RESPONSE: 502,
+  ENTITLEMENT_UNAVAILABLE: 503,
   INTERNAL: 500,
 };
 
@@ -62,6 +69,7 @@ function requireSecret(name: string): string {
 }
 
 const GEMINI_API_KEY = requireSecret('GEMINI_API_KEY');
+const REVENUECAT_SECRET_KEY = requireSecret('REVENUECAT_SECRET_KEY');
 // Provided automatically to every hosted Edge Function.
 const SUPABASE_URL = requireSecret('SUPABASE_URL');
 const SERVICE_ROLE_KEY = requireSecret('SUPABASE_SERVICE_ROLE_KEY');
@@ -76,6 +84,8 @@ const scanRow = z.object({
   status: z.string(),
   image_path: z.string(),
 });
+
+const profileRow = z.object({ free_scan_used: z.boolean() });
 
 /** A failure with a code the app has a message for. */
 class ScanFailure extends Error {
@@ -159,6 +169,40 @@ async function downloadImage(path: string): Promise<{ base64: string; mimeType: 
     base64: Buffer.from(bytes).toString('base64'),
     mimeType: SUPPORTED_MIME_TYPES.has(contentType) ? contentType : 'image/jpeg',
   };
+}
+
+/**
+ * Whether this scan may be analysed: the free scan, or an active
+ * subscription. The free scan is only used up by complete_scan, once a scan
+ * finishes with scores, so a rejected or failed scan leaves it available.
+ * After that, the subscription is checked with RevenueCat, not taken from
+ * the app. If RevenueCat can't answer, the scan is refused for now rather
+ * than analysed for free.
+ */
+async function checkAccess(
+  scanId: string,
+  userId: string,
+): Promise<'allowed' | 'SUBSCRIPTION_REQUIRED' | 'ENTITLEMENT_UNAVAILABLE' | 'INTERNAL'> {
+  const { data, error } = await admin
+    .from('profiles')
+    .select('free_scan_used')
+    .eq('id', userId)
+    .maybeSingle();
+  const profile = profileRow.safeParse(data);
+  if (error || !profile.success) {
+    log('error', { scanId, stage: 'access', message: error?.message ?? 'No usable profile row' });
+    return 'INTERNAL';
+  }
+  if (!profile.data.free_scan_used) return 'allowed';
+
+  try {
+    if (await hasActiveEntitlement(userId, REVENUECAT_SECRET_KEY)) return 'allowed';
+  } catch (checkError: unknown) {
+    log('error', { scanId, stage: 'entitlement', message: describe(checkError) });
+    return 'ENTITLEMENT_UNAVAILABLE';
+  }
+  log('info', { scanId, stage: 'access', outcome: 'subscription_required' });
+  return 'SUBSCRIPTION_REQUIRED';
 }
 
 /** Moves a claimed scan to 'failed' or 'rejected'. Only ever from 'processing'. */
@@ -275,7 +319,13 @@ Deno.serve(async (request) => {
   // 3. Only a pending scan is analysed, so retries can't pay for it twice.
   if (scan.status !== 'pending') return errorResponse('ALREADY_PROCESSED');
 
-  // 4. Claim it. The status filter makes this atomic: of two overlapping
+  // 4. Who pays for it: the free scan or a subscription. Checked before
+  //    anything costs money. A refusal leaves the scan pending, so the same
+  //    photo can go ahead once the user subscribes.
+  const access = await checkAccess(scanId, userId);
+  if (access !== 'allowed') return errorResponse(access);
+
+  // 5. Claim it. The status filter makes this atomic: of two overlapping
   //    calls, only one gets the row.
   const { data: claimed, error: claimError } = await admin
     .from('scans')
@@ -295,10 +345,10 @@ Deno.serve(async (request) => {
   let settled = false;
   let failureCode: ErrorCode = 'INTERNAL';
   try {
-    // 5. The image, fetched with the service role.
+    // 6. The image, fetched with the service role.
     const image = await downloadImage(scan.image_path);
 
-    // 6-9. The model call, validation, one retry, clamping and overall.
+    // 7-10. The model call, validation, one retry, clamping and overall.
     const analysis = await analyseImage(image, GEMINI_API_KEY);
 
     if (!analysis.usable) {
@@ -308,7 +358,7 @@ Deno.serve(async (request) => {
       return json({ ok: true });
     }
 
-    // 10. Scores, status and the free scan, together.
+    // 11. Scores, status and the free scan, together.
     await completeScan(scanId, analysis);
     settled = true;
     logUsage(scanId, analysis.attempts, 'complete');

@@ -288,6 +288,12 @@ export const copy = {
       title: 'Something went wrong',
       body: "Your scan didn't finish. This didn't use up your free scan.",
     },
+    /** The server turned the scan down: the free scan is used and there's no subscription. */
+    subscriptionNeeded: {
+      title: 'This scan needs a subscription',
+      body: 'Subscribe to get the results for this photo and keep scanning. Your photo is saved, so you can carry on right here.',
+      seePlans: 'See plans',
+    },
   },
 
   results: {
@@ -662,6 +668,8 @@ export const copy = {
       MODEL_TIMEOUT: 'Your scan took too long to process. Try again.',
       MODEL_INVALID_RESPONSE: "Your scan didn't finish properly. Try again.",
       SUBSCRIPTION_REQUIRED: 'Subscribe to take another scan.',
+      ENTITLEMENT_UNAVAILABLE:
+        "We couldn't check your subscription just now. Try again in a moment.",
       INTERNAL: 'Something went wrong on our side. Try again in a moment.',
     },
     upload: "Your photo didn't upload. Check your connection and try again.",

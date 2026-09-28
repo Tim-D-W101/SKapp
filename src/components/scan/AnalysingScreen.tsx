@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   BackHandler,
@@ -12,8 +12,10 @@ import {
 import { Button, Icon, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { SCAN_SLOW_MS, SCAN_STILL_WORKING_MS } from '@/constants/scan';
+import { openPaywall } from '@/lib/access';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useScanStore, type AnalysisState } from '@/stores/useScanStore';
+import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
 import { radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { ScanSweep } from './ScanSweep';
@@ -57,6 +59,9 @@ function useWaitLevel(startedAt: number | null): WaitLevel {
  * step it's really on. No invented progress. It moves to the results when
  * the scan completes, explains a rejected photo, and never strands anyone:
  * after a minute it offers to try again or go back.
+ *
+ * If the server says the scan needs a subscription, the plans open; once
+ * there is one, the same photo carries on without being taken again.
  */
 export function AnalysingScreen() {
   const analysis = useScanStore((state) => state.analysis);
@@ -64,14 +69,33 @@ export function AnalysingScreen() {
   const retryAnalysis = useScanStore((state) => state.retryAnalysis);
   const endScanFlow = useScanStore((state) => state.endScanFlow);
   const freeScanUsed = useAuthStore((state) => state.profile?.free_scan_used ?? false);
+  const isPremium = useSubscriptionStore((state) => state.isPremium);
   const [photoHeight, setPhotoHeight] = useState(0);
+  const paywallOpenedFor = useRef<string | null>(null);
+  const resumedFor = useRef<string | null>(null);
 
   const inProgress = isInProgress(analysis);
   const wait = useWaitLevel(inProgress ? analysis.startedAt : null);
+  const needsSubscription =
+    analysis.stage === 'failed' && analysis.code === 'SUBSCRIPTION_REQUIRED';
+  const refusedScanId = needsSubscription ? analysis.scanId : null;
 
   useEffect(() => {
     if (analysis.stage === 'complete') router.replace('/scan/result');
   }, [analysis.stage]);
+
+  // Each at most once per scan, so a second refusal can't loop.
+  useEffect(() => {
+    if (refusedScanId === null) return;
+    if (isPremium) {
+      if (resumedFor.current === refusedScanId) return;
+      resumedFor.current = refusedScanId;
+      void retryAnalysis();
+    } else if (paywallOpenedFor.current !== refusedScanId) {
+      paywallOpenedFor.current = refusedScanId;
+      openPaywall('subscription_required');
+    }
+  }, [refusedScanId, isPremium, retryAnalysis]);
 
   // Leaving doesn't cancel anything: a scan in progress finishes on the server.
   const leave = useCallback(() => {
@@ -181,7 +205,29 @@ export function AnalysingScreen() {
         </View>
       ) : null}
 
-      {analysis.stage === 'failed' || analysis.stage === 'idle' ? (
+      {needsSubscription ? (
+        <View style={styles.panel}>
+          <Text variant="h2" accessibilityRole="header">
+            {copy.scan.subscriptionNeeded.title}
+          </Text>
+          <Text accessibilityLiveRegion="polite">{copy.scan.subscriptionNeeded.body}</Text>
+          <View style={styles.actions}>
+            {isPremium ? (
+              <Button label={copy.common.retry} onPress={retry} fullWidth size="lg" />
+            ) : (
+              <Button
+                label={copy.scan.subscriptionNeeded.seePlans}
+                onPress={() => openPaywall('subscription_required')}
+                fullWidth
+                size="lg"
+              />
+            )}
+            <Button label={copy.scan.analysing.goBack} onPress={leave} variant="ghost" fullWidth />
+          </View>
+        </View>
+      ) : null}
+
+      {(analysis.stage === 'failed' && !needsSubscription) || analysis.stage === 'idle' ? (
         <View style={styles.panel}>
           <Text variant="h2" accessibilityRole="header">
             {copy.scan.failed.title}

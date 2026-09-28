@@ -95,8 +95,10 @@ the Gemini key exists. To set it up:
    Realtime for `scans`, which the app uses to follow each scan, and let each
    scan save its routine alongside its scores. Run 0004 before deploying the
    Phase 9 version of the function.
-2. Set the `GEMINI_API_KEY` secret and deploy the function, as described in
-   `supabase/functions/analyze-scan/README.md`.
+2. Set the `GEMINI_API_KEY` and `REVENUECAT_SECRET_KEY` secrets and deploy
+   the function, as described in `supabase/functions/analyze-scan/README.md`.
+   Before analysing a paid scan, the function checks the subscription with
+   RevenueCat itself, so a modified app can't scan for free.
 3. Run the calibration harness before trusting the scores:
    `npm run calibrate` (see `scripts/README.md`).
 

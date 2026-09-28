@@ -18,6 +18,7 @@ import {
 import { watchScan } from '@/lib/scanWatcher';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
 import type { CapturedPhoto, RejectReason, ScanResult } from '@/types/scan';
 
 /** The previous scan photo shown faintly over the camera, if there is one. */
@@ -53,6 +54,8 @@ export type AnalysisState =
       message: string;
       /** The scan row exists but its analysis never started, so a retry reuses it. */
       restartable: boolean;
+      /** The analyze-scan error code, when there is one. */
+      code: string | null;
     };
 
 interface ScanState {
@@ -181,6 +184,7 @@ export const useScanStore = create<ScanState>()((set, get) => {
             scanId,
             message: scanErrorMessage(update.failureReason),
             restartable: false,
+            code: update.failureReason,
           },
         });
         return;
@@ -214,8 +218,20 @@ export const useScanStore = create<ScanState>()((set, get) => {
         scanId,
         message: result.code ? scanErrorMessage(result.code) : toUserMessage(result.error),
         restartable: true,
+        code: result.code,
       },
     });
+
+    // The server knows better than the app: bring both up to date.
+    if (result.code === 'SUBSCRIPTION_REQUIRED') {
+      void useSubscriptionStore.getState().refresh();
+      void useAuthStore
+        .getState()
+        .refreshProfile()
+        .then((refreshed) => {
+          if (!refreshed.ok) logInDevelopment('Could not refresh the profile', refreshed.message);
+        });
+    }
   };
 
   const follow = (scanId: string, started: Promise<StartResult>) => {
@@ -266,6 +282,7 @@ export const useScanStore = create<ScanState>()((set, get) => {
             scanId: null,
             message: submitErrorMessage(error),
             restartable: false,
+            code: null,
           },
         });
       }
