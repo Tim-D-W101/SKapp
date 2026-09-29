@@ -23,6 +23,8 @@ interface ProgressState {
   loadPhotos: (paths: string[]) => Promise<void>;
   /** Replaces a link that stopped working, most likely because it expired. */
   renewPhoto: (path: string) => Promise<void>;
+  /** Drops every photo link, after the photos were deleted. Thumbnails show placeholders. */
+  forgetPhotos: () => void;
   reset: () => void;
 }
 
@@ -110,6 +112,11 @@ export const useProgressStore = create<ProgressState>()((set, get) => {
 
     renewPhoto: async (path) => {
       await sign([path]);
+    },
+
+    forgetPhotos: () => {
+      signing.clear();
+      set({ photos: {}, photoErrors: {} });
     },
 
     reset: () => {

@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { EmptyState, ErrorState, LoadingState, Screen, Text } from '@/components/ui';
+import { Disclaimer, EmptyState, ErrorState, LoadingState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { EVENING_FROM_HOUR, MIDNIGHT_GRACE_MS } from '@/constants/routine';
 import { startScan } from '@/lib/access';
@@ -126,6 +126,8 @@ export function RoutineScreen() {
       <Text variant="bodySmall" color="textSecondary" align="center">
         {copy.routine.consistency}
       </Text>
+
+      <Disclaimer />
     </Screen>
   );
 }

@@ -9,6 +9,7 @@ import { create } from 'zustand';
 import { copy } from '@/constants/copy';
 import { authRedirectUrl } from '@/lib/auth';
 import { logInDevelopment, toUserMessage } from '@/lib/errors';
+import { removeStoredPhotos } from '@/lib/personalData';
 import { supabase } from '@/lib/supabase';
 import { withTimeout } from '@/lib/timeout';
 import type { Profile, ProfileUpdate } from '@/types/profile';
@@ -66,9 +67,6 @@ interface AuthState {
 
 /** No launch-time network call may hold up the first screen for longer than this. */
 const STARTUP_TIMEOUT_MS = 3000;
-
-const SCANS_BUCKET = 'scans';
-const STORAGE_PAGE_SIZE = 100;
 
 const signedOutState = {
   session: null,
@@ -142,26 +140,6 @@ async function startAnonymousSession(timeoutMs?: number): Promise<Session> {
   if (error) throw error;
   if (!data.session) throw new Error('Anonymous sign-in returned no session');
   return data.session;
-}
-
-/** Removes every file under the user's folder in the scans bucket. */
-async function removeStoredPhotos(userId: string): Promise<void> {
-  const bucket = supabase.storage.from(SCANS_BUCKET);
-  for (;;) {
-    // Always list from the start: each pass deletes what the previous one found.
-    const { data: files, error } = await bucket.list(userId, { limit: STORAGE_PAGE_SIZE });
-    if (error) throw error;
-    if (files.length === 0) return;
-
-    const { data: removed, error: removeError } = await bucket.remove(
-      files.map((file) => `${userId}/${file.name}`),
-    );
-    if (removeError) throw removeError;
-    // Storage reports a refused delete as an empty result, not an error. Stop
-    // rather than loop forever over files that can't be removed.
-    if (removed.length === 0) throw new Error('Stored photos could not be removed');
-    if (files.length < STORAGE_PAGE_SIZE) return;
-  }
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => {

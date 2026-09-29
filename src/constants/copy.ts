@@ -586,10 +586,18 @@ export const copy = {
     },
     subscription: {
       title: 'Subscription',
+      checking: 'Checking your subscription',
       plan: (plan: string) => `Plan: ${plan}`,
+      /** For a product that isn't one of the paywall's plans. */
+      otherPlan: 'Premium',
       renews: (date: string) => `Renews on ${date}`,
+      ends: (date: string) => `Ends on ${date}`,
+      trialEnds: (date: string) => `Free trial ends on ${date}`,
       none: 'No active subscription',
+      lapsed: 'Your subscription has ended. Your history and comparisons stay.',
       manage: 'Manage subscription',
+      manageHint: 'Opens your subscriptions in Google Play.',
+      manageFailed: "Google Play didn't open. Try again later.",
     },
     reminders: {
       title: 'Reminders',
@@ -624,19 +632,38 @@ export const copy = {
     data: {
       title: 'Your data',
       download: 'Download my data',
-      downloadBody: 'Exports your scans, scores and routines as a file you can keep.',
+      downloadBody:
+        'Exports your scans, scores and routines as a file you can keep. Your photos are not included.',
+      downloadFailed: "Your data didn't export. Check your connection and try again.",
+      /** The exported file's name, as the share sheet shows it. */
+      exportFileName: 'glowtrack-my-data.json',
+      shareUnavailable: "This phone can't share files, so your data couldn't be exported.",
       deletePhotos: 'Delete all my scan photos',
       deletePhotosBody:
         'Removes every photo from our storage. Your scores and history stay, but you won’t be able to compare photos.',
       deletePhotosConfirm: 'Delete photos',
       deletePhotosDone: 'Your photos have been deleted.',
+      deletePhotosFailed:
+        'Not all of your photos were deleted. Check your connection and try again.',
       deleteAccount: 'Delete my account',
+      deleteAccountBody: 'Permanently deletes your account and everything in it.',
     },
     deleteAccount: {
       title: 'Delete your account',
-      body: 'This permanently deletes your account, every scan photo, all your scores, your routine and your history. It cannot be undone.',
+      deletes: 'This permanently deletes:',
+      items: [
+        'Every scan photo',
+        'All your scores and your scan history',
+        'Your routine and every step you ticked',
+        'Your answers from getting started: age range, skin type, concerns and goal',
+        'Your reminder settings',
+        'Your account itself, including your email if you added one',
+      ],
+      cannotUndo: 'It can’t be undone. Nothing can be recovered afterwards.',
       subscriptionNote:
         'Deleting your account does not cancel a Google Play subscription. Cancel it in Google Play first.',
+      analyticsNote:
+        'Usage statistics and crash reports sent before now are not part of this. They never include your photos or your email address.',
       typeToConfirm: 'Type DELETE to confirm',
       confirmWord: 'DELETE',
       confirm: 'Delete everything',
@@ -650,6 +677,8 @@ export const copy = {
       disclaimer: 'About your results',
       version: (version: string) => `Version ${version}`,
       support: 'Contact support',
+      supportSubject: 'GlowTrack support',
+      linkFailed: "That didn't open. Try again later.",
     },
   },
 

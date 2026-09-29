@@ -8,3 +8,12 @@ export const LEGAL_LINKS = {
   terms: process.env.EXPO_PUBLIC_TERMS_URL || null,
   privacy: process.env.EXPO_PUBLIC_PRIVACY_URL || null,
 } as const;
+
+/**
+ * The address Settings' "Contact support" writes to, and the one data
+ * requests go to under the Privacy Policy. Null until it is set.
+ */
+export const SUPPORT_EMAIL = process.env.EXPO_PUBLIC_SUPPORT_EMAIL || null;
+
+/** Google Play's list of the person's subscriptions, when RevenueCat has no direct link. */
+export const PLAY_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';

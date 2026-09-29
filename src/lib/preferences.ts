@@ -14,3 +14,17 @@ export async function hasSeenGhostTooltip(): Promise<boolean> {
 export async function markGhostTooltipSeen(): Promise<void> {
   await SecureStore.setItemAsync(GHOST_TOOLTIP_KEY, 'true');
 }
+
+const DATA_NOTICE_KEY = 'glowtrack.data-notice-accepted-by';
+
+/**
+ * The user who last accepted the notice about photos, shown before the first
+ * camera use. Kept per user, so a new account on this phone sees it again.
+ */
+export async function dataNoticeAcceptedBy(): Promise<string | null> {
+  return SecureStore.getItemAsync(DATA_NOTICE_KEY);
+}
+
+export async function markDataNoticeAccepted(userId: string): Promise<void> {
+  await SecureStore.setItemAsync(DATA_NOTICE_KEY, userId);
+}

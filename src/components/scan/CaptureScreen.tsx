@@ -19,6 +19,7 @@ import type { CameraFacing } from '@/types/scan';
 
 import { CameraMessage, ControlButton, ControlPill, ShutterButton } from './CameraControls';
 import { CameraPermissionGate } from './CameraPermissionGate';
+import { DataNoticeGate } from './DataNoticeGate';
 import { FaceOval } from './FaceOval';
 import { GhostOverlay } from './GhostOverlay';
 import { ScanAccessGate } from './ScanAccessGate';
@@ -33,14 +34,17 @@ function leave() {
 /**
  * The scan camera. Guidance checks the light on the face and that the phone
  * is still, and the shutter only works once both are good, so photos stay
- * comparable from week to week.
+ * comparable from week to week. The first time, a notice about what happens
+ * to the photo comes before the camera.
  */
 export function CaptureScreen() {
   return (
     <ScanAccessGate>
-      <CameraPermissionGate>
-        <CaptureView />
-      </CameraPermissionGate>
+      <DataNoticeGate>
+        <CameraPermissionGate>
+          <CaptureView />
+        </CameraPermissionGate>
+      </DataNoticeGate>
     </ScanAccessGate>
   );
 }

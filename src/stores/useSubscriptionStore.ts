@@ -13,10 +13,12 @@ import {
   onCustomerInfoChange,
   purchasePlan,
   restorePurchases,
+  subscriptionDetails,
   type EntitlementStatus,
   type Plan,
   type PurchaseOutcome,
   type RestoreOutcome,
+  type SubscriptionDetails,
 } from '@/lib/purchases';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -34,6 +36,8 @@ interface SubscriptionState {
   isPremium: boolean;
   /** True while the entitlement is being checked and nothing is known yet. */
   isLoading: boolean;
+  /** The active subscription's plan and dates, for Settings. Null without one. */
+  details: SubscriptionDetails | null;
   offerings: OfferingsState;
 
   /** Links RevenueCat to the signed-in user and loads their entitlement. */
@@ -52,7 +56,8 @@ const signedOutState = {
   entitlement: 'unknown',
   isPremium: false,
   isLoading: true,
-} as const satisfies Pick<SubscriptionState, 'entitlement' | 'isPremium' | 'isLoading'>;
+  details: null,
+} as const satisfies Pick<SubscriptionState, 'entitlement' | 'isPremium' | 'isLoading' | 'details'>;
 
 // Outside the store: neither is state any screen renders.
 /** Bumped whenever the user changes, so an answer about the previous user is dropped. */
@@ -64,7 +69,12 @@ let listening = false;
 export const useSubscriptionStore = create<SubscriptionState>()((set, get) => {
   const apply = (info: CustomerInfo) => {
     const entitlement = entitlementStatus(info);
-    set({ entitlement, isPremium: entitlement === 'active', isLoading: false });
+    set({
+      entitlement,
+      isPremium: entitlement === 'active',
+      isLoading: false,
+      details: subscriptionDetails(info),
+    });
   };
 
   return {

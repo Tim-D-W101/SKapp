@@ -236,6 +236,45 @@ user id.
    **Without the token, release builds fail.** To build anyway, without
    readable stack traces, set `SENTRY_DISABLE_AUTO_UPLOAD=true` for that build.
 
+## Privacy controls
+
+Settings → **Your data** holds three controls:
+
+- **Download my data** exports the profile, scans, scores, routines and ticks
+  as JSON through the share sheet. The photos aren't included.
+- **Delete all my scan photos** removes every file in the person's storage
+  folder. The scores and history stay.
+- **Delete my account** opens a screen that lists what is destroyed and only
+  acts once DELETE is typed. It removes every photo, then calls
+  `delete_my_account()`, which deletes every row and the user itself. The app
+  then starts over as a first launch. Anonymous accounts are deleted the same
+  way.
+
+Before the first photo, the camera shows a notice saying what happens to it.
+The notice is remembered per user.
+
+Set `EXPO_PUBLIC_SUPPORT_EMAIL` in `.env` and in EAS. It's the address behind
+Settings → Contact support, and the one data requests go to. Without it, the
+button is hidden.
+
+To check that a deletion really removed everything, note the user id first
+(the `sub` in the session, or the `id` in `profiles`). After deleting, run this
+in the SQL editor. Every count must be 0.
+
+```sql
+select 'auth.users' as place, count(*) from auth.users where id = 'USER_ID'
+union all select 'profiles', count(*) from public.profiles where id = 'USER_ID'
+union all select 'scans', count(*) from public.scans where user_id = 'USER_ID'
+union all select 'scan_results', count(*) from public.scan_results where user_id = 'USER_ID'
+union all select 'routines', count(*) from public.routines where user_id = 'USER_ID'
+union all select 'routine_logs', count(*) from public.routine_logs where user_id = 'USER_ID'
+union all select 'photos', count(*) from storage.objects
+  where bucket_id = 'scans' and name like 'USER_ID/%';
+```
+
+Deleting an account doesn't cancel a Google Play subscription (the screen says
+so), and doesn't reach data already sent to PostHog or Sentry.
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.

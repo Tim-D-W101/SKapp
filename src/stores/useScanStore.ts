@@ -88,6 +88,8 @@ interface ScanState {
   endScanFlow: () => void;
   /** Finds the latest completed scan and signs a short-lived URL for its photo. */
   loadGhost: () => Promise<void>;
+  /** Drops the previous photo's link, after the photos were deleted. */
+  forgetGhost: () => void;
   reset: () => void;
 }
 
@@ -391,6 +393,8 @@ export const useScanStore = create<ScanState>()((set, get) => {
         set({ ghost: { status: 'failed' } });
       }
     },
+
+    forgetGhost: () => set({ ghost: { status: 'idle' } }),
 
     reset: () => {
       submitGeneration += 1;

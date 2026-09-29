@@ -120,6 +120,39 @@ export function entitlementStatus(info: CustomerInfo): EntitlementStatus {
   return PREMIUM_ENTITLEMENT in info.entitlements.all ? 'lapsed' : 'none';
 }
 
+/** The subscription as Settings describes it. */
+export interface SubscriptionDetails {
+  /** Null for a product that isn't one of the paywall's plans. */
+  planId: PlanId | null;
+  /** When it renews, ends or (in a free trial) the trial ends, as an ISO timestamp. Null if never. */
+  expiresAt: string | null;
+  willRenew: boolean;
+  isTrial: boolean;
+  /** Where the store manages it, when RevenueCat knows. */
+  managementUrl: string | null;
+}
+
+function isPlanId(value: string): value is PlanId {
+  return (PLAN_IDS as readonly string[]).includes(value);
+}
+
+/** The premium subscription in effect now, or null without one. */
+export function subscriptionDetails(info: CustomerInfo): SubscriptionDetails | null {
+  const entitlement = info.entitlements.active[PREMIUM_ENTITLEMENT];
+  if (!entitlement) return null;
+  // On Google Play the base plan (weekly, monthly, annual) is the plan; the
+  // product id carries it after a colon too, as "glowtrack_premium:annual".
+  const basePlan =
+    entitlement.productPlanIdentifier ?? entitlement.productIdentifier.split(':')[1] ?? '';
+  return {
+    planId: isPlanId(basePlan) ? basePlan : null,
+    expiresAt: entitlement.expirationDate,
+    willRenew: entitlement.willRenew,
+    isTrial: entitlement.periodType === 'TRIAL',
+    managementUrl: info.managementURL,
+  };
+}
+
 /** The plans in the current offering, in display order. Empty if it has none of ours. */
 export async function fetchPlans(): Promise<Plan[]> {
   const offerings = await Purchases.getOfferings();
