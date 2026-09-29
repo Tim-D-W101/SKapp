@@ -76,3 +76,28 @@ export async function scheduleReminders(plan: PlannedReminder[]): Promise<void> 
 export async function cancelReminders(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
+
+/** The reminders that ask for a new scan. The routine reminder doesn't. */
+function isRescanReminder(response: Notifications.NotificationResponse): boolean {
+  if (response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return false;
+  const kind: unknown = response.notification.request.content.data?.kind;
+  return kind === 'weekly' || kind === 'streak';
+}
+
+/**
+ * Calls `listener` when someone opens the app by tapping a re-scan or streak
+ * reminder, including the tap that launched it. Returns a function that
+ * stops listening.
+ */
+export function onRescanReminderOpened(listener: () => void): () => void {
+  const launchedBy = Notifications.getLastNotificationResponse();
+  if (launchedBy) {
+    // Handled once: the next launch must not count the same tap again.
+    Notifications.clearLastNotificationResponse();
+    if (isRescanReminder(launchedBy)) listener();
+  }
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    if (isRescanReminder(response)) listener();
+  });
+  return () => subscription.remove();
+}

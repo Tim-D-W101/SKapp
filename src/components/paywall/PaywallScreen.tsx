@@ -7,6 +7,7 @@ import { copy } from '@/constants/copy';
 import { LEGAL_LINKS } from '@/constants/links';
 import { DEFAULT_PLAN, type PaywallTrigger, type PlanId } from '@/constants/subscription';
 import { track, type PurchaseFailureReason } from '@/lib/analytics';
+import { completedScanCount } from '@/lib/analyticsContext';
 import { formatShortDate } from '@/lib/dates';
 import {
   annualSaving,
@@ -78,7 +79,7 @@ export function PaywallScreen({ trigger }: PaywallScreenProps) {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    track('paywall_viewed', { trigger });
+    track('paywall_viewed', { trigger, scan_number: completedScanCount() });
   }, [trigger]);
 
   useEffect(() => {

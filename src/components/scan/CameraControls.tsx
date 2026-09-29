@@ -81,21 +81,26 @@ export interface ShutterButtonProps {
   disabled: boolean;
   /** Shows a spinner while the photo is taken and processed. */
   busy: boolean;
+  /**
+   * Called when it's pressed while disabled (not while busy). It still takes
+   * no photo; this only lets the attempt be recorded.
+   */
+  onBlockedPress?: () => void;
 }
 
-export function ShutterButton({ onPress, disabled, busy }: ShutterButtonProps) {
+export function ShutterButton({ onPress, disabled, busy, onBlockedPress }: ShutterButtonProps) {
   const inactive = disabled || busy;
   return (
     <Pressable
-      onPress={onPress}
-      disabled={inactive}
+      onPress={disabled ? onBlockedPress : onPress}
+      disabled={busy || (disabled && !onBlockedPress)}
       accessibilityRole="button"
       accessibilityLabel={busy ? copy.scan.capture.processing : copy.scan.capture.shutter}
       accessibilityState={{ disabled: inactive, busy }}
       style={({ pressed }) => [
         styles.shutter,
         { opacity: disabled && !busy ? opacity.disabled : 1 },
-        { transform: [{ scale: pressed ? motion.pressScale : 1 }] },
+        { transform: [{ scale: pressed && !inactive ? motion.pressScale : 1 }] },
       ]}
     >
       <View style={styles.shutterCore}>

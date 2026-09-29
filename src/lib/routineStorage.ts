@@ -42,7 +42,12 @@ function isChange(value: unknown): value is RoutineChange {
 function isRoutine(value: unknown): value is Routine {
   if (typeof value !== 'object' || value === null) return false;
   const routine: Partial<Record<keyof Routine, unknown>> = value;
-  return typeof routine.id === 'string' && Array.isArray(routine.steps);
+  // A routine saved before the date was kept is dropped, and fetched again.
+  return (
+    typeof routine.id === 'string' &&
+    Array.isArray(routine.steps) &&
+    typeof routine.createdAt === 'string'
+  );
 }
 
 /** Reads the saved state for this user, or null if there is none (or it belongs to someone else). */

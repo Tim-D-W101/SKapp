@@ -3,6 +3,13 @@ import { create } from 'zustand';
 import { GHOST_URL_TTL_SECONDS } from '@/constants/capture';
 import { copy } from '@/constants/copy';
 import { SCANS_BUCKET } from '@/constants/scan';
+import { track } from '@/lib/analytics';
+import {
+  daysSinceLastScan,
+  nextScanNumber,
+  noteCompletedScan,
+  takeRescanReminder,
+} from '@/lib/analyticsContext';
 import { logInDevelopment, scanErrorMessage, toUserMessage } from '@/lib/errors';
 import { deleteLocalFile } from '@/lib/photos';
 import {
@@ -14,6 +21,7 @@ import {
   submitScan,
   type ScanUpdate,
   type StartResult,
+  type SubmitStage,
 } from '@/lib/scan';
 import { watchScan } from '@/lib/scanWatcher';
 import { supabase } from '@/lib/supabase';
@@ -110,6 +118,17 @@ function isRejectReason(value: string | null): value is RejectReason {
   return value !== null && value in copy.scan.rejected.reasons;
 }
 
+/** A machine-readable code as-is (never free text), or the fallback. */
+function analyticsErrorCode(code: string | null, fallback: string): string {
+  return code !== null && /^[A-Z][A-Z_]{0,39}$/.test(code) ? code : fallback;
+}
+
+const SUBMIT_ERROR_CODES: Record<SubmitStage, string> = {
+  session: 'SESSION_MISSING',
+  upload: 'UPLOAD_FAILED',
+  save: 'SAVE_FAILED',
+};
+
 function submitErrorMessage(error: unknown): string {
   if (!(error instanceof ScanSubmitError)) return toUserMessage(error);
   if (error.stage === 'session') return copy.errors.sessionExpired;
@@ -120,7 +139,8 @@ function submitErrorMessage(error: unknown): string {
 }
 
 export const useScanStore = create<ScanState>()((set, get) => {
-  const loadResult = async (scanId: string) => {
+  /** `secondsElapsed`: from submitting the photo to the server saying it's complete. */
+  const loadResult = async (scanId: string, secondsElapsed: number) => {
     if (loadingResults.has(scanId)) return;
     loadingResults.add(scanId);
     try {
@@ -129,6 +149,11 @@ export const useScanStore = create<ScanState>()((set, get) => {
       const previous = await fetchPreviousResult(result);
       if (!isFollowing(scanId)) return;
       stopFollowing();
+      track('scan_completed', {
+        scan_number: noteCompletedScan(result.createdAt),
+        overall_score: result.overall,
+        seconds_elapsed: secondsElapsed,
+      });
       // The ghost resets so next time it shows this newest photo.
       set({
         analysis: { stage: 'complete', scanId, result, previous },
@@ -164,20 +189,21 @@ export const useScanStore = create<ScanState>()((set, get) => {
         }
         return;
       case 'complete':
-        void loadResult(scanId);
+        void loadResult(scanId, Math.round((Date.now() - analysis.startedAt) / 1000));
         return;
-      case 'rejected':
+      case 'rejected': {
         stopFollowing();
-        set({
-          analysis: {
-            stage: 'rejected',
-            scanId,
-            reason: isRejectReason(update.failureReason) ? update.failureReason : null,
-          },
+        const reason = isRejectReason(update.failureReason) ? update.failureReason : null;
+        track('scan_rejected', {
+          reject_reason: reason ?? 'unknown',
+          scan_number: nextScanNumber(),
         });
+        set({ analysis: { stage: 'rejected', scanId, reason } });
         return;
+      }
       case 'failed':
         stopFollowing();
+        track('scan_failed', { error_code: analyticsErrorCode(update.failureReason, 'UNKNOWN') });
         set({
           analysis: {
             stage: 'failed',
@@ -212,6 +238,10 @@ export const useScanStore = create<ScanState>()((set, get) => {
 
     // It never started, so a retry calls the function again for the same scan.
     stopFollowing();
+    track('scan_failed', {
+      // No code: the function couldn't be reached, or answered without one.
+      error_code: result.code === null ? 'NO_RESPONSE' : analyticsErrorCode(result.code, 'UNKNOWN'),
+    });
     set({
       analysis: {
         stage: 'failed',
@@ -266,6 +296,17 @@ export const useScanStore = create<ScanState>()((set, get) => {
       const generation = ++submitGeneration;
       const startedAt = Date.now();
       set({ analysis: { stage: 'uploading', startedAt } });
+      track('scan_submitted', {
+        scan_number: nextScanNumber(),
+        capture_quality: {
+          brightness: capture.quality.brightness,
+          motion: capture.quality.motion,
+          facing: capture.quality.facing,
+        },
+      });
+      if (takeRescanReminder()) {
+        track('rescan_from_reminder', { days_since_last: daysSinceLastScan() });
+      }
 
       try {
         const { scanId, started } = await submitScan(capture.uri, capture.quality);
@@ -276,6 +317,10 @@ export const useScanStore = create<ScanState>()((set, get) => {
       } catch (error: unknown) {
         if (generation !== submitGeneration) return;
         logInDevelopment('Could not submit the scan', error);
+        track('scan_failed', {
+          error_code:
+            error instanceof ScanSubmitError ? SUBMIT_ERROR_CODES[error.stage] : 'SUBMIT_FAILED',
+        });
         set({
           analysis: {
             stage: 'failed',

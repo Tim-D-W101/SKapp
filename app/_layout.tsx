@@ -5,10 +5,15 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { StartupScreen } from '@/components/auth/StartupScreen';
+import { initCrashReporting } from '@/lib/crashReporting';
 import { isOnboarded } from '@/lib/onboarding';
+import { useAnalyticsSync } from '@/lib/useAnalyticsSync';
 import { useSubscriptionSync } from '@/lib/useSubscriptionSync';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useColors } from '@/theme/tokens';
+
+// Before anything renders, so a crash during startup is reported too.
+initCrashReporting();
 
 /**
  * Root layout.
@@ -18,7 +23,8 @@ import { useColors } from '@/theme/tokens';
  * the startup screen (with a retry if it fails).
  *
  * Once a user exists, RevenueCat is configured with the same user id, so a
- * subscription and the account stay linked across reinstalls.
+ * subscription and the account stay linked across reinstalls. Analytics and
+ * crash reports use the same id.
  *
  * The guards then decide what is reachable. Until onboarding is complete only
  * the onboarding flow is; afterwards only the tabs are. When a guard flips, the
@@ -37,6 +43,7 @@ export default function RootLayout() {
   }, [initialise]);
 
   useSubscriptionSync();
+  useAnalyticsSync();
 
   let content;
   if (startupError) {

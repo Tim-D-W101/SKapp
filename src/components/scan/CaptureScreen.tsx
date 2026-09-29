@@ -7,6 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Card, ErrorState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
+import { track } from '@/lib/analytics';
+import { nextScanNumber } from '@/lib/analyticsContext';
 import { captureQuality, choosePictureSize, pickGuidance, processPhoto } from '@/lib/capture';
 import { logInDevelopment } from '@/lib/errors';
 import { hapticImpact } from '@/lib/haptics';
@@ -79,6 +81,10 @@ function CaptureView() {
   const ghostUrl = ghost.status === 'ready' ? ghost.url : null;
 
   useEffect(() => {
+    track('camera_opened', { scan_number: nextScanNumber() });
+  }, []);
+
+  useEffect(() => {
     void loadGhost();
   }, [loadGhost]);
 
@@ -136,10 +142,21 @@ function CaptureView() {
     setCameraKey((key) => key + 1);
   };
 
+  // Every press counts, including one the checks hold back: that's how too-strict
+  // guidance shows up in the numbers.
+  const recordAttempt = () => {
+    track('capture_attempted', {
+      brightness_ok: meter.level === 'ok',
+      face_ok: null,
+      stability_ok: steadiness.steady,
+    });
+  };
+
   const capture = async () => {
     const cameraView = cameraRef.current;
     if (!cameraView || !canCapture || capturing) return;
 
+    recordAttempt();
     hapticImpact();
     setCapturing(true);
     setError(null);
@@ -253,7 +270,12 @@ function CaptureView() {
                 accessibilityHint={copy.scan.tips.title}
               />
             </View>
-            <ShutterButton onPress={() => void capture()} disabled={!canCapture} busy={capturing} />
+            <ShutterButton
+              onPress={() => void capture()}
+              onBlockedPress={recordAttempt}
+              disabled={!canCapture}
+              busy={capturing}
+            />
             <View style={styles.side} />
           </View>
         </View>

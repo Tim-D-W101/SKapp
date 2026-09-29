@@ -39,11 +39,11 @@ export function tickKey(slot: RoutineSlot, stepKey: string): string {
 export async function fetchActiveRoutine(): Promise<Routine | null> {
   const { data, error } = await supabase
     .from('routines')
-    .select('id, steps')
+    .select('id, steps, created_at')
     .eq('is_active', true)
     .maybeSingle();
   if (error) throw error;
-  return data ? { id: data.id, steps: parseSteps(data.steps) } : null;
+  return data ? { id: data.id, steps: parseSteps(data.steps), createdAt: data.created_at } : null;
 }
 
 /** The steps ticked on a local day, as tick keys. */

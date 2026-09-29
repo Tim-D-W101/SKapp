@@ -16,6 +16,7 @@ import { copy } from '@/constants/copy';
 import { SHARE_FORMATS } from '@/constants/share';
 import { useTrendsAccess } from '@/lib/access';
 import { track } from '@/lib/analytics';
+import { calendarDaysBetween } from '@/lib/dates';
 import { logInDevelopment } from '@/lib/errors';
 import type { ScanRecord } from '@/lib/progress';
 import { captureCard, confirmPhotoShare, openShareSheet } from '@/lib/shareImage';
@@ -93,6 +94,15 @@ function Comparison({ records, onClose }: { records: ScanRecord[]; onClose: () =
   useEffect(() => {
     void loadPhotos([before.imagePath, after.imagePath]);
   }, [before.imagePath, after.imagePath, loadPhotos]);
+
+  // Once per pair of scans shown.
+  const beforeDate = before.result.createdAt;
+  const afterDate = after.result.createdAt;
+  useEffect(() => {
+    const [earlier, later] =
+      beforeDate <= afterDate ? [beforeDate, afterDate] : [afterDate, beforeDate];
+    track('comparison_viewed', { days_between: calendarDaysBetween(earlier, later) });
+  }, [beforeDate, afterDate]);
 
   return (
     <Screen scroll contentStyle={styles.content}>

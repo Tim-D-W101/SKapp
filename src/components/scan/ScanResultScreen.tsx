@@ -1,8 +1,10 @@
 import { Redirect, router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BackHandler } from 'react-native';
 
 import { copy } from '@/constants/copy';
+import { track } from '@/lib/analytics';
+import { completedScanCount } from '@/lib/analyticsContext';
 import { useReminderStore } from '@/stores/useReminderStore';
 import { useScanStore } from '@/stores/useScanStore';
 
@@ -36,6 +38,15 @@ export function ScanResultScreen() {
   );
 
   const leave = useCallback(() => exitTo('/'), [exitTo]);
+
+  useEffect(() => {
+    if (analysis.stage !== 'complete') return;
+    // The count already includes this scan, so it's this scan's number.
+    track('results_viewed', {
+      scan_number: completedScanCount(),
+      overall_score: analysis.result.overall,
+    });
+  }, [analysis]);
 
   useFocusEffect(
     useCallback(() => {

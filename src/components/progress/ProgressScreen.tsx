@@ -1,5 +1,5 @@
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import {
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { startScan, useTrendsAccess } from '@/lib/access';
+import { track } from '@/lib/analytics';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { spacing } from '@/theme/tokens';
 
@@ -39,11 +40,27 @@ export function ProgressScreen() {
   const loadPhotos = useProgressStore((state) => state.loadPhotos);
   const trends = useTrendsAccess();
 
+  // Counted once per visit to the tab: straight away when the history is
+  // already there, otherwise as soon as it has loaded.
+  const visitPending = useRef(false);
+
   useFocusEffect(
     useCallback(() => {
+      const current = useProgressStore.getState();
+      if (current.status === 'ready') {
+        track('progress_viewed', { scan_count: current.records.length });
+      } else {
+        visitPending.current = true;
+      }
       void load();
     }, [load]),
   );
+
+  useEffect(() => {
+    if (!visitPending.current || status !== 'ready') return;
+    visitPending.current = false;
+    track('progress_viewed', { scan_count: records.length });
+  }, [status, records.length]);
 
   // One request signs every thumbnail's link.
   useEffect(() => {

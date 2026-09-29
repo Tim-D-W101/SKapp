@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { ROUTINE_VISITS_BEFORE_OFFER } from '@/constants/reminders';
+import { track } from '@/lib/analytics';
 import { localDayKey } from '@/lib/dates';
 import { logInDevelopment } from '@/lib/errors';
 import {
@@ -140,6 +141,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       if (get().permission === 'denied') return 'denied';
       try {
         const permission = await requestPermission();
+        track('notification_permission', { granted: permission === 'granted' });
         set({ permission });
         if (permission === 'granted') await get().reschedule();
         return permission;

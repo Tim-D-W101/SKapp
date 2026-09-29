@@ -13,6 +13,8 @@ export interface RoutineStep {
 export interface Routine {
   id: string;
   steps: RoutineStep[];
+  /** When the scan that produced it made it, as an ISO timestamp. */
+  createdAt: string;
 }
 
 /** A tick or an untick made on the phone and not yet saved to the server. */

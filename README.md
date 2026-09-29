@@ -150,6 +150,92 @@ Testing purchases:
   free scan. Or reset it for your own user in the SQL editor:
   `update public.profiles set free_scan_used = false where id = 'YOUR_USER_ID';`
 
+## Analytics and crash reporting
+
+Events go to PostHog, and crashes to Sentry. Both need a new development
+build, because Sentry adds a native module.
+
+### What is sent
+
+Only the events typed in `src/lib/analytics.ts`, and only scores, counts and
+choices. Never the photo, a storage path, a signed link, an email address, the
+headline or the observation text. The PostHog client captures nothing on its
+own: autocapture, session recording, app lifecycle events, exception capture
+and remote configuration are all off. People are identified by their Supabase
+user id, with these properties: `skin_type`, `age_band`, `concern_count`,
+`is_premium`, `scan_count` and `days_since_install`.
+
+A few events need explaining:
+
+- `scan_number` is which scan this is for the person. For `camera_opened`,
+  `scan_submitted` and `scan_rejected` it's the next one; for `scan_completed`
+  and `results_viewed` it's the scan itself; on `paywall_viewed` it's how many
+  are done so far. It's null when the count isn't known yet (offline at
+  launch).
+- `capture_attempted` counts every press of the shutter, including presses
+  while the light or steadiness checks still hold it back. `face_ok` is always
+  null: the app has no face detection, only the oval guide.
+- `app_opened` fires at launch, and again on coming back after 30 minutes or
+  more away. Shorter trips out, such as the purchase sheet, don't count.
+- `rescan_from_reminder` fires when a scan is submitted within an hour of
+  tapping a re-scan or streak reminder.
+
+### PostHog setup
+
+1. Create a PostHog Cloud project in the EU or US region.
+2. **Project settings:** turn on **Discard client IP data**, and leave session
+   replay off.
+3. Put the project API key (`phc_...`, public by design) in
+   `EXPO_PUBLIC_POSTHOG_KEY`, and the region's host (`https://eu.i.posthog.com`
+   or `https://us.i.posthog.com`) in `EXPO_PUBLIC_POSTHOG_HOST`. Nothing is
+   sent until both are set. Set them in EAS as well.
+
+Events are sent from development builds too. Leave the two variables empty in
+your local `.env`, or use a separate PostHog project for development, so
+testing doesn't count as real use.
+
+### The four funnels
+
+Build each one in PostHog under **Product analytics → New insight → Funnel**,
+then save it to a dashboard.
+
+| Funnel         | Steps                                                                                                                          | Conversion window |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
+| Activation     | `app_opened` where `is_first_open` = true → `onboarding_completed` → `scan_completed`                                          | 7 days            |
+| Monetisation   | `scan_completed` → `paywall_viewed` → `purchase_completed`                                                                     | 14 days           |
+| Retention loop | `scan_completed` where `scan_number` = 1 → `scan_completed` where `scan_number` = 2 → `scan_completed` where `scan_number` = 3 | 21 days           |
+| Capture        | `camera_opened` → `capture_attempted` → `scan_completed`                                                                       | 1 hour            |
+
+The retention loop's steps are the day-7 and day-14 rescans, since the weekly
+reminder asks for one scan a week. Open **Time to convert** on it to see how
+close to weekly people really come. For the capture funnel, break
+`capture_attempted` down by `brightness_ok` and `stability_ok` to see which
+check stops people.
+
+### Sentry setup
+
+Sentry only runs in production builds with a DSN, so Expo Go and development
+builds never report. No screenshots, view hierarchy, request bodies or IP
+addresses are sent, and web addresses, storage paths and email addresses are
+removed from every message and breadcrumb. The only identifier is the Supabase
+user id.
+
+1. Create a React Native project in Sentry. In **Settings → Security &
+   Privacy**, turn on **Prevent Storing of IP Addresses**.
+2. Put the DSN (public by design) in `EXPO_PUBLIC_SENTRY_DSN`, in `.env` and in
+   EAS.
+3. Release builds upload source maps so stack traces point to the real code.
+   The Sentry plugin in `app.json` and `metro.config.js` handle this, but EAS
+   needs three variables:
+   - `SENTRY_ORG`: the organisation slug;
+   - `SENTRY_PROJECT`: the project slug;
+   - `SENTRY_AUTH_TOKEN`: an organisation auth token. This one is a **secret**.
+     Give it secret visibility in EAS, and never put it in `.env`, `app.json`
+     or the repository.
+
+   **Without the token, release builds fail.** To build anyway, without
+   readable stack traces, set `SENTRY_DISABLE_AUTO_UPLOAD=true` for that build.
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.

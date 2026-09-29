@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   BackHandler,
@@ -13,6 +13,7 @@ import {
 import { Button, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { MAX_CONCERNS, type Concern } from '@/constants/onboarding';
+import { track } from '@/lib/analytics';
 import {
   ONBOARDING_STEPS,
   answersFromProfile,
@@ -78,6 +79,16 @@ function OnboardingPager({ profile }: OnboardingPagerProps) {
   const step = ONBOARDING_STEPS[stepIndex];
   const translateX = useMemo(() => Animated.multiply(position, -width), [position, width]);
 
+  // Started once, from the welcome step: resuming part-way isn't a new start.
+  const [startsAtWelcome] = useState(stepIndex === 0);
+  useEffect(() => {
+    if (startsAtWelcome) track('onboarding_started', {});
+  }, [startsAtWelcome]);
+
+  useEffect(() => {
+    track('onboarding_step', { step_name: ONBOARDING_STEPS[stepIndex], step_index: stepIndex });
+  }, [stepIndex]);
+
   const goTo = (index: number) => {
     setSaveError(null);
     setLimitReached(false);
@@ -117,6 +128,11 @@ function OnboardingPager({ profile }: OnboardingPagerProps) {
       goTo(stepIndex + 1);
       return;
     }
+    track('onboarding_completed', {
+      skin_type: answers.skinType,
+      age_band: answers.ageBand,
+      concern_count: answers.concerns.length,
+    });
     // Finishing flips the root layout's guard, which swaps onboarding for the
     // tabs; the camera then opens on top of them.
     router.push('/scan/capture');

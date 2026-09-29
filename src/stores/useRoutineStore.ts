@@ -2,7 +2,8 @@ import { addNetworkStateListener } from 'expo-network';
 import { AppState } from 'react-native';
 import { create } from 'zustand';
 
-import { localDayKey } from '@/lib/dates';
+import { track } from '@/lib/analytics';
+import { calendarDaysBetween, localDayKey } from '@/lib/dates';
 import { isConnectionFailure, logInDevelopment } from '@/lib/errors';
 import { fetchActiveRoutine, fetchTicks, saveChange, tickKey } from '@/lib/routine';
 import { clearRoutineState, readRoutineState, writeRoutineState } from '@/lib/routineStorage';
@@ -167,6 +168,13 @@ export const useRoutineStore = create<RoutineState>()((set, get) => {
       });
       persist();
       void get().sync();
+      if (change.kind === 'tick') {
+        track('routine_step_ticked', {
+          slot: step.slot,
+          step_key: step.key,
+          day_number: calendarDaysBetween(routine.createdAt, new Date().toISOString()) + 1,
+        });
+      }
     },
 
     sync: () => {

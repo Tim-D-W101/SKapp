@@ -18,7 +18,8 @@
           "recordAudioAndroid": false,
           "barcodeScannerEnabled": false
         }
-      ]
+      ],
+      "@sentry/react-native/expo"
     ],
     "experiments": {
       "tsconfigPaths": true
