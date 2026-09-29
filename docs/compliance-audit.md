@@ -2,7 +2,9 @@
 
 **Date:** 2026-09-29
 **Code audited:** branch `claude/clever-turing-1wol88` at `b24bee1` (Phases 1–12.2)
-**Status:** report only. Nothing has been changed. Waiting for review.
+**Status:** reviewed on 2026-09-29. All six decisions were approved and
+applied. See [Resolution](#resolution) at the end. Line numbers in the
+findings refer to the audited commit.
 
 Banned words are written with a middle dot in this report (for example
 "me·dical"), so the report itself doesn't show up in the next search for them.
@@ -308,3 +310,51 @@ here. Recommendations are in bold.
 
 With 1 and 2 approved, categories 1, 2, 5 and 6 show zero findings. The
 detector list remains, as the documented exception.
+
+## Resolution
+
+All six decisions were approved on 2026-09-29 and applied in
+`chore: compliance audit clean`.
+
+| #   | Decision                                  | Outcome                                                                                                                                                                                                         |
+| --- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Reword the prompt; add "dermato·logist"   | **Done.** Rules 1 and 2 and the role statement are reworded (`prompt.ts` 186, 190 and 191 now). The word is in `BANNED_TERMS`, and `PROMPT_VERSION` is `v2.1.0`: a minor bump, because rules and lists changed. |
+| 2   | Keep `BANNED_TERMS` as the one exception  | **Done.** CLAUDE.md §3 names it, and so does the comment above the list.                                                                                                                                        |
+| 3   | Block the four unused Android permissions | **Done.** `app.json` → `android.blockedPermissions`. After prebuild, the manifest marks all four `tools:node="remove"`, which also strips the copies the libraries declare.                                     |
+| 4   | `app.json` name, camera text, icon colour | **Accepted as config exceptions.** The camera text is aligned with `copy.scan.permission.body` before the iOS build (Phase 15). The icon colour changes with the final icon (Phase 14).                         |
+| 5   | Sunscreen step text on the server         | **Accepted.** No change.                                                                                                                                                                                        |
+| 6   | Delete the dev gallery                    | **Scheduled for Phase 14.** The route, its Home-tab button and `copy.devGallery` are removed with the release build.                                                                                            |
+
+### After the fixes
+
+| #   | Category                                  | Open findings                                         | Plan target |
+| --- | ----------------------------------------- | ----------------------------------------------------- | ----------- |
+| 1   | Banned vocabulary                         | **0.** The detector list is the documented exception. | 0           |
+| 2   | Accuracy claims                           | **0**                                                 | 0           |
+| 3   | Hardcoded user-facing strings             | 0 (3 accepted exceptions)                             | —           |
+| 4   | Hardcoded colours, spacing and font sizes | 0 (1 accepted exception)                              | —           |
+| 5   | Secrets                                   | **0**                                                 | 0           |
+| 6   | Missing disclaimers                       | **0**                                                 | 0           |
+| 7   | Permissions the app doesn't use           | 0 (2 to confirm from the first EAS build)             | —           |
+
+### How the fixes were checked
+
+- **Banned-word search, repeated.** The only hits left are the rule itself
+  in CLAUDE.md §3, and the entries of `BANNED_TERMS` (`prompt.ts` 63–87).
+- **The whole system prompt, with the list block taken out**, contains no
+  banned term. This was checked with the Edge Function's own matcher.
+- **The output check** now catches "see a dermato·logist", the plural, and
+  the "-grade" phrase.
+- **The Edge Function:** `deno check` and `deno lint` pass, and all 46
+  scenarios pass on `v2.1.0`.
+- **The app:** `tsc` and ESLint pass.
+
+### Still to do, outside the code
+
+1. **Calibration.** Run `npm run calibrate` with the photo set, and compare
+   the spread and scores with `v2.0.0` before trusting the new version.
+2. **Deploy.** Deploy `analyze-scan`. Scans record `v2.1.0` from then on.
+3. **Test on an older phone.** On one running Android 12 or older, check that
+   scanning, sharing an image and downloading your data all still work.
+4. **Check the first EAS build.** Look at its permission list for the two
+   build-time items in section 7.

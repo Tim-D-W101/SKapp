@@ -49,6 +49,10 @@ store copy:
 > dermatologist-grade, medically proven, acne vulgaris, rosacea, eczema,
 > psoriasis, dermatitis, melasma, lesion
 
+The one exception is `BANNED_TERMS` in
+`supabase/functions/analyze-scan/prompt.ts`: the list the model is told to
+avoid and its output is checked against. It has to contain the words to work.
+
 ### ALWAYS use this vocabulary instead
 
 > the appearance of, looks, visible, cosmetic, routine, care, skincare,
