@@ -275,6 +275,15 @@ union all select 'photos', count(*) from storage.objects
 Deleting an account doesn't cancel a Google Play subscription (the screen says
 so), and doesn't reach data already sent to PostHog or Sentry.
 
+### Legal pages
+
+Drafts of the Privacy Policy and the Terms of Service are in
+`docs/privacy-policy.md` and `docs/terms-of-service.md`. Each starts with a
+checklist of what to fill in and confirm. Have both reviewed by someone
+qualified, publish them as web pages (not PDFs), and set their addresses in
+`EXPO_PUBLIC_PRIVACY_URL` and `EXPO_PUBLIC_TERMS_URL`. The app and the store
+listing both link to them.
+
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
