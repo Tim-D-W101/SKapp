@@ -300,6 +300,8 @@ listing both link to them.
 Cloud builds run on EAS, so no Mac is needed for iOS later.
 `docs/android-release.md` has the full guide: one-time setup, the EAS
 environment variables, version numbers, and backing up the signing keystore.
+`docs/ios-release.md` covers iOS: setup, what each dependency needs, the
+App Store Connect checklist, and what must change before App Review.
 
 ```bash
 npm install -g eas-cli
