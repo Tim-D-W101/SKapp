@@ -1,14 +1,13 @@
-import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, EmptyState, Screen } from '@/components/ui';
+import { EmptyState, Screen } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { startScan } from '@/lib/access';
 import { spacing } from '@/theme/tokens';
 
 /**
  * Home. A placeholder until scan results and progress exist: for now it offers
- * a scan. In development it also links to the component gallery.
+ * a scan.
  */
 export default function Home() {
   return (
@@ -23,14 +22,6 @@ export default function Home() {
           }}
         />
       </View>
-      {__DEV__ ? (
-        <Button
-          label={copy.devGallery.open}
-          variant="secondary"
-          onPress={() => router.push('/dev-gallery')}
-          fullWidth
-        />
-      ) : null}
     </Screen>
   );
 }

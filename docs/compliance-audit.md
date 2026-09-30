@@ -323,7 +323,7 @@ All six decisions were approved on 2026-09-29 and applied in
 | 3   | Block the four unused Android permissions | **Done.** `app.json` → `android.blockedPermissions`. After prebuild, the manifest marks all four `tools:node="remove"`, which also strips the copies the libraries declare.                                     |
 | 4   | `app.json` name, camera text, icon colour | **Accepted as config exceptions.** The camera text is aligned with `copy.scan.permission.body` before the iOS build (Phase 15). The icon colour changes with the final icon (Phase 14).                         |
 | 5   | Sunscreen step text on the server         | **Accepted.** No change.                                                                                                                                                                                        |
-| 6   | Delete the dev gallery                    | **Scheduled for Phase 14.** The route, its Home-tab button and `copy.devGallery` are removed with the release build.                                                                                            |
+| 6   | Delete the dev gallery                    | **Done** in Phase 14. The route, its Home-tab button and `copy.devGallery` are removed, so no release build can open it by link.                                                                                |
 
 ### After the fixes
 
