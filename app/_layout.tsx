@@ -67,7 +67,6 @@ export default function RootLayout() {
           <Stack.Screen name="progress" />
           <Stack.Screen name="paywall" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="delete-account" options={{ animation: 'slide_from_bottom' }} />
-          <Stack.Screen name="delete-account" options={{ animation: 'slide_from_bottom' }} />
         </Stack.Protected>
         <Stack.Screen name="(auth)" />
       </Stack>
