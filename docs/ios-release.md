@@ -15,16 +15,16 @@ would be wrong on an iPhone.
 
 ## What's already set up
 
-| Where                               | What                                                                                                                                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app.json` → `ios`                  | Bundle identifier `com.glowtrack.app`, iPhone only (`supportsTablet: false`).                                                                                                        |
-| `app.json` → camera plugin          | The camera purpose string: "GlowTrack uses your camera to take a photo of your face for each scan, so you can see how your skin looks over time."                                    |
-| `app.json` → `ios.infoPlist`        | The photo library purpose string, for Save Image in the share sheet (see [Dependencies](#dependencies)).                                                                             |
-| `app.json` → sensors plugin         | `motionPermission: false`. The app only reads the accelerometer, which needs no permission on iOS. This removes Expo's default motion purpose string and the unused permission code. |
-| `app.json` → `ios.config`           | `usesNonExemptEncryption: false`. The app only uses HTTPS, so App Store Connect stops asking the export compliance question on every upload.                                         |
-| `app.json` → `ios.privacyManifests` | The privacy manifest (see [Privacy manifest](#privacy-manifest)).                                                                                                                    |
-| `eas.json` → `production.ios`       | A Release build for the App Store. The same `production` profile builds both platforms.                                                                                              |
-| `src/lib/purchases.ts`              | Reads `EXPO_PUBLIC_REVENUECAT_IOS_KEY` on iOS. Without it, subscriptions can't start on an iPhone at all.                                                                            |
+| Where                               | What                                                                                                                                                                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app.json` → `ios`                  | Bundle identifier `com.glowtrack.app`, iPhone only (`supportsTablet: false`).                                                                                                                        |
+| `app.json` → camera plugin          | The camera purpose string: "GlowTrack uses your camera to take a photo of your face for each scan, so you can see how your skin looks over time. Scan photos are never saved to your photo library." |
+| `app.json` → `ios.infoPlist`        | The photo library purpose string, for Save Image in the share sheet (see [Dependencies](#dependencies)).                                                                                             |
+| `app.json` → sensors plugin         | `motionPermission: false`. The app only reads the accelerometer, which needs no permission on iOS. This removes Expo's default motion purpose string and the unused permission code.                 |
+| `app.json` → `ios.config`           | `usesNonExemptEncryption: false`. The app only uses HTTPS, so App Store Connect stops asking the export compliance question on every upload.                                                         |
+| `app.json` → `ios.privacyManifests` | The privacy manifest (see [Privacy manifest](#privacy-manifest)).                                                                                                                                    |
+| `eas.json` → `production.ios`       | A Release build for the App Store. The same `production` profile builds both platforms.                                                                                                              |
+| `src/lib/purchases.ts`              | Reads `EXPO_PUBLIC_REVENUECAT_IOS_KEY` on iOS. Without it, subscriptions can't start on an iPhone at all.                                                                                            |
 
 **Why there's no `buildNumber` in `app.json`:**
 
