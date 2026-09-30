@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
-import { radius, sizes, spacing, typography, useColors } from '@/theme/tokens';
+import { maxFontScale, radius, sizes, spacing, typography, useColors } from '@/theme/tokens';
 
 import { Text } from './Text';
 
@@ -29,6 +29,7 @@ export function TextField({ label, error, onFocus, onBlur, ...inputProps }: Text
         {label}
       </Text>
       <TextInput
+        maxFontSizeMultiplier={maxFontScale}
         {...inputProps}
         accessibilityLabel={label}
         accessibilityHint={error ?? undefined}

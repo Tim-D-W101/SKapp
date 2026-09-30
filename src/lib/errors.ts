@@ -84,6 +84,12 @@ export function toUserMessage(error: unknown): string {
 
   if (error instanceof FunctionsFetchError) return copy.errors.offline;
 
+  // A database request that never got an answer: no connection, or abandoned
+  // after its time limit.
+  if (isConnectionFailure(error)) {
+    return wasAbandoned(error) ? copy.errors.timeout : copy.errors.offline;
+  }
+
   // PostgrestError and StorageError both land here: their messages can name
   // tables, columns or policies, so they are never shown.
   return copy.errors.generic;
@@ -106,6 +112,14 @@ export function isConnectionFailure(error: unknown): boolean {
     );
   }
   return false;
+}
+
+/** True for a request cut off by its time limit rather than refused by the network. */
+function wasAbandoned(error: unknown): boolean {
+  if (isTimeoutError(error)) return true;
+  if (typeof error !== 'object' || error === null || !('message' in error)) return false;
+  const { message } = error;
+  return typeof message === 'string' && /abort|timed? ?out/i.test(message);
 }
 
 function isNetworkError(error: unknown): boolean {

@@ -337,6 +337,13 @@ export const typography: Record<TypographyVariant, TypographyStyle> = {
   label: { fontFamily: fontFamilies.semibold, fontSize: 14, lineHeight: 20, fontWeight: '600' },
 };
 
+/**
+ * The most text grows with the phone's font size setting. Android's usual
+ * "Largest" setting (about 1.3x) is honoured in full; beyond this, fixed-size
+ * elements such as the score rings would overflow.
+ */
+export const maxFontScale = 1.5;
+
 // ---------------------------------------------------------------------------
 // Shadows
 // ---------------------------------------------------------------------------

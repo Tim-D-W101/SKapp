@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Redirect, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button, Screen, Text } from '@/components/ui';
@@ -17,6 +17,7 @@ export function CaptureConfirm() {
   const submitCapture = useScanStore((state) => state.submitCapture);
   const discardCapture = useScanStore((state) => state.discardCapture);
   const [kilobytes, setKilobytes] = useState<number | null>(null);
+  const submitted = useRef(false);
 
   // Development only: the file size, to check the photo stays well under 500 KB.
   useEffect(() => {
@@ -41,6 +42,9 @@ export function CaptureConfirm() {
   };
 
   const use = () => {
+    // A second tap before the screen changes would send the photo twice.
+    if (submitted.current) return;
+    submitted.current = true;
     // Progress and errors show on the waiting screen, so this isn't awaited.
     void submitCapture();
     router.replace('/scan/analysing');

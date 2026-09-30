@@ -2,6 +2,7 @@ import { createClient, type SupportedStorage } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { AppState } from 'react-native';
 
+import { fetchWithTimeout } from '@/lib/fetchTimeout';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -85,6 +86,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
     // link intercepted by another app on the phone is useless on its own.
     flowType: 'pkce',
   },
+  // Every request, auth included, gives up rather than hang on a stalled connection.
+  global: { fetch: fetchWithTimeout },
 });
 
 // Refresh tokens only while the app is in the foreground. Refreshing from the
