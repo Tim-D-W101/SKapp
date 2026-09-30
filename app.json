@@ -19,7 +19,19 @@
           "barcodeScannerEnabled": false
         }
       ],
-      "@sentry/react-native/expo"
+      "@sentry/react-native/expo",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#F8F5F1",
+          "dark": {
+            "backgroundColor": "#0D100F"
+          }
+        }
+      ]
     ],
     "experiments": {
       "tsconfigPaths": true
@@ -34,6 +46,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.CAMERA", "android.permission.INTERNET"],
       "blockedPermissions": [
         "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.READ_EXTERNAL_STORAGE",

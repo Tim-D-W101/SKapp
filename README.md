@@ -34,12 +34,23 @@ only.
 
 ## Run
 
+The app uses native modules Expo Go doesn't include (RevenueCat, Sentry,
+view-shot and others), so it runs in its own development build. Make one
+once, and again after adding a native package:
+
+```bash
+eas build --profile development --platform android
+```
+
+Install the APK from the link EAS prints, then start the dev server and open
+the app on the phone:
+
 ```bash
 npm start
 ```
 
-Scan the QR code with Expo Go on your Android phone. If your network blocks
-device-to-device traffic (common on guest and corporate Wi-Fi):
+If your network blocks device-to-device traffic (common on guest and
+corporate Wi-Fi):
 
 ```bash
 npx expo start --tunnel
@@ -287,13 +298,15 @@ listing both link to them.
 ## Build
 
 Cloud builds run on EAS, so no Mac is needed for iOS later.
+`docs/android-release.md` has the full guide: one-time setup, the EAS
+environment variables, version numbers, and backing up the signing keystore.
 
 ```bash
 npm install -g eas-cli
 eas login
-eas build:configure
-eas build --platform android --profile preview   # installable APK for testing
-eas build --platform android --profile production
+eas init                   # once: links the project and adds its id to app.json
+npm run build:preview      # installable APK for testing
+npm run build:production   # .aab for Play Console
 ```
 
 ## Layout
