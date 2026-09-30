@@ -1,6 +1,12 @@
 import { Text as RNText, type TextProps as RNTextProps, type TextStyle } from 'react-native';
 
-import { typography, useColors, type ColorName, type TypographyVariant } from '@/theme/tokens';
+import {
+  maxFontScale,
+  typography,
+  useColors,
+  type ColorName,
+  type TypographyVariant,
+} from '@/theme/tokens';
 
 export interface TextProps extends RNTextProps {
   variant?: TypographyVariant;
@@ -20,6 +26,7 @@ export function Text({
 
   return (
     <RNText
+      maxFontSizeMultiplier={maxFontScale}
       {...rest}
       style={[typography[variant], { color: palette[color], textAlign: align }, style]}
     />

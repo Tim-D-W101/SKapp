@@ -19,6 +19,8 @@ import { copy } from '@/constants/copy';
 
 export type ScanErrorCode = keyof typeof copy.errors.scan;
 
+const AUTH_RATE_LIMIT_CODES = new Set(['over_email_send_rate_limit', 'over_request_rate_limit']);
+
 const AUTH_EXPIRED_CODES = new Set([
   'session_expired',
   'session_not_found',
@@ -67,6 +69,13 @@ export function toUserMessage(error: unknown): string {
   if (isAuthError(error)) {
     if (isAuthSessionMissingError(error)) return copy.errors.sessionExpired;
     if (isAuthRetryableFetchError(error)) return copy.errors.offline;
+    if (
+      error.status === 429 ||
+      (error.code !== undefined && AUTH_RATE_LIMIT_CODES.has(error.code))
+    ) {
+      return copy.errors.rateLimited;
+    }
+    if (error.code === 'email_address_invalid') return copy.auth.signIn.invalidEmail;
     if (error.code !== undefined && AUTH_EXPIRED_CODES.has(error.code)) {
       return copy.errors.sessionExpired;
     }
@@ -75,9 +84,42 @@ export function toUserMessage(error: unknown): string {
 
   if (error instanceof FunctionsFetchError) return copy.errors.offline;
 
+  // A database request that never got an answer: no connection, or abandoned
+  // after its time limit.
+  if (isConnectionFailure(error)) {
+    return wasAbandoned(error) ? copy.errors.timeout : copy.errors.offline;
+  }
+
   // PostgrestError and StorageError both land here: their messages can name
   // tables, columns or policies, so they are never shown.
   return copy.errors.generic;
+}
+
+/**
+ * True when a request never got an answer (no connection, timed out), so it's
+ * worth trying again later, as opposed to the server turning it down.
+ */
+export function isConnectionFailure(error: unknown): boolean {
+  if (isNetworkError(error) || isTimeoutError(error) || isAuthRetryableFetchError(error)) {
+    return true;
+  }
+  // PostgREST reports a request that never reached the server as an error
+  // with an empty code and the fetch failure as its message.
+  if (typeof error === 'object' && error !== null && 'code' in error && 'message' in error) {
+    const { code, message } = error;
+    return (
+      code === '' && typeof message === 'string' && /fetch|network|abort|timed? ?out/i.test(message)
+    );
+  }
+  return false;
+}
+
+/** True for a request cut off by its time limit rather than refused by the network. */
+function wasAbandoned(error: unknown): boolean {
+  if (isTimeoutError(error)) return true;
+  if (typeof error !== 'object' || error === null || !('message' in error)) return false;
+  const { message } = error;
+  return typeof message === 'string' && /abort|timed? ?out/i.test(message);
 }
 
 function isNetworkError(error: unknown): boolean {
@@ -89,7 +131,7 @@ function isTimeoutError(error: unknown): boolean {
   return error instanceof Error && (error.name === 'AbortError' || error.name === 'TimeoutError');
 }
 
-function logInDevelopment(context: string, error: unknown): void {
+export function logInDevelopment(context: string, error: unknown): void {
   if (__DEV__) {
     console.warn(`[errors] ${context}:`, error);
   }

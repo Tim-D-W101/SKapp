@@ -2,6 +2,7 @@ import { createClient, type SupportedStorage } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { AppState } from 'react-native';
 
+import { fetchWithTimeout } from '@/lib/fetchTimeout';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -48,7 +49,7 @@ const secureChunkedStorage: SupportedStorage = {
     const chunks: string[] = [];
     for (let index = 0; index < count; index += 1) {
       const chunk = await SecureStore.getItemAsync(chunkKey(key, index));
-      // A missing chunk means a write was interrupted; treat the session as absent.
+      // A missing chunk means a write was interrupted, so the session counts as absent.
       if (chunk === null) return null;
       chunks.push(chunk);
     }
@@ -80,7 +81,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // Email links return with a one-time code rather than tokens in the URL. The
+    // code only works alongside a verifier kept in this app's secure storage, so a
+    // link intercepted by another app on the phone is useless on its own.
+    flowType: 'pkce',
   },
+  // Every request, auth included, gives up rather than hang on a stalled connection.
+  global: { fetch: fetchWithTimeout },
 });
 
 // Refresh tokens only while the app is in the foreground. Refreshing from the
