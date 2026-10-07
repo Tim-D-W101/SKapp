@@ -10,6 +10,11 @@ within seconds. Those scores are tracked over weeks so the user can see whether
 their routine is working — the scan is the hook, the progress graph is the
 product.
 
+Planning documents — the phase roadmap, specs, briefs — live in
+`docs/reference/`, committed to the repository. Read what is there before
+starting work. A document attached to a chat does not survive into the next
+session; only a committed file does.
+
 ## 2. STACK
 
 | Layer         | Choice                                             |
@@ -43,6 +48,10 @@ store copy:
 > cure, heal, therapy, medical, clinical, patient, prescription,
 > dermatologist-grade, medically proven, acne vulgaris, rosacea, eczema,
 > psoriasis, dermatitis, melasma, lesion
+
+The one exception is `BANNED_TERMS` in
+`supabase/functions/analyze-scan/prompt.ts`: the list the model is told to
+avoid and its output is checked against. It has to contain the words to work.
 
 ### ALWAYS use this vocabulary instead
 
