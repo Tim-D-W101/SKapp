@@ -79,6 +79,8 @@ export function AnalysingScreen() {
   const needsSubscription =
     analysis.stage === 'failed' && analysis.code === 'SUBSCRIPTION_REQUIRED';
   const refusedScanId = needsSubscription ? analysis.scanId : null;
+  // The day's free attempts are used up: trying again today would be refused too.
+  const attemptsUsed = analysis.stage === 'failed' && analysis.code === 'FREE_ATTEMPTS_USED';
 
   useEffect(() => {
     if (analysis.stage === 'complete') router.replace('/scan/result');
@@ -230,7 +232,7 @@ export function AnalysingScreen() {
       {(analysis.stage === 'failed' && !needsSubscription) || analysis.stage === 'idle' ? (
         <View style={styles.panel}>
           <Text variant="h2" accessibilityRole="header">
-            {copy.scan.failed.title}
+            {attemptsUsed ? copy.scan.freeAttemptsUsed.title : copy.scan.failed.title}
           </Text>
           <Text accessibilityLiveRegion="polite">
             {analysis.stage === 'failed' ? analysis.message : copy.errors.generic}
@@ -241,7 +243,7 @@ export function AnalysingScreen() {
             </Text>
           )}
           <View style={styles.actions}>
-            {analysis.stage === 'failed' && canRetry ? (
+            {analysis.stage === 'failed' && canRetry && !attemptsUsed ? (
               <Button label={copy.common.retry} onPress={retry} fullWidth size="lg" />
             ) : null}
             <Button label={copy.scan.analysing.goBack} onPress={leave} variant="ghost" fullWidth />
