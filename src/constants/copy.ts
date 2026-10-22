@@ -573,6 +573,23 @@ export const copy = {
     },
   },
 
+  home: {
+    title: 'Home',
+    latestDate: (date: string) => `From your scan on ${date}`,
+    seeResults: 'See these results',
+    nextScan: {
+      title: 'Your next scan',
+      on: (date: string) => `Suggested for ${date}, a week after your last one.`,
+      now: 'Your next scan is ready whenever you are.',
+      cta: 'Take a scan',
+    },
+    routine: {
+      title: "Today's routine",
+      open: 'Open my routine',
+    },
+    loadFailed: "Your latest scan didn't load. Check your connection and try again.",
+  },
+
   tabs: {
     home: 'Home',
     progress: 'Progress',
