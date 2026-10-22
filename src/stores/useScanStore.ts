@@ -10,7 +10,12 @@ import {
   noteCompletedScan,
   takeRescanReminder,
 } from '@/lib/analyticsContext';
-import { logInDevelopment, scanErrorMessage, toUserMessage } from '@/lib/errors';
+import {
+  isConnectionFailure,
+  logInDevelopment,
+  scanErrorMessage,
+  toUserMessage,
+} from '@/lib/errors';
 import { deleteLocalFile } from '@/lib/photos';
 import {
   fetchPreviousResult,
@@ -133,7 +138,12 @@ const SUBMIT_ERROR_CODES: Record<SubmitStage, string> = {
 
 function submitErrorMessage(error: unknown): string {
   if (!(error instanceof ScanSubmitError)) return toUserMessage(error);
-  if (error.stage === 'session') return copy.errors.sessionExpired;
+  // Offline, the session can't be refreshed: that's a connection problem, not a sign-out.
+  if (error.stage === 'session') {
+    return isConnectionFailure(error.cause)
+      ? toUserMessage(error.cause)
+      : copy.errors.sessionExpired;
+  }
   const message = toUserMessage(error.cause);
   // Connection problems keep their own message; anything else during upload
   // is described as an upload problem.

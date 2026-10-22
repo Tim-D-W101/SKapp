@@ -213,10 +213,10 @@ The free scan must survive every one of these.
 4. [ ] **Turn airplane mode off and tap Try again.**
        Pass: the scan completes normally.
 5. [ ] **With airplane mode on, close the app completely and reopen it.**
-       Pass: "We couldn't get started. Check your connection and try again." with
-       a retry. This is expected: see the known limitation in
-       `docs/hardening-report.md`. Turn airplane mode off and retry: the app
-       opens where you were.
+       Pass: the app opens on Home. Home says your latest scan didn't load,
+       with Try again. The Routine tab shows today's routine and ticks, and
+       ticking works. Turn airplane mode off and tap Try again on Home: your
+       latest score appears.
 6. [ ] **In the Play Store app, cancel the test subscription** (profile →
        Payments & subscriptions → Subscriptions → GlowTrack → Cancel).
        Pass: Play confirms the cancellation. Test subscriptions end within a few

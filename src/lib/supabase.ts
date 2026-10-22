@@ -2,7 +2,7 @@ import { createClient, type SupportedStorage } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { AppState } from 'react-native';
 
-import { fetchWithTimeout } from '@/lib/fetchTimeout';
+import { fetchWithTimeout, requestUrl } from '@/lib/fetchTimeout';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -41,7 +41,8 @@ async function removeChunks(key: string, from: number, to: number): Promise<void
   }
 }
 
-const secureChunkedStorage: SupportedStorage = {
+/** Also holds the phone's copy of the account (`src/lib/accountCache.ts`). */
+export const secureChunkedStorage: SupportedStorage = {
   async getItem(key) {
     const count = await readChunkCount(key);
     if (count === 0) return null;
@@ -75,6 +76,27 @@ const secureChunkedStorage: SupportedStorage = {
   },
 };
 
+const PUBLIC_KEY_BEARER = `Bearer ${supabaseKey}`;
+
+/**
+ * Every table, bucket and function the app uses needs a signed-in user.
+ * Without a usable session (for a minute after a token refresh fails offline,
+ * for example), supabase-js sends the public key instead, and row-level
+ * security answers with empty results, not an error. That would read as "no
+ * scans yet" and would turn down routine ticks saved offline, undoing them.
+ * Such a request fails here instead, the same way as one sent with no
+ * connection, so it's retried later. Auth's own requests use the public key
+ * by design and go through.
+ */
+function fetchAsUser(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const authorization = new Headers(init?.headers).get('Authorization');
+  const asUser = authorization !== null && authorization !== PUBLIC_KEY_BEARER;
+  if (!asUser && !requestUrl(input).includes('/auth/v1/')) {
+    return Promise.reject(new TypeError('Network request failed: no user session yet'));
+  }
+  return fetchWithTimeout(input, init);
+}
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     storage: secureChunkedStorage,
@@ -87,7 +109,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
     flowType: 'pkce',
   },
   // Every request, auth included, gives up rather than hang on a stalled connection.
-  global: { fetch: fetchWithTimeout },
+  global: { fetch: fetchAsUser },
 });
 
 // Refresh tokens only while the app is in the foreground. Refreshing from the

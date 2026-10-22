@@ -4,11 +4,14 @@ import {
   type Session,
   type User,
 } from '@supabase/supabase-js';
+import { addNetworkStateListener } from 'expo-network';
+import { AppState } from 'react-native';
 import { create } from 'zustand';
 
 import { copy } from '@/constants/copy';
+import { clearCachedAccount, readCachedAccount, writeCachedAccount } from '@/lib/accountCache';
 import { authRedirectUrl } from '@/lib/auth';
-import { logInDevelopment, toUserMessage } from '@/lib/errors';
+import { isConnectionFailure, logInDevelopment, toUserMessage } from '@/lib/errors';
 import { removeStoredPhotos } from '@/lib/personalData';
 import { supabase } from '@/lib/supabase';
 import { withTimeout } from '@/lib/timeout';
@@ -21,6 +24,10 @@ import type { Profile, ProfileUpdate } from '@/types/profile';
  * exist before the first screen renders, with no sign-in screen. An email is
  * only asked for when it matters ("save my progress", or subscribing), and
  * linking it keeps the same user id, so every scan carries over.
+ *
+ * A returning user can also open the app offline: launch then starts from the
+ * account and profile saved on the phone, and confirms them with the server
+ * once it can be reached.
  */
 
 export interface ActionFailure {
@@ -48,6 +55,12 @@ interface AuthState {
   isAnonymous: boolean;
   /** Set when launch could not establish a session. The root layout offers a retry. */
   startupError: string | null;
+  /**
+   * Launch couldn't reach the server, so `user` and `profile` are the copy saved
+   * on the phone, and `session` is null unless the stored one was still valid.
+   * Cleared once the server confirms the account.
+   */
+  startedOffline: boolean;
 
   /** Restores the stored session, or signs in anonymously when there is none. */
   initialise: () => Promise<void>;
@@ -73,6 +86,7 @@ const signedOutState = {
   user: null,
   profile: null,
   isAnonymous: false,
+  startedOffline: false,
 } as const;
 
 function sessionState(session: Session) {
@@ -91,6 +105,7 @@ function failure(error: unknown): ActionFailure {
 // while the first is still in flight (that would create an orphaned user), and
 // a link's one-time code can only be exchanged once.
 let pendingInitialise: Promise<void> | null = null;
+let pendingConfirm: Promise<void> | null = null;
 let pendingAnonymousSignIn: ReturnType<typeof supabase.auth.signInAnonymously> | null = null;
 const emailLinkExchanges = new Map<string, Promise<ActionResult>>();
 
@@ -143,6 +158,39 @@ async function startAnonymousSession(timeoutMs?: number): Promise<Session> {
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => {
+  /**
+   * After an offline start, swaps the phone's copy for the server's session and
+   * profile as soon as it answers. Still offline, it waits for the next chance.
+   */
+  function confirmAccount(): void {
+    if (!get().startedOffline || pendingConfirm || pendingInitialise) return;
+    const userId = get().user?.id;
+    pendingConfirm = (async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        // Still unreachable: try again later. Any other error means the stored
+        // session is gone (its refresh token was revoked, say).
+        if (error && isConnectionFailure(error)) throw error;
+        const session = error ? null : data.session;
+        const profile =
+          session && session.user.id === userId ? await fetchProfile(session.user.id) : null;
+        // Signing out, or deleting the account, has already moved on meanwhile.
+        if (!get().startedOffline || get().user?.id !== userId) return;
+        if (session && profile) {
+          set({ ...sessionState(session), profile, startedOffline: false });
+        } else {
+          // The account is gone, or the phone now holds a different one. Start
+          // over, exactly as a launch with a connection would.
+          await get().initialise();
+        }
+      } catch (error: unknown) {
+        logInDevelopment('Could not confirm the account yet', error);
+      }
+    })().finally(() => {
+      pendingConfirm = null;
+    });
+  }
+
   function listenForAuthChanges(): void {
     if (listening) return;
     listening = true;
@@ -154,14 +202,28 @@ export const useAuthStore = create<AuthState>()((set, get) => {
 
       if ((event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session) {
         if (session.user.id === current.user?.id) set(sessionState(session));
+        // The server is reachable again: confirm an offline start.
+        if (current.startedOffline) setTimeout(confirmAccount, 0);
         return;
       }
 
       // The session ended without the app asking, for example a revoked
       // refresh token. Start over rather than show screens with no user.
-      if (event === 'SIGNED_OUT' && !signingOut && current.session && !current.isLoading) {
+      if (
+        event === 'SIGNED_OUT' &&
+        !signingOut &&
+        (current.session || current.startedOffline) &&
+        !current.isLoading
+      ) {
         setTimeout(() => void get().initialise(), 0);
       }
+    });
+
+    addNetworkStateListener((network) => {
+      if (network.isConnected && network.isInternetReachable !== false) confirmAccount();
+    });
+    AppState.addEventListener('change', (appState) => {
+      if (appState === 'active') confirmAccount();
     });
   }
 
@@ -174,20 +236,26 @@ export const useAuthStore = create<AuthState>()((set, get) => {
       pendingInitialise ??= (async () => {
         set({ isLoading: true, startupError: null });
         listenForAuthChanges();
+        // The session stored on the phone: unknown until it has been read, and
+        // null once it's known there is none (or it belonged to a deleted user).
+        let stored: Session | null | undefined;
         try {
           const { data, error } = await withTimeout(supabase.auth.getSession(), STARTUP_TIMEOUT_MS);
           // A stored session that couldn't be read (usually offline during a
           // token refresh) must not be replaced by a new anonymous user: that
-          // would strand everything the stored user owns. Retry instead.
+          // would strand everything the stored user owns. Start from the copy
+          // on the phone, or retry.
           if (error) throw error;
 
           let session = data.session;
+          stored = session;
           let profile = session ? await fetchProfile(session.user.id, STARTUP_TIMEOUT_MS) : null;
           if (session && !profile) {
             // The stored user has been deleted (account deletion, or removed in
             // the dashboard). Its data is gone, so start over.
             await clearLocalSession(STARTUP_TIMEOUT_MS);
             session = null;
+            stored = null;
           }
           if (!session) {
             session = await startAnonymousSession(STARTUP_TIMEOUT_MS);
@@ -195,8 +263,30 @@ export const useAuthStore = create<AuthState>()((set, get) => {
           }
           if (!profile) throw new Error('No profile row for the signed-in user');
 
-          set({ ...sessionState(session), profile, isLoading: false, startupError: null });
+          set({
+            ...sessionState(session),
+            profile,
+            isLoading: false,
+            startupError: null,
+            startedOffline: false,
+          });
         } catch (error: unknown) {
+          // The server can't be reached. A returning user starts from the copy
+          // saved on the phone, as long as it's the account the phone still holds.
+          const cached = isConnectionFailure(error) ? await readCachedAccount() : null;
+          if (cached && stored !== null && (!stored || stored.user.id === cached.user.id)) {
+            const user = stored?.user ?? cached.user;
+            set({
+              session: stored ?? null,
+              user,
+              isAnonymous: user.is_anonymous === true,
+              profile: cached.profile,
+              isLoading: false,
+              startupError: null,
+              startedOffline: true,
+            });
+            return;
+          }
           logInDevelopment('Could not establish a session at launch', error);
           set({ isLoading: false, startupError: copy.auth.startFailed });
         }
@@ -334,4 +424,17 @@ export const useAuthStore = create<AuthState>()((set, get) => {
       return { ok: true };
     },
   };
+});
+
+// The phone keeps a copy of the account the server last confirmed, for offline
+// starts. An unconfirmed copy is never saved over it, and signing out or
+// deleting the account removes it.
+useAuthStore.subscribe((state, previous) => {
+  if (state.startedOffline) return;
+  if (state.user === previous.user && state.profile === previous.profile) return;
+  if (state.user && state.profile?.id === state.user.id) {
+    void writeCachedAccount({ user: state.user, profile: state.profile });
+  } else if (previous.user && !state.user) {
+    void clearCachedAccount();
+  }
 });

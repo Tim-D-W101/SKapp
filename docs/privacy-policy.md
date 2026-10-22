@@ -97,9 +97,10 @@ your scans. See "Analytics" below.
 **Crash reports.** If the app crashes, we receive a technical report. See
 "Crash reports" below.
 
-**Kept only on your phone.** A copy of your routine and today's ticks (so the
-routine works offline), your reminder settings, and the date you first opened
-the app. These never leave your phone except as described above. Reminders are
+**Kept only on your phone.** A copy of your account details and your answers
+from getting started (so the app opens offline), a copy of your routine and
+today's ticks (so the routine works offline), your reminder settings, and the
+date you first opened the app. These never leave your phone except as described above. Reminders are
 scheduled on your phone; there is no push notification server.
 
 ## What we don't collect

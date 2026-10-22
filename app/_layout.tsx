@@ -18,9 +18,10 @@ initCrashReporting();
 /**
  * Root layout.
  *
- * Nothing routes until a session exists: on launch the auth store restores the
+ * Nothing routes until a user exists: on launch the auth store restores the
  * stored session or signs in anonymously, and until that resolves this shows
- * the startup screen (with a retry if it fails).
+ * the startup screen (with a retry if it fails). Offline, a returning user
+ * starts from the account and profile saved on the phone instead.
  *
  * Once a user exists, RevenueCat is configured with the same user id, so a
  * subscription and the account stay linked across reinstalls. Analytics and
@@ -35,7 +36,7 @@ export default function RootLayout() {
   const initialise = useAuthStore((state) => state.initialise);
   const isLoading = useAuthStore((state) => state.isLoading);
   const startupError = useAuthStore((state) => state.startupError);
-  const hasProfile = useAuthStore((state) => state.session !== null && state.profile !== null);
+  const hasProfile = useAuthStore((state) => state.user !== null && state.profile !== null);
   const onboarded = useAuthStore((state) => isOnboarded(state.profile));
 
   useEffect(() => {

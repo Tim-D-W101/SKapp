@@ -1,6 +1,6 @@
 import { FUNCTION_TIMEOUT_MS, REQUEST_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/constants/network';
 
-function requestUrl(input: RequestInfo | URL): string {
+export function requestUrl(input: RequestInfo | URL): string {
   if (typeof input === 'string') return input;
   if (input instanceof URL) return input.href;
   return input.url;
