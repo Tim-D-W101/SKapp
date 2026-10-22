@@ -299,12 +299,16 @@ export const copy = {
   results: {
     title: 'Your results',
     overall: 'Overall',
+    /**
+     * Every score is higher-is-better, so each label names the good end. Otherwise
+     * "Up 5" would read as more of what a person wants less of.
+     */
     attributes: {
       clarity: 'Clarity',
       texture: 'Texture',
-      pores: 'Pores',
+      pores: 'Refined pores',
       hydration: 'Hydration',
-      redness: 'Redness',
+      redness: 'Calm tone',
       evenness: 'Evenness',
       firmness: 'Firmness',
     },

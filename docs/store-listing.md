@@ -39,7 +39,7 @@ answers, which is the reason to install.
 
 ## 3. Full description (4,000 characters max)
 
-3,002 characters. Paste it as-is: Play keeps line breaks and the bullets.
+3,012 characters. Paste it as-is: Play keeps line breaks and the bullets.
 
 ```text
 Is your skincare routine actually working? GlowTrack shows you, one weekly photo at a time.
@@ -50,7 +50,7 @@ You've bought the cleanser and the serum. You follow the steps. And a month late
 HOW IT WORKS
 
 1. Take your weekly photo. The camera checks the light and how steady you are, and shows last week's photo faintly so you can line up the same way.
-2. Get your scores. Moments later you see an overall score and seven cosmetic scores (clarity, texture, pores, hydration, redness, evenness and firmness), with a short summary of what stands out and where to focus.
+2. Get your scores. Moments later you see an overall score and seven cosmetic scores (clarity, texture, refined pores, hydration, calm tone, evenness and firmness), with a short summary of what stands out and where to focus.
 3. Watch the trend. Scan once a week and your scores build into a chart. Compare any two scans side by side with a before-and-after slider.
 
 WHAT YOU GET

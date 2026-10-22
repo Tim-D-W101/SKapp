@@ -99,8 +99,8 @@ The free scan must survive every one of these.
        scan appears later in the history (checked in 6.5).
 4. [ ] **Wait for the results.**
        Pass: within about 30 seconds, "Your results" appears. The overall score
-       counts up, then seven scores (Clarity, Texture, Pores, Hydration,
-       Redness, Evenness, Firmness), a one-line summary, "What stands out" and
+       counts up, then seven scores (Clarity, Texture, Refined pores, Hydration,
+       Calm tone, Evenness, Firmness), a one-line summary, "What stands out" and
        "Where to focus".
 5. [ ] **Read the whole results screen.**
        Pass: the disclaimer "GlowTrack gives cosmetic estimates of how your skin
