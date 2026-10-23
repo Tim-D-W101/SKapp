@@ -85,6 +85,10 @@ scan, and which steps you tick off each day.
 still the phone was, and which camera was used. This helps read results in
 context.
 
+**Free scan attempts.** Until your free scan is used, how many free attempts
+you've made in the last 24 hours and when the first of them was. This stops
+one account from sending unlimited photos for free.
+
 **Your settings.** Your time zone, and your reminder choices (which reminders,
 which day and hour).
 
@@ -104,9 +108,10 @@ your scans. See "Analytics" below.
 **Crash reports.** If the app crashes, we receive a technical report. See
 "Crash reports" below.
 
-**Kept only on your phone.** A copy of your routine and today's ticks (so the
-routine works offline), your reminder settings, and the date you first opened
-the app. These never leave your phone except as described above. Reminders are
+**Kept only on your phone.** A copy of your account details and your answers
+from getting started (so the app opens offline), a copy of your routine and
+today's ticks (so the routine works offline), your reminder settings, and the
+date you first opened the app. These never leave your phone except as described above. Reminders are
 scheduled on your phone; there is no push notification server.
 
 ## What we don't collect

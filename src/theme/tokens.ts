@@ -63,6 +63,10 @@ const lightColors: ColorPalette = {
   textSecondary: '#474F4C',
   textTertiary: '#646B68',
   textInverse: '#FFFFFF',
+  /**
+   * Also the brand colour. `app.json` copies it as
+   * `android.adaptiveIcon.backgroundColor`, so change both together.
+   */
   accent: '#1D655D',
   accentSubtle: '#DDF2EF',
   accentPressed: '#0A504A',

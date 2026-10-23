@@ -13,6 +13,7 @@ pending -> processing -> complete   (scores and routine saved, free scan used up
                       -> rejected   (photo unusable, free scan kept)
                       -> failed     (anything else, free scan kept)
 pending, unchanged: 402 SUBSCRIPTION_REQUIRED (free scan used, no subscription)
+pending, unchanged: 429 FREE_ATTEMPTS_USED    (free scan unused, free attempts used)
 ```
 
 ## Who may scan
@@ -22,20 +23,29 @@ Checked before anything costs money, never trusting the app:
 1. If `profiles.free_scan_used` is false, the scan is the free one. It is only
    used up by `complete_scan()`, once a scan finishes with scores, so a
    rejected photo or a failure leaves it available.
-2. Otherwise the user needs an active `premium` entitlement, which the
-   function asks RevenueCat's REST API for, with the user id (the app uses the
-   Supabase user id as RevenueCat's app user id).
-3. Without one, the answer is `402 SUBSCRIPTION_REQUIRED` and the scan stays
-   `pending`, so the app can open the paywall and carry on with the same photo
-   after a purchase.
-4. An active entitlement is remembered for 5 minutes per user (or until it
+2. Each free analysis takes one of the free attempts first, through
+   `take_free_attempt()` (5 in the 24 hours from the first, set by
+   `FREE_ATTEMPTS_PER_DAY` in `index.ts`). Without a limit, a modified app
+   could keep sending unusable photos, or several at once, and each would
+   cost a model call. The count is kept on the profile, where only the server
+   can change it, so deleting scans doesn't reset it.
+3. Otherwise (the free scan used, or its free attempts) the user needs an
+   active `premium` entitlement, which the function asks RevenueCat's REST
+   API for, with the user id (the app uses the Supabase user id as
+   RevenueCat's app user id).
+4. Without one, the answer is `402 SUBSCRIPTION_REQUIRED` once the free scan
+   is used, so the app can open the paywall and carry on with the same photo
+   after a purchase. While it's unused, it's `429 FREE_ATTEMPTS_USED`, and the
+   app says to try again in 24 hours. The scan stays `pending` either way.
+5. An active entitlement is remembered for 5 minutes per user (or until it
    ends, if sooner), so a run of scans doesn't ask RevenueCat every time. Only
    an active answer is remembered: remembering a refusal would keep refusing
    someone for minutes after they subscribe. The memory belongs to one warm
    function instance, so a cold start simply asks again.
-5. If RevenueCat can't be reached, or answers with something unexpected, the
+6. If RevenueCat can't be reached, or answers with something unexpected, the
    answer is `503 ENTITLEMENT_UNAVAILABLE`: the scan waits rather than running
-   for free.
+   for free. That includes a free scan past its free attempts, so a subscriber
+   is never told their free attempts are used up.
 
 ## Files
 
@@ -86,27 +96,32 @@ scan fails, free ones included.
 ## Deploy
 
 Run the migrations first, in order: paste each into the SQL editor and run it.
-Both are safe to run twice.
+Each is safe to run twice.
 
 - `supabase/migrations/0003_scan_pipeline.sql` turns on Realtime for `scans`
   and adds `complete_scan()`, which the function calls.
 - `supabase/migrations/0004_routines.sql` (Phase 9) replaces `complete_scan()`
   with a version that also saves the routine, in the same transaction.
+- `supabase/migrations/0005_free_attempts.sql` adds the 24-hour free-attempt
+  count to `profiles` and `take_free_attempt()`, which the function calls
+  before each free analysis.
 
 **0004 must be in place before this version of the function is deployed.** It
 sends a routine to `complete_scan()`, which the 0003 version doesn't accept,
-so until 0004 runs every scan would end `failed`.
+so until 0004 runs every scan would end `failed`. **The same goes for 0005:**
+without `take_free_attempt()`, every free scan is refused with `500 INTERNAL`.
 
 **Phase 10 adds a secret:** set `REVENUECAT_SECRET_KEY` (see Secrets) before
 deploying this version, or the function won't start.
 
 **The move to Claude replaces a secret:** set `ANTHROPIC_API_KEY` (see
 Secrets) before deploying this version, or the function won't start, and
-every scan fails. `GEMINI_API_KEY` is no longer read. Once the new version is
-live, remove it:
+every scan fails. The previous model provider's key is no longer read. Once
+the new version is live, find it in the list and remove it:
 
 ```sh
-npx supabase secrets unset GEMINI_API_KEY --project-ref yheevhjamvuxtnqudszk
+npx supabase secrets list --project-ref yheevhjamvuxtnqudszk
+npx supabase secrets unset OLD_KEY_NAME --project-ref yheevhjamvuxtnqudszk
 ```
 
 Then deploy the function:
@@ -195,6 +210,7 @@ the `INTERNAL` message.
 | 400  | `BAD_REQUEST`             | The body has no valid `scanId`.                                                                                    |
 | 401  | `UNAUTHORIZED`            | Missing or invalid access token.                                                                                   |
 | 402  | `SUBSCRIPTION_REQUIRED`   | Free scan used, no active subscription. Stays `pending`.                                                           |
+| 429  | `FREE_ATTEMPTS_USED`      | Free scan unused, 5 free attempts in 24 h used. Stays `pending`.                                                   |
 | 403  | `FORBIDDEN`               | The scan belongs to someone else.                                                                                  |
 | 404  | `NOT_FOUND`               | No scan with that id.                                                                                              |
 | 405  | `METHOD_NOT_ALLOWED`      | Anything other than POST.                                                                                          |

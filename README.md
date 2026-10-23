@@ -103,10 +103,12 @@ to Anthropic's Claude API (Claude Haiku 5.5) and is the only place the
 Anthropic API key exists. To set it up:
 
 1. Run `supabase/migrations/0003_scan_pipeline.sql`, then
-   `supabase/migrations/0004_routines.sql`, in the SQL editor. They turn on
-   Realtime for `scans`, which the app uses to follow each scan, and let each
-   scan save its routine alongside its scores. Run 0004 before deploying the
-   Phase 9 version of the function.
+   `supabase/migrations/0004_routines.sql`, then
+   `supabase/migrations/0005_free_attempts.sql`, in the SQL editor. They turn
+   on Realtime for `scans`, which the app uses to follow each scan, let each
+   scan save its routine alongside its scores, and cap free attempts at 5
+   every 24 hours. Run all three before deploying the current version of the
+   function.
 2. Set the `ANTHROPIC_API_KEY` and `REVENUECAT_SECRET_KEY` secrets and deploy
    the function, as described in `supabase/functions/analyze-scan/README.md`.
    Before analysing a paid scan, the function checks the subscription with

@@ -1,5 +1,10 @@
-import { HISTORY_LIMIT, PHOTO_URL_TTL_SECONDS } from '@/constants/progress';
+import {
+  HISTORY_LIMIT,
+  PHOTO_URL_TTL_SECONDS,
+  SUGGESTED_SCAN_INTERVAL_DAYS,
+} from '@/constants/progress';
 import { SCANS_BUCKET } from '@/constants/scan';
+import { formatShortDate } from '@/lib/dates';
 import { RESULT_COLUMNS, toScanResult } from '@/lib/scan';
 import { supabase } from '@/lib/supabase';
 import type { ScanResult } from '@/types/scan';
@@ -26,6 +31,17 @@ export async function fetchScanHistory(): Promise<ScanRecord[]> {
   return data
     .map((row) => ({ result: toScanResult(row), imagePath: row.scans.image_path }))
     .reverse();
+}
+
+/** When the next weekly scan is suggested, after the latest one; null once it's due. */
+export function nextScanDate(latest: string): string | null {
+  const created = new Date(latest);
+  const due = new Date(
+    created.getFullYear(),
+    created.getMonth(),
+    created.getDate() + SUGGESTED_SCAN_INTERVAL_DAYS,
+  );
+  return due.getTime() > Date.now() ? formatShortDate(due.toISOString()) : null;
 }
 
 /** When each completed scan was taken, oldest first. For reminders, which need nothing else. */

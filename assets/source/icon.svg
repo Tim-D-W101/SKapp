@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- GlowTrack app icon: a sun rising over a gentle arc. Export 1024x1024, no transparency. -->
+  <defs>
+    <!-- Everything above the upper arc, less a clear gap: the sun rises from behind it. -->
+    <mask id="above-arc" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="1024" fill="#FFFFFF"/>
+      <circle cx="512" cy="1883.5" r="1357" fill="#000000"/>
+    </mask>
+    <radialGradient id="glow" cx="512" cy="453.5" r="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="0.75" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="#1D655D"/>
+  <circle cx="512" cy="453.5" r="330" fill="url(#glow)"/>
+  <circle cx="512" cy="563.5" r="250" fill="#F8F5F1" mask="url(#above-arc)"/>
+  <path d="M192 623.5A1300 1300 0 0 1 832 623.5" fill="none" stroke="#96DAD0" stroke-width="54" stroke-linecap="round"/>
+  <path d="M312 699A1300 1300 0 0 1 712 699" fill="none" stroke="#96DAD0" stroke-width="54" stroke-linecap="round"/>
+</svg>

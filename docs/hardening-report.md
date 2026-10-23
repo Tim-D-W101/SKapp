@@ -16,7 +16,12 @@ can reproduce.
 | 2   | Same scan submitted twice                         | A fast double-tap on "Use this" could start two uploads before the screen changed: two scans, two model calls. On the free scan, both could slip through before either finished.                                                | The confirm screen ignores a second tap (`src/components/scan/CaptureConfirm.tsx`). The server was already safe against the same scan being analysed twice.                                                                                                                                                                                                                                                                                           |
 | 3   | Largest system font size                          | Text grew without limit. At the extreme settings some Android phones offer (up to 2×), fixed-size elements would overflow, for example the score inside a score ring.                                                           | Text and text fields scale up to 1.5× (`maxFontScale` in `src/theme/tokens.ts`). The usual "Largest" setting (about 1.3×) is honoured in full.                                                                                                                                                                                                                                                                                                        |
 
-## Known limitation
+## Known limitation (since fixed)
+
+**Fixed after this pass:** a returning user can now open the app with no
+connection. Launch starts from a copy of the account and profile saved on the
+phone (`src/lib/accountCache.ts`), and confirms it with the server as soon as
+it can be reached. The original finding follows.
 
 **The app can't open with no connection, even for a returning user.**
 
@@ -46,12 +51,12 @@ can reproduce.
 
 ### Auth
 
-| Scenario                                    | Behaviour                                                                                                                                                                                                  |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Session expired while backgrounded for days | The stored session refreshes on launch. If it can't (offline), the app offers Retry instead of creating a new user, so nothing the old user owns is stranded.                                              |
-| Anonymous sign-in fails on first launch     | Retry screen, with the single-flight guard above.                                                                                                                                                          |
-| Magic link opened on a different device     | The sign-in link only works with a code stored on the phone that asked for it. On another phone it fails with "Request a new one and open it on this phone."                                               |
-| Account deleted server-side while open      | The next token refresh fails, the app notices it was signed out and starts over as a new user. Until then, reads come back empty and a new scan fails with an error message. Next launch also starts over. |
+| Scenario                                    | Behaviour                                                                                                                                                                                                                        |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Session expired while backgrounded for days | The stored session refreshes on launch. If it can't (offline), the app starts from the copy of the account on the phone, or offers Retry if there's none. It never creates a new user, so nothing the old user owns is stranded. |
+| Anonymous sign-in fails on first launch     | Retry screen, with the single-flight guard above.                                                                                                                                                                                |
+| Magic link opened on a different device     | The sign-in link only works with a code stored on the phone that asked for it. On another phone it fails with "Request a new one and open it on this phone."                                                                     |
+| Account deleted server-side while open      | The next token refresh fails, the app notices it was signed out and starts over as a new user. Until then, reads come back empty and a new scan fails with an error message. Next launch also starts over.                       |
 
 ### Scan
 
