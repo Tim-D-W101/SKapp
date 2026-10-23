@@ -12,11 +12,11 @@ and 80, the progress graph measures model noise, not skin.
 
 1. **Node** is all you need: the command fetches Deno on first run with
    `npx`. Nothing is added to the project.
-2. **API key.** Put your Gemini key in `supabase/functions/.env`, the same
-   gitignored file used to upload the Edge Function secret:
+2. **API key.** Put your Anthropic API key in `supabase/functions/.env`, the
+   same gitignored file used to upload the Edge Function secret:
 
    ```text
-   GEMINI_API_KEY=your-key-here
+   ANTHROPIC_API_KEY=your-key-here
    ```
 
    The key stays on your machine and in Supabase secrets. It is never part of
@@ -34,8 +34,8 @@ From the repository root:
 npm run calibrate
 ```
 
-Each image takes a few seconds per run. On the free Gemini tier the script
-may pause when it hits the rate limit; it waits and carries on.
+Each image takes a few seconds per run. If the script hits your Anthropic
+rate limit, or the API is overloaded, it pauses, waits and carries on.
 
 It prints a summary and writes the full detail to
 `scripts/calibration-report.md` (also gitignored, since it describes the
@@ -64,10 +64,12 @@ The summary gives:
 
 In this order, rerunning after each change:
 
-1. **Temperature.** `model.ts` uses 0.2, as the build plan asks. Google
-   recommends leaving Gemini 3 models at their default of 1.0, so try 1.0.
+1. **Effort and thinking.** `model.ts` runs at effort `low` with thinking
+   off, for speed. Try effort `medium`, then thinking `adaptive`. There is no
+   temperature to lower: Claude Haiku 5.5 accepts only its default.
 2. **Anchor the rubric.** Make the scoring bands in `prompt.ts` more concrete
    for the attributes that move most. Bump `PROMPT_VERSION`.
-3. **Move up a model tier** in `model.ts`.
+3. **Move up a model tier** in `model.ts`, such as Claude Sonnet 5.5. Check
+   its page in Anthropic's docs for the settings it accepts first.
 
 Commit prompt and model changes only once the report passes.

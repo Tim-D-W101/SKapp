@@ -8,9 +8,15 @@
 > - Fill in every `[bracketed]` item.
 > - Check each processor's current terms against what is said here. The
 >   claims most worth checking are:
->   - Google's Gemini API terms. The statement that photos aren't used for
->     training holds only on a **paid (billing-enabled)** Gemini API project.
->   - How long Google keeps requests.
+>   - Anthropic's terms for the Claude API. Its published policy (checked
+>     October 2026) is that it doesn't train its models on API inputs or
+>     outputs unless the customer opts in, for example through its Development
+>     Partner Program or by sending feedback. Confirm our Anthropic
+>     organization has done neither.
+>   - How long Anthropic keeps requests. Its published policy for API
+>     customers is deletion within 30 days, and longer only to enforce its
+>     Usage Policy (up to 2 years for flagged content) or where the law
+>     requires. Check this against our own agreement with Anthropic.
 >   - PostHog's and Sentry's retention periods.
 >   - The Supabase region.
 > - In PostHog, turn on **Discard client IP data**. In Sentry, turn on
@@ -45,8 +51,9 @@ Our Information Officer is [name]. You can reach them at [privacy email].
 
 - Your face photos are stored privately, only so you can compare your scans
   over time.
-- Each photo is sent to Google's AI service to produce your estimate. It is
-  not used to train any AI model.
+- Each photo is sent to Anthropic's AI service, the Claude API, to produce
+  your estimate. Only the photo goes, with our standard instructions: not your
+  name, email, answers or account ID. It is not used to train any AI model.
 - We never sell your photos or your information, never share them with
   advertisers, and never use them for advertising.
 - You can download everything, delete your photos, or delete your whole
@@ -120,14 +127,16 @@ scheduled on your phone; there is no push notification server.
 ## How we use your photos
 
 1. **To produce your estimate.** When you take a scan, the photo is sent to
-   Google's Gemini API, an AI service, which returns the scores and short
-   observations. It's used for nothing else.
+   Anthropic's Claude API, an AI service, which returns the scores and short
+   observations. Nothing else about you is sent with it, and it's used for
+   nothing else.
 2. **To let you compare over time.** The photo is stored privately so you can
    see it in your history, line up your next photo with it, and compare scans
    side by side.
 
-Your photos are **not** used to train any AI model, by us or by Google.
-[Holds only on a paid Gemini API project; check before publishing.] They are
+Your photos are **not** used to train any AI model, by us or by Anthropic.
+[Anthropic's terms allow training on API data only if the customer opts in;
+confirm we haven't, before publishing.] They are
 **not** shared with advertisers, **not** sold, and **not** used for any
 purpose other than the two above.
 
@@ -165,14 +174,14 @@ made from them.
 We use these service providers ("processors"). Each handles your information
 only on our instructions, and only for the purpose listed.
 
-| Provider                | What they do                                                           | What they receive                                                                                  | Where                                |
-| ----------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| **Supabase**            | Hosts our database and private photo storage, and sends sign-in emails | Everything described under "What we collect" except analytics and crash reports                    | [region, such as the EU (Frankfurt)] |
-| **Google** (Gemini API) | Produces the cosmetic estimate from your photo                         | Each scan photo, at the moment of the scan                                                         | [United States and other countries]  |
-| **RevenueCat**          | Manages subscriptions                                                  | Your account's random ID, your subscription and its purchase records from Google Play              | United States                        |
-| **Google Play**         | Takes payment and manages your subscription                            | Payment is between you and Google, under Google's own privacy policy                               | Worldwide                            |
-| **PostHog**             | Analytics                                                              | App events and the account properties listed under "Analytics", linked to your account's random ID | [EU or United States]                |
-| **Sentry**              | Crash reporting                                                        | Crash reports, linked to your account's random ID                                                  | [United States or EU]                |
+| Provider                   | What they do                                                           | What they receive                                                                                  | Where                                        |
+| -------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Supabase**               | Hosts our database and private photo storage, and sends sign-in emails | Everything described under "What we collect" except analytics and crash reports                    | [region, such as the EU (Frankfurt)]         |
+| **Anthropic** (Claude API) | Produces the cosmetic estimate from your photo                         | Each scan photo, at the moment of the scan                                                         | [United States and other countries; confirm] |
+| **RevenueCat**             | Manages subscriptions                                                  | Your account's random ID, your subscription and its purchase records from Google Play              | United States                                |
+| **Google Play**            | Takes payment and manages your subscription                            | Payment is between you and Google, under Google's own privacy policy                               | Worldwide                                    |
+| **PostHog**                | Analytics                                                              | App events and the account properties listed under "Analytics", linked to your account's random ID | [EU or United States]                        |
+| **Sentry**                 | Crash reporting                                                        | Crash reports, linked to your account's random ID                                                  | [United States or EU]                        |
 
 We don't share your information with anyone else, except where the law
 requires it (for example, a valid court order), or to protect people's safety
@@ -222,17 +231,17 @@ the mechanism for each provider.]
 
 ## How long we keep it
 
-| Information                         | How long                                                                                                 |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Face photos                         | Until you delete them (Settings → Your data) or delete your account. Deleted from storage straight away. |
-| Scores, history, routine and ticks  | Until you delete your account                                                                            |
-| Your answers, settings and email    | Until you delete your account                                                                            |
-| Copies sent to Google for analysis  | [As long as Google's Gemini API terms allow, for abuse monitoring; confirm]                              |
-| Subscription records                | [As long as tax and accounting law requires, typically 5 years]                                          |
-| Analytics events                    | [PostHog retention period, such as 12 months]                                                            |
-| Crash reports                       | [Sentry retention period, such as 90 days]                                                               |
-| Database backups                    | [Supabase backup period, such as 7 days], after which deleted data is gone from backups too              |
-| Information kept only on your phone | Until you delete your account or uninstall the app                                                       |
+| Information                           | How long                                                                                                                                                   |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Face photos                           | Until you delete them (Settings → Your data) or delete your account. Deleted from storage straight away.                                                   |
+| Scores, history, routine and ticks    | Until you delete your account                                                                                                                              |
+| Your answers, settings and email      | Until you delete your account                                                                                                                              |
+| Copies sent to Anthropic for analysis | [Under Anthropic's API policy, deleted within 30 days, or kept up to 2 years if flagged under its Usage Policy, or longer where the law requires; confirm] |
+| Subscription records                  | [As long as tax and accounting law requires, typically 5 years]                                                                                            |
+| Analytics events                      | [PostHog retention period, such as 12 months]                                                                                                              |
+| Crash reports                         | [Sentry retention period, such as 90 days]                                                                                                                 |
+| Database backups                      | [Supabase backup period, such as 7 days], after which deleted data is gone from backups too                                                                |
+| Information kept only on your phone   | Until you delete your account or uninstall the app                                                                                                         |
 
 [Consider a rule for accounts nobody has used in a long time, such as
 deleting anonymous accounts after 24 months of no use.]
@@ -246,7 +255,7 @@ deleting anonymous accounts after 24 months of no use.]
 - The app only ever sees a photo through a link that stops working after a
   few minutes.
 - Database rules let each account read only its own information.
-- The secret keys that reach Google and RevenueCat live only on our servers,
+- The secret keys that reach Anthropic and RevenueCat live only on our servers,
   never in the app.
 
 No system is perfectly secure. If a breach puts your information at risk, we

@@ -28,9 +28,9 @@ cp .env.example .env
 ```
 
 Then fill in `.env`. Every key is an `EXPO_PUBLIC_*` value that is safe to ship
-in the app. The Gemini API key and the Supabase service role key are **not**
-in this file and must never be — they belong in Supabase Edge Function secrets
-only.
+in the app. The Anthropic API key and the Supabase service role key are
+**not** in this file and must never be — they belong in Supabase Edge Function
+secrets only.
 
 ## Run
 
@@ -98,8 +98,9 @@ that limit.
 
 ## Scan pipeline
 
-Scans are scored by the `analyze-scan` Edge Function, which is the only place
-the Gemini key exists. To set it up:
+Scans are scored by the `analyze-scan` Edge Function, which sends each photo
+to Anthropic's Claude API (Claude Haiku 5.5) and is the only place the
+Anthropic API key exists. To set it up:
 
 1. Run `supabase/migrations/0003_scan_pipeline.sql`, then
    `supabase/migrations/0004_routines.sql`, then
@@ -108,7 +109,7 @@ the Gemini key exists. To set it up:
    scan save its routine alongside its scores, and cap free attempts at 5
    every 24 hours. Run all three before deploying the current version of the
    function.
-2. Set the `GEMINI_API_KEY` and `REVENUECAT_SECRET_KEY` secrets and deploy
+2. Set the `ANTHROPIC_API_KEY` and `REVENUECAT_SECRET_KEY` secrets and deploy
    the function, as described in `supabase/functions/analyze-scan/README.md`.
    Before analysing a paid scan, the function checks the subscription with
    RevenueCat itself, so a modified app can't scan for free.

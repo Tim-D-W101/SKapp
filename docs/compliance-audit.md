@@ -60,7 +60,7 @@ yet; it comes in P14.3.
    requires a bump for any change, and each scan row records the version it
    was scored with.
 2. Re-run calibration (`npm run calibrate`) and compare the results with
-   v2.0.0. I can't run this from here: it needs your `GEMINI_API_KEY` and the
+   v2.0.0. I can't run this from here: it needs your `ANTHROPIC_API_KEY` and the
    calibration photos.
 3. Redeploy `analyze-scan`.
 
@@ -171,11 +171,11 @@ The only style numbers are `0` offsets.
 
   No key value appears anywhere.
 
-- **Server secrets:** `GEMINI_API_KEY` and `REVENUECAT_SECRET_KEY` are only
+- **Server secrets:** `ANTHROPIC_API_KEY` and `REVENUECAT_SECRET_KEY` are only
   read in two places:
   - `supabase/functions/analyze-scan/index.ts` lines 71–72, from the
     function's secrets;
-  - `scripts/calibrate.ts` line 392, a local developer script. It reads the
+  - `scripts/calibrate.ts` line 398, a local developer script. It reads the
     git-ignored `supabase/functions/.env` and never goes into the app.
 - **App code** only reads `EXPO_PUBLIC_*` variables, and always by name
   (never by building the name at runtime):

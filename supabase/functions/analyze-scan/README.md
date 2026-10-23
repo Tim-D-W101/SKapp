@@ -4,9 +4,9 @@ Turns an uploaded scan photo into validated scores and a simple routine, in
 one model call. The app uploads the photo,
 inserts a `scans` row with status `pending`, then calls this function with the
 scan id. The function checks the caller owns the scan and may scan (the free
-scan, or an active subscription), sends the photo to Gemini, validates the
-reply and writes the result. The app follows the row's status through
-Realtime.
+scan, or an active subscription), sends the photo to Anthropic's Claude API
+(Claude Haiku 5.5), validates the reply and writes the result. The app
+follows the row's status through Realtime.
 
 ```text
 pending -> processing -> complete   (scores and routine saved, free scan used up)
@@ -63,19 +63,20 @@ Checked before anything costs money, never trusting the app:
 
 ## Secrets
 
-The Gemini API key and the RevenueCat secret key live **only** here, as Edge
-Function secrets. Never put either in the app, in the root `.env`, or anywhere
-with an `EXPO_PUBLIC_` prefix: anything in the app can be pulled out of the
-APK.
+The Anthropic API key and the RevenueCat secret key live **only** here, as
+Edge Function secrets. Never put either in the app, in the root `.env`, or
+anywhere with an `EXPO_PUBLIC_` prefix: anything in the app can be pulled out
+of the APK.
 
-1. Create a Gemini key in Google AI Studio.
+1. Create an API key in the Claude Console (platform.claude.com), under
+   **API keys**.
 2. In RevenueCat, under **API keys**, create a **secret** API key for API
    version **V1** (it starts `sk_`). This is not the public `goog_` key the app
    uses.
 3. Put both in `supabase/functions/.env` (gitignored, like every `.env` file):
 
    ```text
-   GEMINI_API_KEY=your-key-here
+   ANTHROPIC_API_KEY=your-key-here
    REVENUECAT_SECRET_KEY=sk_your-key-here
    ```
 
@@ -87,8 +88,8 @@ APK.
    ```
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to every hosted
-Edge Function automatically. If `GEMINI_API_KEY` or `REVENUECAT_SECRET_KEY` is
-missing, the function refuses to start, and the error shows in its logs. So
+Edge Function automatically. If `ANTHROPIC_API_KEY` or `REVENUECAT_SECRET_KEY`
+is missing, the function refuses to start, and the error shows in its logs. So
 **set `REVENUECAT_SECRET_KEY` before deploying the Phase 10 version**, or every
 scan fails, free ones included.
 
@@ -112,6 +113,16 @@ without `take_free_attempt()`, every free scan is refused with `500 INTERNAL`.
 
 **Phase 10 adds a secret:** set `REVENUECAT_SECRET_KEY` (see Secrets) before
 deploying this version, or the function won't start.
+
+**The move to Claude replaces a secret:** set `ANTHROPIC_API_KEY` (see
+Secrets) before deploying this version, or the function won't start, and
+every scan fails. The previous model provider's key is no longer read. Once
+the new version is live, find it in the list and remove it:
+
+```sh
+npx supabase secrets list --project-ref yheevhjamvuxtnqudszk
+npx supabase secrets unset OLD_KEY_NAME --project-ref yheevhjamvuxtnqudszk
+```
 
 Then deploy the function:
 
@@ -158,7 +169,7 @@ who has no subscription, returns 402. No app needed:
    ```
 
    Expect `402` with `{"ok":false,"code":"SUBSCRIPTION_REQUIRED"}`, the scan
-   still `pending`, and no Gemini call in the logs.
+   still `pending`, and no model call in the logs.
 
 4. Delete the throwaway user under Authentication > Users. Its rows go with it.
 
@@ -194,21 +205,21 @@ Every error response is `{ "ok": false, "code": "..." }`. The app maps codes to
 messages in `src/constants/copy.ts` (`errors.scan`); unknown codes fall back to
 the `INTERNAL` message.
 
-| HTTP | Code                      | Meaning                                                          |
-| ---- | ------------------------- | ---------------------------------------------------------------- |
-| 400  | `BAD_REQUEST`             | The body has no valid `scanId`.                                  |
-| 401  | `UNAUTHORIZED`            | Missing or invalid access token.                                 |
-| 402  | `SUBSCRIPTION_REQUIRED`   | Free scan used, no active subscription. Stays `pending`.         |
-| 429  | `FREE_ATTEMPTS_USED`      | Free scan unused, 5 free attempts in 24 h used. Stays `pending`. |
-| 403  | `FORBIDDEN`               | The scan belongs to someone else.                                |
-| 404  | `NOT_FOUND`               | No scan with that id.                                            |
-| 405  | `METHOD_NOT_ALLOWED`      | Anything other than POST.                                        |
-| 409  | `ALREADY_PROCESSED`       | The scan isn't `pending`. Makes retries safe to send.            |
-| 413  | `IMAGE_TOO_LARGE`         | The photo is over 6 MB.                                          |
-| 502  | `MODEL_INVALID_RESPONSE`  | Two replies in a row failed validation.                          |
-| 503  | `ENTITLEMENT_UNAVAILABLE` | RevenueCat couldn't confirm a subscription. Stays `pending`.     |
-| 504  | `MODEL_TIMEOUT`           | Gemini didn't answer within 25 seconds.                          |
-| 500  | `INTERNAL`                | Anything else: Gemini errors, database or storage errors.        |
+| HTTP | Code                      | Meaning                                                                                                            |
+| ---- | ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 400  | `BAD_REQUEST`             | The body has no valid `scanId`.                                                                                    |
+| 401  | `UNAUTHORIZED`            | Missing or invalid access token.                                                                                   |
+| 402  | `SUBSCRIPTION_REQUIRED`   | Free scan used, no active subscription. Stays `pending`.                                                           |
+| 429  | `FREE_ATTEMPTS_USED`      | Free scan unused, 5 free attempts in 24 h used. Stays `pending`.                                                   |
+| 403  | `FORBIDDEN`               | The scan belongs to someone else.                                                                                  |
+| 404  | `NOT_FOUND`               | No scan with that id.                                                                                              |
+| 405  | `METHOD_NOT_ALLOWED`      | Anything other than POST.                                                                                          |
+| 409  | `ALREADY_PROCESSED`       | The scan isn't `pending`. Makes retries safe to send.                                                              |
+| 413  | `IMAGE_TOO_LARGE`         | The photo is over 6 MB.                                                                                            |
+| 502  | `MODEL_INVALID_RESPONSE`  | Two replies in a row couldn't be used: invalid, declined or cut off.                                               |
+| 503  | `ENTITLEMENT_UNAVAILABLE` | RevenueCat couldn't confirm a subscription. Stays `pending`.                                                       |
+| 504  | `MODEL_TIMEOUT`           | The model didn't answer within 25 seconds, or Anthropic's API timed out.                                           |
+| 500  | `INTERNAL`                | Anything else: Anthropic API errors (rate limits, overload, server errors, a bad key), database or storage errors. |
 
 Once a scan is claimed, every failure leaves it `failed` with the code in
 `failure_reason`, and a rejected photo leaves it `rejected` with the reason
@@ -218,12 +229,16 @@ Once a scan is claimed, every failure leaves it `failed` with the code in
 
 Dashboard → Edge Functions → analyze-scan → Logs. One line per scan with its
 id, outcome, model, prompt version, attempts, tokens and estimated cost, plus
-one line per error. The photo, its base64 data and the model's text are never
-logged.
+one line per error. The photo, its base64 data, the API key and the model's
+text are never logged. An Anthropic error is logged as its HTTP status, error
+type, message and request id, with any long unbroken string cut out of the
+message first.
 
 ## Changing the model or the prompt
 
-- Model: edit `name` (and the prices) in `model.ts`.
+- Model: edit `name` (and the prices) in `model.ts`. Check the new model's
+  page in Anthropic's docs first: effort levels, thinking settings and
+  sampling parameters differ between models.
 - Prompt: edit `prompt.ts` and bump `PROMPT_VERSION`, following the rules at
   the top of that file.
 

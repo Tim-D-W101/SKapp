@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { findBannedTerms, findRoutineProblems } from './compliance.ts';
-import { estimateCostUsd, generateContentUrl, MODEL } from './model.ts';
+import { estimateCostUsd, MODEL } from './model.ts';
 import {
   ATTRIBUTE_KEYS,
   REJECT_REASONS,
@@ -137,30 +137,23 @@ const modelOutput = z.discriminatedUnion('usable', [
   }),
 ]);
 
-/** The parts of a generateContent reply we read. Unknown fields are ignored. */
-const generateContentReply = z.object({
-  candidates: z
-    .array(
-      z.object({
-        content: z
-          .object({
-            parts: z
-              .array(z.object({ text: z.string().optional(), thought: z.boolean().optional() }))
-              .optional(),
-          })
-          .optional(),
-        finishReason: z.string().optional(),
-      }),
-    )
-    .optional(),
-  promptFeedback: z.object({ blockReason: z.string().optional() }).optional(),
-  usageMetadata: z
+/** The parts of a Messages API reply we read. Unknown fields are ignored. */
+const messagesReply = z.object({
+  content: z.array(z.object({ type: z.string(), text: z.string().optional() })).optional(),
+  stop_reason: z.string().nullable().optional(),
+  stop_details: z.object({ category: z.string().nullable().optional() }).nullable().optional(),
+  usage: z
     .object({
-      promptTokenCount: z.number().optional(),
-      candidatesTokenCount: z.number().optional(),
-      thoughtsTokenCount: z.number().optional(),
+      input_tokens: z.number().optional(),
+      output_tokens: z.number().optional(),
     })
     .optional(),
+});
+
+/** The body the Messages API sends with a failed request. */
+const errorReply = z.object({
+  error: z.object({ type: z.string().optional(), message: z.string().optional() }).optional(),
+  request_id: z.string().optional(),
 });
 
 type Interpretation =
@@ -196,9 +189,7 @@ function interpret(text: string): Interpretation {
   const routineText = [...output.routine.morning, ...output.routine.evening]
     .map((routineStep) => `${routineStep.title}\n${routineStep.why}`)
     .join('\n');
-  const bannedTerms = findBannedTerms(
-    [output.headline, ...observations, routineText].join('\n'),
-  );
+  const bannedTerms = findBannedTerms([output.headline, ...observations, routineText].join('\n'));
   if (bannedTerms.length > 0) {
     return {
       ok: false,
@@ -259,43 +250,82 @@ function transportError(error: unknown, attempts: Attempt[]): AnalysisError {
   return new AnalysisError('INTERNAL', `Model request failed: ${message}`, attempts);
 }
 
+/**
+ * Error text that is safe to log. Whatever the API puts in its message, any
+ * long unbroken run of characters (image data, a key) is cut out.
+ */
+function loggable(text: string): string {
+  return text.replace(/[A-Za-z0-9+/=_-]{40,}/g, '[removed]').slice(0, 300);
+}
+
+/** Why a request failed, from the error body: type, message and request id. */
+async function failureDetail(response: Response): Promise<string> {
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    // Unreadable or not JSON: the caller still reports the HTTP status.
+    return '';
+  }
+  const parsed = errorReply.safeParse(body);
+  if (!parsed.success) return '';
+  const { error, request_id: requestId } = parsed.data;
+  return loggable([error?.type, error?.message, requestId].filter(Boolean).join(' / '));
+}
+
+/**
+ * The code for a failed HTTP response. Anthropic's own timeout (504) is a
+ * MODEL_TIMEOUT, like ours. Everything else is INTERNAL: a rate limit (429),
+ * overload (529) or other server error passes with time, and the app's
+ * INTERNAL message asks the user to try again in a moment; any other 4xx is
+ * a key, model or request problem on our side.
+ */
+function failureCode(status: number): AnalysisErrorCode {
+  return status === 504 ? 'MODEL_TIMEOUT' : 'INTERNAL';
+}
+
 async function callModel(
   image: ImageInput,
   apiKey: string,
   retry: boolean,
   attempts: Attempt[],
 ): Promise<Reply> {
-  const parts: Record<string, unknown>[] = [
-    { inlineData: { mimeType: image.mimeType, data: image.base64 } },
-    { text: USER_INSTRUCTION },
+  const content: Record<string, unknown>[] = [
+    { type: 'image', source: { type: 'base64', media_type: image.mimeType, data: image.base64 } },
+    { type: 'text', text: USER_INSTRUCTION },
   ];
-  if (retry) parts.push({ text: RETRY_INSTRUCTION });
+  if (retry) content.push({ type: 'text', text: RETRY_INSTRUCTION });
 
   let payload: unknown;
   try {
-    const response = await fetch(generateContentUrl(), {
+    const response = await fetch(MODEL.apiUrl, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': MODEL.apiVersion,
+      },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts }],
-        generationConfig: {
-          temperature: MODEL.generation.temperature,
-          maxOutputTokens: MODEL.generation.maxOutputTokens,
-          thinkingConfig: { thinkingLevel: MODEL.generation.thinkingLevel },
-          responseMimeType: 'application/json',
-          responseSchema: RESPONSE_SCHEMA,
+        model: MODEL.name,
+        max_tokens: MODEL.generation.maxOutputTokens,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content }],
+        thinking: { type: MODEL.generation.thinking },
+        output_config: {
+          effort: MODEL.generation.effort,
+          format: { type: 'json_schema', schema: RESPONSE_SCHEMA },
         },
       }),
       // Covers reading the body too, not just the headers.
       signal: AbortSignal.timeout(MODEL.timeoutMs),
     });
     if (!response.ok) {
-      // Google's error bodies describe the request, never echo the image.
-      const detail = (await response.text()).slice(0, 300);
+      // "HTTP <status>" stays in the message: the calibration harness looks
+      // for it to wait out a rate limit.
+      const detail = await failureDetail(response);
       throw new AnalysisError(
-        'INTERNAL',
-        `Model request failed with HTTP ${response.status}: ${detail}`,
+        failureCode(response.status),
+        `Model request failed with HTTP ${response.status}${detail ? `: ${detail}` : ''}`,
         attempts,
       );
     }
@@ -305,32 +335,35 @@ async function callModel(
     throw transportError(error, attempts);
   }
 
-  const reply = generateContentReply.safeParse(payload);
+  const reply = messagesReply.safeParse(payload);
   if (!reply.success) return { text: null, problem: 'unexpected reply format', usage: null };
 
-  const { candidates, promptFeedback, usageMetadata } = reply.data;
-  const inputTokens = usageMetadata?.promptTokenCount ?? 0;
-  const outputTokens =
-    (usageMetadata?.candidatesTokenCount ?? 0) + (usageMetadata?.thoughtsTokenCount ?? 0);
-  const usage: Usage | null = usageMetadata
+  const { content: blocks, stop_reason: stopReason, stop_details: stopDetails } = reply.data;
+  const tokens = reply.data.usage;
+  const inputTokens = tokens?.input_tokens ?? 0;
+  const outputTokens = tokens?.output_tokens ?? 0;
+  const usage: Usage | null = tokens
     ? { inputTokens, outputTokens, costUsd: estimateCostUsd(inputTokens, outputTokens) }
     : null;
 
-  if (promptFeedback?.blockReason) {
-    return { text: null, problem: `request blocked (${promptFeedback.blockReason})`, usage };
-  }
-
-  const candidate = candidates?.[0];
-  const text = (candidate?.content?.parts ?? [])
-    .filter((part) => part.thought !== true)
-    .map((part) => part.text ?? '')
-    .join('');
-  if (!text) {
+  // A declined or cut-off reply may not match the schema, so it is not read.
+  if (stopReason === 'refusal') {
     return {
       text: null,
-      problem: `empty reply (finish reason ${candidate?.finishReason ?? 'unknown'})`,
+      problem: `request declined (${stopDetails?.category ?? 'no category'})`,
       usage,
     };
+  }
+  if (stopReason === 'max_tokens') {
+    return { text: null, problem: 'reply cut off at the output token limit', usage };
+  }
+
+  const text = (blocks ?? [])
+    .filter((block) => block.type === 'text')
+    .map((block) => block.text ?? '')
+    .join('');
+  if (!text) {
+    return { text: null, problem: `empty reply (stop reason ${stopReason ?? 'unknown'})`, usage };
   }
   return { text, problem: '', usage };
 }

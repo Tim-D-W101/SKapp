@@ -107,7 +107,7 @@ there. Never hardcode a user-facing string in a component.**
 ## 6. SECURITY
 
 - Only `EXPO_PUBLIC_*` variables may be referenced in app code.
-- The Gemini API key and the Supabase service role key exist ONLY in Supabase
+- The Anthropic API key and the Supabase service role key exist ONLY in Supabase
   Edge Function secrets. If you are ever about to put either in the app, stop
   and tell me instead.
 - Every table has row-level security enabled.

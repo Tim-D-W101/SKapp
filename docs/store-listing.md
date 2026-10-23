@@ -141,5 +141,6 @@ Run on everything above before it goes into Play Console. It passed.
   - what stays after cancelling.
 - **Nothing gendered.** It reads the same to anyone.
 - **Consistent with the privacy policy.** The copy doesn't say photos aren't
-  used for AI training. The policy flags that claim as depending on a paid
-  Gemini project, so leave it out of the listing until that's confirmed.
+  used for AI training. The policy flags that claim for checking against our
+  agreement with Anthropic, whose Claude API analyses the photos, so leave it
+  out of the listing until that's confirmed.

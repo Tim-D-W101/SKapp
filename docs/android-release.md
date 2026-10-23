@@ -79,8 +79,9 @@ these specs:
    locally with the same values, `eas env:pull --environment development`
    writes them to `.env.local`, which git ignores.
 
-   **Never add the Gemini key, the RevenueCat secret key or the Supabase
-   service role key here.** They live only in Supabase Edge Function secrets.
+   **Never add the Anthropic API key, the RevenueCat secret key or the
+   Supabase service role key here.** They live only in Supabase Edge Function
+   secrets.
 
 ## The three build profiles
 
