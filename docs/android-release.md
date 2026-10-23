@@ -31,15 +31,11 @@ from the icon SVGs. Change them together. The in-app palette
    eas login
    ```
 
-2. **Link the project to your Expo account:**
-
-   ```bash
-   eas init
-   ```
-
-   This adds `extra.eas.projectId` (and `owner`) to `app.json`. Commit that
-   change. The build profiles are already in `eas.json`, so there's no need
-   to run `eas build:configure`.
+2. **The project is already linked to your Expo account.** `app.json` has
+   `owner` (`tim1212`) and `extra.eas.projectId`, so there's no need to run
+   `eas init`. Running it anyway only confirms the link. The build profiles
+   are already in `eas.json`, so there's no need to run
+   `eas build:configure` either.
 
 3. **Store the app's settings in EAS, per environment.**
 
@@ -98,6 +94,12 @@ npm run build:preview                                 # eas build --profile prev
 npm run build:production                              # eas build --profile production --platform android
 ```
 
+Preview and production builds also take over-the-air updates, on the EAS
+Update channel of the same name (`channel` in `eas.json`). Once a preview
+build is installed, most code and UI changes reach it without a new build or
+a reinstall. `docs/ota-updates.md` has the workflow and what still needs a
+build.
+
 **Version numbers:**
 
 - **`versionCode`** (the number Play uses to tell builds apart) is kept by
@@ -105,7 +107,9 @@ npm run build:production                              # eas build --profile prod
   build, so you can't upload a duplicate by mistake. Check it with
   `eas build:version:get -p android`.
 - **`version`** in `app.json` (currently `1.0.0`) is the name users see. Raise
-  it yourself for each release you announce.
+  it yourself for each release you announce. It's also the runtime version for
+  over-the-air updates, so raise it with every native change and make a new
+  build (`docs/ota-updates.md`).
 
 ## Your first production build
 

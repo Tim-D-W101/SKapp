@@ -2,8 +2,15 @@
   "expo": {
     "name": "GlowTrack",
     "slug": "glowtrack",
+    "owner": "tim1212",
     "scheme": "glowtrack",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/08db2af0-1899-439b-b798-ce98fb29a6bf"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -41,6 +48,11 @@
     ],
     "experiments": {
       "tsconfigPaths": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "08db2af0-1899-439b-b798-ce98fb29a6bf"
+      }
     },
     "android": {
       "package": "com.glowtrack.app",
