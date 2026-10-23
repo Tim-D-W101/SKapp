@@ -16,6 +16,8 @@
     "android",
     "ios",
     "supabase/functions",
-    "scripts"
+    "scripts",
+    // Checked with tsconfig.test.json, which allows their Node-style imports.
+    "src/**/*.test.ts"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  // The unit tests run in plain Node (`npm test`), which imports TypeScript
+  // files by their full name and provides node:test. This checks them with
+  // those rules, so the app's own config stays free of Node's globals.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    // Installed with Expo's tooling, not listed in package.json.
+    "types": ["node"]
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": ["node_modules"]
+}

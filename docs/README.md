@@ -34,6 +34,6 @@ docs/
 1. `CLAUDE.md` — binding project rules.
 2. `docs/reference/` — the current phase roadmap and any active spec.
 
-Reference documents describe *what to build*. They do not override `CLAUDE.md`,
+Reference documents describe _what to build_. They do not override `CLAUDE.md`,
 and in particular they never relax the compliance language rules in its
 section 3.

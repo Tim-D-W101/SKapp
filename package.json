@@ -53,7 +53,8 @@
     "build:preview": "eas build --profile preview --platform android",
     "build:production": "eas build --profile production --platform android",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "node --test --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \"src/**/*.test.ts\"",
     "format": "prettier --write .",
     "types:db": "npx supabase gen types typescript --project-id yheevhjamvuxtnqudszk --schema public > src/types/database.ts",
     "calibrate": "npx --yes deno@2 run --config supabase/functions/analyze-scan/deno.json --env-file=supabase/functions/.env --allow-env=ANTHROPIC_API_KEY --allow-net=api.anthropic.com --allow-read=scripts/fixtures --allow-write=scripts/calibration-report.md scripts/calibrate.ts"
