@@ -109,10 +109,14 @@ export const sizes = {
   progressSegment: 4,
   /** Height of the morning and evening progress bars on Home. */
   routineProgress: 6,
-  /** The tab bar, not counting the safe area below it. The pill behind the open tab's icon is `indicator`. */
+  /**
+   * The tab bar's two big buttons: their least height (they grow with large
+   * text), and the smallest their label shrinks to, as a fraction, before it
+   * would be cut off at the largest text sizes.
+   */
   tabBar: {
-    height: 64,
-    indicator: { width: 56, height: 32 },
+    button: 56,
+    minLabelScale: 0.8,
   },
   /**
    * The "Scan my skin" card at the top of Home: the width of its sun mark,
@@ -394,6 +398,12 @@ export const motion = {
   },
   /** Scale applied to a button while pressed. */
   pressScale: 0.97,
+  /**
+   * The quick spring a tab bar button presses down and comes back up with,
+   * as `Animated.spring` speed and bounciness: fast, with only a hint of
+   * settle.
+   */
+  pressSpring: { speed: 40, bounciness: 4 },
   /**
    * Horizontal swipe between steps. A drag becomes a swipe once it travels
    * `activation` dp mostly sideways; it counts on release past `distance` dp
