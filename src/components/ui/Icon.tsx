@@ -22,7 +22,11 @@ export type IconName =
   | 'drag'
   | 'list'
   | 'chevronDown'
-  | 'chevronUp';
+  | 'chevronUp'
+  | 'chevronRight'
+  | 'user'
+  | 'sun'
+  | 'moon';
 
 export interface IconProps {
   name: IconName;
@@ -135,6 +139,24 @@ function renderGlyph(name: IconName) {
       return <Path d="M6 9l6 6 6-6" />;
     case 'chevronUp':
       return <Path d="M6 15l6-6 6 6" />;
+    case 'chevronRight':
+      return <Path d="M9 6l6 6-6 6" />;
+    case 'user':
+      return (
+        <>
+          <Circle cx={12} cy={8} r={4} />
+          <Path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+        </>
+      );
+    case 'sun':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={4} />
+          <Path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+        </>
+      );
+    case 'moon':
+      return <Path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z" />;
     case 'drag':
       return (
         <>

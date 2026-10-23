@@ -202,8 +202,10 @@ Five things need checking on an iPhone.
 
 - **Screens:** every screen is wrapped in `Screen`, which keeps content inside
   the safe area on all four sides.
-- **Tab screens:** these keep top, left and right. The tab bar sits above the
-  home indicator by itself.
+- **Tab screens (Home, Progress):** these keep top, left and right. The
+  floating tab bar pads itself above the home indicator with the bottom
+  safe-area inset. The routine and Settings open over the tabs as full
+  screens, inset on all four sides.
 - **The camera:** the camera screen runs edge to edge and pads its controls by
   the safe-area insets. The close button clears the Dynamic Island, and the
   shutter clears the home indicator. The tips sheet adds the bottom inset too.
@@ -213,12 +215,13 @@ Five things need checking on an iPhone.
   - The paywall's Close stays visible.
 - **Absolute positioning:** nothing is absolutely positioned against the top
   or bottom of the screen. The absolute elements are all inside content: the
-  chart tooltip, the comparison slider and the off-screen share card.
+  chart tooltip, the comparison slider, the off-screen share card, and the
+  Scan button raised out of the middle of the tab bar.
 
 ### No back button
 
 iPhones have no back button. Instead, a swipe from the left edge goes back in
-a stack. Four screens catch Android's back button, and none of them relies on
+a stack. Six screens catch Android's back button, and none of them relies on
 it:
 
 | Screen          | On Android, back…             | On iOS                                                                                           |
@@ -227,6 +230,8 @@ it:
 | Analysing       | leaves for Home               | The close button is always visible. The swipe is off on purpose.                                 |
 | Results         | leaves for Home               | The close button. The swipe is off on purpose.                                                   |
 | Reminders intro | counts as Not now             | The Not now button. The swipe is off on purpose.                                                 |
+| Routine         | goes Home if nothing's behind | The Back button at the top, which does the same, and the swipe.                                  |
+| Settings        | goes Home if nothing's behind | The Back button at the top, which does the same, and the swipe.                                  |
 
 Every other stack screen has a Close, Back, Retake, Not now or Done button,
 and the edge swipe does the same thing. Sign-in and the email check use the

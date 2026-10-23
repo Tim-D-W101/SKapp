@@ -1,27 +1,24 @@
 import { Tabs } from 'expo-router';
 
+import { TabBar } from '@/components/navigation/TabBar';
 import { Icon } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { useReminderSync } from '@/lib/useReminderSync';
-import { sizes, typography, useColors } from '@/theme/tokens';
+import { sizes, useColors } from '@/theme/tokens';
 
+/**
+ * Home and Progress, either side of the round scan button that TabBar draws
+ * in the middle. The routine and Settings open from Home.
+ */
 export default function TabsLayout() {
   const palette = useColors();
-  // The tabs only mount once onboarding is done: reminders are managed from here on.
-  useReminderSync();
 
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
+      // Android's back button on Progress goes to Home; on Home it leaves the app.
+      backBehavior="firstRoute"
       screenOptions={{
         headerShown: false,
-        // Labels are text, so the active one uses the text-safe coral.
-        tabBarActiveTintColor: palette.accentText,
-        tabBarInactiveTintColor: palette.textSecondary,
-        tabBarLabelStyle: typography.caption,
-        tabBarStyle: {
-          backgroundColor: palette.surfaceElevated,
-          borderTopColor: palette.borderSubtle,
-        },
         sceneStyle: { backgroundColor: palette.background },
       }}
     >
@@ -45,32 +42,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ focused }) => (
             <Icon
               name="chart"
-              size={sizes.icon.lg}
-              color={focused ? 'accentText' : 'textSecondary'}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="routine"
-        options={{
-          title: copy.tabs.routine,
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              name="list"
-              size={sizes.icon.lg}
-              color={focused ? 'accentText' : 'textSecondary'}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: copy.tabs.settings,
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              name="settings"
               size={sizes.icon.lg}
               color={focused ? 'accentText' : 'textSecondary'}
             />

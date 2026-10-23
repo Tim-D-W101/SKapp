@@ -11,34 +11,34 @@ import {
   LoadingState,
   Screen,
   ScoreRing,
-  SunMark,
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { startScan } from '@/lib/access';
 import { formatShortDate } from '@/lib/dates';
 import { nextScanDate } from '@/lib/progress';
-import { tickKey } from '@/lib/routine';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
+
+import { HomeHeader } from './HomeHeader';
+import { TodayRoutine } from './TodayRoutine';
 
 /** Skeleton lines shown until the first load finishes. */
 const LOADING_LINES = 4;
 
 /**
- * Where things stand today: the latest score, when the next weekly scan is
- * suggested, and how today's routine is going. Each card leads to the screen
- * with the detail. It reads the same stores as the Progress and Routine tabs
- * and refreshes them on each visit, so all three always agree.
+ * Where things stand today: the latest score, today's routine, and when the
+ * next weekly scan is suggested. Each card leads to the screen with the
+ * detail, and the profile button in the header opens Settings. It reads the
+ * same stores as the Progress tab and the routine and refreshes them on each
+ * visit, so all three always agree.
  */
 export function HomeScreen() {
   const status = useProgressStore((state) => state.status);
   const records = useProgressStore((state) => state.records);
   const refreshFailed = useProgressStore((state) => state.refreshFailed);
   const loadProgress = useProgressStore((state) => state.load);
-  const routine = useRoutineStore((state) => state.routine);
-  const ticked = useRoutineStore((state) => state.ticked);
   const loadRoutine = useRoutineStore((state) => state.load);
   const checkDay = useRoutineStore((state) => state.checkDay);
 
@@ -54,39 +54,35 @@ export function HomeScreen() {
 
   if (records.length === 0) {
     return (
-      <Screen edges={['top', 'right', 'left']} contentStyle={styles.centered}>
-        {status === 'error' ? (
-          <ErrorState message={copy.home.loadFailed} onRetry={retry} />
-        ) : status === 'ready' ? (
-          <EmptyState
-            title={copy.progress.noScans.title}
-            body={copy.progress.noScans.body}
-            action={{
-              label: copy.progress.noScans.cta,
-              onPress: startScan,
-            }}
-          />
-        ) : (
-          <LoadingState lines={LOADING_LINES} />
-        )}
+      <Screen edges={['top', 'right', 'left']} contentStyle={styles.content}>
+        {/* Always there, so Settings is reachable before the first scan too. */}
+        <HomeHeader />
+        <View style={styles.centered}>
+          {status === 'error' ? (
+            <ErrorState message={copy.home.loadFailed} onRetry={retry} />
+          ) : status === 'ready' ? (
+            <EmptyState
+              title={copy.progress.noScans.title}
+              body={copy.progress.noScans.body}
+              action={{
+                label: copy.progress.noScans.cta,
+                onPress: startScan,
+              }}
+            />
+          ) : (
+            <LoadingState lines={LOADING_LINES} />
+          )}
+        </View>
       </Screen>
     );
   }
 
   const latest = records[records.length - 1].result;
   const next = nextScanDate(latest.createdAt);
-  const done = routine
-    ? routine.steps.filter((step) => ticked[tickKey(step.slot, step.key)]).length
-    : 0;
 
   return (
     <Screen scroll edges={['top', 'right', 'left']} contentStyle={styles.content}>
-      <View style={styles.header}>
-        <SunMark width={sizes.sunMark.sm} />
-        <Text variant="h1" accessibilityRole="header">
-          {copy.home.title}
-        </Text>
-      </View>
+      <HomeHeader />
 
       {refreshFailed ? (
         <View style={styles.notice} accessibilityLiveRegion="polite">
@@ -110,6 +106,8 @@ export function HomeScreen() {
         />
       </Card>
 
+      <TodayRoutine />
+
       <Card style={styles.card}>
         <Text variant="h3" accessibilityRole="header">
           {copy.home.nextScan.title}
@@ -125,21 +123,6 @@ export function HomeScreen() {
         />
       </Card>
 
-      {routine ? (
-        <Card style={styles.card}>
-          <Text variant="h3" accessibilityRole="header">
-            {copy.home.routine.title}
-          </Text>
-          <Text color="textSecondary">{copy.routine.completion(done, routine.steps.length)}</Text>
-          <Button
-            label={copy.home.routine.open}
-            onPress={() => router.navigate('/routine')}
-            variant="secondary"
-            fullWidth
-          />
-        </Card>
-      ) : null}
-
       <Disclaimer />
     </Screen>
   );
@@ -147,15 +130,11 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   centered: {
+    flex: 1,
     justifyContent: 'center',
   },
   content: {
     gap: spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
   },
   notice: {
     flexDirection: 'row',

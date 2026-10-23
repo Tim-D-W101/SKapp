@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import {
   colors,
   getScoreColor,
+  iconColors,
   shareCardColors,
+  sunMarkColors,
   type ColorName,
   type ColorSchemeName,
 } from './colors.ts';
@@ -21,6 +24,11 @@ function luminance(hex: string): number {
 function contrast(a: string, b: string): number {
   const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (light + 0.05) / (dark + 0.05);
+}
+
+/** A file from the repository, by its path from the root. */
+function readRepoFile(path: string): string {
+  return readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 }
 
 /** AA for body text, and for the outlines and fills that identify controls. */
@@ -88,6 +96,50 @@ describe('palette contrast', () => {
       assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
     }
   });
+
+  it('share card ring meets 3:1 on the card', () => {
+    const ratio = contrast(shareCardColors.ring, shareCardColors.background);
+    assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+  });
+});
+
+describe('palette and app icon', () => {
+  it("uses the icon's teal as the light accent, unchanged", () => {
+    assert.equal(colors.light.accent, iconColors.teal);
+    assert.equal(colors.light.accentText, iconColors.teal);
+  });
+
+  it("uses the icon's mint as the dark accent", () => {
+    assert.equal(colors.dark.accent, iconColors.mint);
+  });
+
+  it('matches the colours the icon artwork is drawn in', () => {
+    for (const file of ['icon.svg', 'favicon.svg', 'splash-icon.svg']) {
+      const svg = readRepoFile(`assets/source/${file}`).toUpperCase();
+      for (const color of Object.values(iconColors)) {
+        assert.ok(svg.includes(color), `${file} has no ${color}`);
+      }
+    }
+    const back = readRepoFile('assets/source/android-icon-background.svg').toUpperCase();
+    assert.ok(back.includes(iconColors.teal), 'adaptive icon back layer');
+  });
+
+  it("matches app.json's adaptive icon background", () => {
+    const config: unknown = JSON.parse(readRepoFile('app.json'));
+    const background = (
+      config as { expo: { android: { adaptiveIcon: { backgroundColor: string } } } }
+    ).expo.android.adaptiveIcon.backgroundColor;
+    assert.equal(background.toUpperCase(), iconColors.teal);
+  });
+
+  for (const scheme of SCHEMES) {
+    it(`${scheme}: the sun mark on the scan button meets ${GRAPHIC}:1`, () => {
+      for (const color of Object.values(sunMarkColors.onAccent[scheme])) {
+        const ratio = contrast(color, colors[scheme].accent);
+        assert.ok(ratio >= GRAPHIC, `${color}: ${ratio.toFixed(2)}:1`);
+      }
+    });
+  }
 });
 
 describe('getScoreColor', () => {

@@ -536,7 +536,10 @@ export const copy = {
     plansLabel: 'Choose a plan',
     loadingPlans: 'Loading plans',
     plansFailed: "The plans didn't load. Check your connection and try again.",
-    unavailable: "Subscriptions aren't available on this phone right now.",
+    /** No plans from the store. Expected until the subscriptions are set up in Google Play. */
+    unavailable: "Plans aren't available yet on this device. Please try again soon.",
+    /** Under Try again when the plans can't load. */
+    back: 'Go back',
     plans: {
       weekly: 'Weekly',
       monthly: 'Monthly',
@@ -602,7 +605,16 @@ export const copy = {
     },
     routine: {
       title: "Today's routine",
-      open: 'Open my routine',
+      /** One of the morning and evening rows: how many of its steps are ticked. */
+      progress: (done: number, total: number) => `${done} of ${total} done`,
+      /** Screen reader name for a row: "Morning routine, 2 of 4 done". */
+      slotLabel: (slot: string, progress: string) => `${slot} routine, ${progress}`,
+      openHint: 'Opens your full routine',
+    },
+    /** The round button at the top right of Home that opens Settings. */
+    profile: {
+      label: 'Settings and account',
+      hint: 'Your account, plan, reminders and data',
     },
     loadFailed: "Your latest scan didn't load. Check your connection and try again.",
   },
@@ -610,8 +622,10 @@ export const copy = {
   tabs: {
     home: 'Home',
     progress: 'Progress',
-    routine: 'Routine',
-    settings: 'Settings',
+    /** Under the round scan button in the middle of the tab bar. */
+    scan: 'Scan',
+    scanLabel: 'Take a scan',
+    scanHint: 'Starts a new scan',
   },
 
   settings: {

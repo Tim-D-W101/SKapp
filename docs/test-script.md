@@ -22,6 +22,10 @@ comes last, because it wipes everything.
 - If the app was installed before: uninstall it first, so this is a fresh
   install.
 
+The tab bar has two tabs, **Home** and **Progress**, either side of a large
+round **Scan** button. **Settings** opens from the round profile button at
+the top right of Home, and **the routine** from "Today's routine" on Home.
+
 Mark each step `[x]` as it passes.
 
 ## 1. Fresh install and onboarding (3 minutes)
@@ -123,15 +127,16 @@ The free scan must survive every one of these.
        Pass: "A weekly nudge?" appears first, explaining the reminders.
 6. [ ] **Tap Turn on reminders, and allow notifications in the system
        dialog.**
-       Pass: the Routine tab opens with Morning and Evening steps. The last
-       morning step is sunscreen.
+       Pass: the routine opens with Morning and Evening steps, and a Back
+       button at the top. The last morning step is sunscreen. Back goes to
+       Home.
 
 ## 5. Paywall and purchase (4 minutes)
 
 1. [ ] **On the Progress tab, find the trend.**
        Pass: the latest score shows, plus "Your trend and comparisons" with
        **See plans**. That part is locked.
-2. [ ] **Start a second scan from the Home tab (Take a scan).**
+2. [ ] **Start a second scan with the round Scan button.**
        Pass: the plans open instead of the camera. There's no free second scan.
 3. [ ] **Look at the plans without buying.**
        Pass:
@@ -178,10 +183,11 @@ The free scan must survive every one of these.
 
 ## 7. Routine and notifications (2 minutes)
 
-1. [ ] **Open the Routine tab and tick two steps.**
-       Pass: each tick responds at once, with a small vibration, and the
-       completion ring moves.
-2. [ ] **Close the app completely and reopen the Routine tab.**
+1. [ ] **On Home, tap Morning under "Today's routine", and tick two steps.**
+       Pass: the routine opens on the morning steps. Each tick responds at
+       once, with a small vibration, and the completion ring moves. Back on
+       Home, the Morning row shows the two steps done.
+2. [ ] **Close the app completely, reopen it, and open the routine.**
        Pass: the same two steps are still ticked.
 3. [ ] **Untick one step.**
        Pass: it clears, and stays cleared after reopening.
@@ -198,11 +204,11 @@ The free scan must survive every one of these.
 
 ## 8. Offline behaviour (3 minutes)
 
-1. [ ] **With the app open on the Routine tab, turn on airplane mode, tick a
-       step, and untick another.**
+1. [ ] **With the routine open, turn on airplane mode, tick a step, and
+       untick another.**
        Pass: both change at once. There's no error.
 2. [ ] **Turn airplane mode off and wait 10 seconds.** Close the app
-       completely, reopen it, and open the Routine tab.
+       completely, reopen it, and open the routine.
        Pass: the changes from 8.1 are still there, so they synced.
 3. [ ] **Turn on airplane mode and start a scan. Take the photo and tap Use
        this.**
@@ -212,7 +218,7 @@ The free scan must survive every one of these.
        Pass: the scan completes normally.
 5. [ ] **With airplane mode on, close the app completely and reopen it.**
        Pass: the app opens on Home. Home says your latest scan didn't load,
-       with Try again. The Routine tab shows today's routine and ticks, and
+       with Try again. The routine shows today's steps and ticks, and
        ticking works. Turn airplane mode off and tap Try again on Home: your
        latest score appears.
 6. [ ] **In the Play Store app, cancel the test subscription** (profile →
@@ -255,10 +261,77 @@ The free scan must survive every one of these.
 9. [ ] **Go through onboarding quickly and open the Progress tab.**
        Pass: "No scans yet". Nothing from the deleted account is visible.
 
+## Navigation check (6 minutes)
+
+Run this once on any build that changes how screens are reached, such as
+the three-tab layout. It needs an account with at least one scan and a
+routine, so run it after section 4. Like the look and feel check, it sits
+apart from the numbered sections so their step numbers don't move.
+
+1. [ ] **The tab bar.**
+       Pass: a floating, rounded bar with **Home**, a large round **Scan**
+       button raised out of the middle, and **Progress**. Each has an icon
+       and a label, and the three labels sit on one line. The open tab's icon
+       sits on a pale mint pill and its label is teal. The bar clears the
+       phone's own navigation bar or gesture line, and nothing on the screen
+       is hidden behind it.
+2. [ ] **Tap Progress, then Home.**
+       Pass: each opens, and the pill moves with it.
+3. [ ] **Tap the Scan button, once in its middle and once on its top edge
+       (the part above the bar).**
+       Pass: both taps open the camera, or the plans once the free scan is
+       used without a subscription, exactly as **Take a scan** on Home does.
+       Closing it comes back to the screen you were on.
+4. [ ] **Look at "Today's routine" on Home, then tap Evening.**
+       Pass: Home shows how many steps are done today, and a Morning and an
+       Evening row, each with a count and a progress bar. Evening opens the
+       routine with the evening steps showing and a **Back** button at the
+       top. Tick a step and tap Back: the Evening row shows one more done.
+5. [ ] **Tap the round profile button at the top right of Home.**
+       Pass: Settings opens, with Account, Subscription, Reminders, Your data
+       and About, and a **Back** button that stays at the top while you
+       scroll. Back goes to Home.
+6. [ ] **Open everything that lives in Settings.**
+       Pass: Save my progress (sign-in), Manage subscription, Download my
+       data, Delete all my scan photos (cancel it), Delete my account (open
+       it, then Close without deleting), Privacy Policy, Terms and Contact
+       support all open as before. After Save my progress, tapping the link
+       in the email brings you back to Settings.
+7. [ ] **Before the first scan** (fresh install, before 3.1, or after 9.9).
+       Pass: Home shows "No scans yet" and still has the profile button, so
+       Settings opens before any scan.
+8. [ ] **Android's back button.**
+       Pass:
+   - on Progress, back goes to Home;
+   - on Home, back leaves the app;
+   - on the routine and on Settings, back goes to Home;
+   - on the plans, back closes them;
+   - on the results of a scan, back leaves for Home, as before.
+9. [ ] **The plans, while the subscriptions aren't set up in Play Console
+       yet.** Open Progress → See plans.
+       Pass: in place of the plans, "Plans aren't available yet on this
+       device. Please try again soon." with **Try again** and **Go back**.
+       Try again shows the loading lines briefly, then the plans if the store
+       has them, or the same message. No price shows anywhere. Go back and
+       Close both leave. The value points, Restore purchases, Terms and
+       Privacy Policy are still there. Once the subscriptions exist, the
+       plans show with their store prices instead.
+10. [ ] **TalkBack** (Settings → Accessibility → TalkBack).
+        Pass: the tabs read as "Home, tab, selected" and "Progress, tab"; the
+        Scan button as "Take a scan, button"; the profile button as
+        "Settings and account, button"; a routine row as, for example,
+        "Morning routine, 2 of 4 done, button". The word "Scan" under the
+        button isn't read on its own.
+11. [ ] **Largest font.** Set Font size to the largest and look at the tab
+        bar and Home.
+        Pass: the tab labels aren't cut off, the Scan button still sits in
+        the middle, and the routine rows' text wraps without overlapping.
+        Set the font size back afterwards.
+
 ## Look and feel check (10 minutes)
 
-Run this once on any build that changes the app's look, such as the coral
-and peach restyle. It needs an account with at least two scans and a
+Run this once on any build that changes the app's look, such as the restyle
+in the launcher icon's teal and mint. It needs an account with at least two scans and a
 routine, so run it after section 8 and before section 9 wipes the account.
 It sits apart from the numbered sections so their step numbers don't move.
 
@@ -267,42 +340,46 @@ to change **Font size** and **Dark theme**. Start on the default font size,
 in light mode.
 
 1. [ ] **Startup and onboarding** (fresh install, or after 9.8).
-       Pass: the coral sun-over-arc mark shows on "Getting things ready",
-       the welcome step and "You're all set". The progress bar fills in
-       coral. A selected answer turns peach with a coral outline and tick;
-       nothing shifts sideways when it's tapped.
+       Pass: the app's teal is the teal of the GlowTrack icon on the phone's
+       home screen. The sun-over-arc mark, a teal sun over mint arcs like
+       the icon's, shows on "Getting things ready", the welcome step and
+       "You're all set". The progress bar fills in teal. A selected answer
+       turns pale mint with a teal outline and tick; nothing shifts sideways
+       when it's tapped.
 2. [ ] **Sign-in and "Check your email"** (Settings → Save my progress).
-       Pass: the email field's outline turns coral while typing. A bad
-       address shows its message in a deep pink-red, not coral.
+       Pass: the email field's outline turns teal while typing. A bad
+       address shows its message in a deep pink-red, not teal.
 3. [ ] **Home.**
-       Pass: the small sun mark sits beside "Home". Cards are a soft peach
-       on white, with rounded corners. The main button is a coral pill
-       with white text; outlined buttons have coral text.
+       Pass: the small sun mark sits beside "Home". Cards are a soft mint on
+       white, with rounded corners. The main button is a teal pill with
+       white text; outlined buttons have teal text. The Scan button in the
+       tab bar looks like the app icon: a cream sun over mint arcs on teal.
 4. [ ] **Camera and tips.**
-       Pass: the face oval turns coral at "Looking good". **Why?** opens a
-       sheet with rounded top corners, a grab bar and coral tick badges.
+       Pass: the face oval turns mint at "Looking good". **Why?** opens a
+       sheet with rounded top corners, a grab bar and teal tick badges.
        "Before your first photo" and "Camera access" (on a fresh install)
        match the same style.
 5. [ ] **Waiting, rejected and limit screens** (from section 2).
-       Pass: the photo has rounded corners, finished steps show a coral tick
+       Pass: the photo has rounded corners, finished steps show a teal tick
        badge, and every message and button is readable. "That's enough
        photos for now", if you reach it, looks the same, with Go back.
 6. [ ] **Results.**
-       Pass: the ring and bars run from pale peach (low) to terracotta
-       (high); nothing looks red or alarming. "Where to focus" sits on a
-       peach panel. The full disclaimer, with its info icon, is visible
+       Pass: the ring and bars run from pale mint (low) to deep teal (high);
+       nothing looks red or alarming. "Where to focus" sits on a pale mint
+       panel. The full disclaimer, with its info icon, is visible
        without scrolling past anything collapsed.
 7. [ ] **Share.**
-       Pass: the preview is a light peach card with the sun mark beside
+       Pass: the preview is a light mint card with the sun mark beside
        "GlowTrack". The shared image looks the same as the preview.
 8. [ ] **Progress and compare.**
-       Pass: the chart line and points are coral. History thumbnails show
-       (or show a peach placeholder). On "Before and after", there is no
+       Pass: the chart line and points are teal. History thumbnails show
+       (or show a mint placeholder). On "Before and after", there is no
        coloured strip down the left edge of the screen.
 9. [ ] **Routine pictures.** Open Morning, then Evening.
        Pass:
    - every step shows a drawing between its tick box and its text, and
      still shows its title and its one-line reason;
+   - the drawings are in teal and mint, on a pale mint tile;
    - each drawing matches the step: makeup remover and cotton pad,
      cleanser pump, toner bottle, serum dropper, eye cream tube,
      moisturiser jar, face oil bottle, lip balm, sunscreen tube with a sun;
@@ -314,22 +391,24 @@ in light mode.
         "Illustration of…" for it.
 11. [ ] **Paywall.**
         Pass: on each plan, the billed price is the largest text; "Best
-        value" sits on a small coral pill under it. The terms under the
+        value" sits on a small teal pill under it. The terms under the
         button are plain body text. Close, Restore purchases, Terms and
         Privacy Policy are all visible.
 12. [ ] **Settings and Delete my account.**
-        Pass: each section is a peach card. Switches are coral when on.
+        Pass: each section is a mint card. Switches are teal when on.
         **Delete my account** is a deep pink-red button, clearly different
-        from the coral ones.
+        from the teal ones.
 13. [ ] **Error and empty states.** Look back at the offline screens in
         section 8, and at the Progress tab after 9.9.
         Pass: a full-screen error shows a quiet grey badge and an outlined
         Try again, never red. "No scans yet" shows the sun mark above it.
 14. [ ] **Dark theme.** Turn on Dark theme and repeat 3, 6, 9 and 11
         quickly.
-        Pass: backgrounds are a deep warm brown-black, the coral is
-        brighter, and main buttons have dark text. Every word is readable,
-        and the routine drawings show clearly on their dark tiles.
+        Pass: backgrounds are a deep teal-black, the accent is the icon's
+        bright mint, and main buttons have dark text. The sun mark beside
+        "Home" has a cream sun, and the Scan button is mint with a dark mark.
+        Every word is readable, and the routine drawings show clearly on
+        their dark tiles.
 15. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
         11 and 12.
         Pass: no text is cut off or overlaps. A long button label, such as
