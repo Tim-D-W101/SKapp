@@ -21,8 +21,6 @@ comes last, because it wipes everything.
 - A well-lit spot near a window, and a second person for step 2.5.
 - If the app was installed before: uninstall it first, so this is a fresh
   install.
-- The Home tab is still a placeholder that says "No scans yet" even after
-  scans. That's expected for now, so don't report it.
 
 Mark each step `[x]` as it passes.
 
@@ -256,6 +254,91 @@ The free scan must survive every one of these.
        over at "See whether your routine is working".
 9. [ ] **Go through onboarding quickly and open the Progress tab.**
        Pass: "No scans yet". Nothing from the deleted account is visible.
+
+## Look and feel check (10 minutes)
+
+Run this once on any build that changes the app's look, such as the coral
+and peach restyle. It needs an account with at least two scans and a
+routine, so run it after section 8 and before section 9 wipes the account.
+It sits apart from the numbered sections so their step numbers don't move.
+
+**Before you start:** on the phone, open Settings → Display, and note how
+to change **Font size** and **Dark theme**. Start on the default font size,
+in light mode.
+
+1. [ ] **Startup and onboarding** (fresh install, or after 9.8).
+       Pass: the coral sun-over-arc mark shows on "Getting things ready",
+       the welcome step and "You're all set". The progress bar fills in
+       coral. A selected answer turns peach with a coral outline and tick;
+       nothing shifts sideways when it's tapped.
+2. [ ] **Sign-in and "Check your email"** (Settings → Save my progress).
+       Pass: the email field's outline turns coral while typing. A bad
+       address shows its message in a deep pink-red, not coral.
+3. [ ] **Home.**
+       Pass: the small sun mark sits beside "Home". Cards are a soft peach
+       on white, with rounded corners. The main button is a coral pill
+       with white text; outlined buttons have coral text.
+4. [ ] **Camera and tips.**
+       Pass: the face oval turns coral at "Looking good". **Why?** opens a
+       sheet with rounded top corners, a grab bar and coral tick badges.
+       "Before your first photo" and "Camera access" (on a fresh install)
+       match the same style.
+5. [ ] **Waiting, rejected and limit screens** (from section 2).
+       Pass: the photo has rounded corners, finished steps show a coral tick
+       badge, and every message and button is readable. "That's enough
+       photos for now", if you reach it, looks the same, with Go back.
+6. [ ] **Results.**
+       Pass: the ring and bars run from pale peach (low) to terracotta
+       (high); nothing looks red or alarming. "Where to focus" sits on a
+       peach panel. The full disclaimer, with its info icon, is visible
+       without scrolling past anything collapsed.
+7. [ ] **Share.**
+       Pass: the preview is a light peach card with the sun mark beside
+       "GlowTrack". The shared image looks the same as the preview.
+8. [ ] **Progress and compare.**
+       Pass: the chart line and points are coral. History thumbnails show
+       (or show a peach placeholder). On "Before and after", there is no
+       coloured strip down the left edge of the screen.
+9. [ ] **Routine pictures.** Open Morning, then Evening.
+       Pass:
+   - every step shows a drawing between its tick box and its text, and
+     still shows its title and its one-line reason;
+   - each drawing matches the step: makeup remover and cotton pad,
+     cleanser pump, toner bottle, serum dropper, eye cream tube,
+     moisturiser jar, face oil bottle, lip balm, sunscreen tube with a sun;
+   - no drawing shows a brand, logo or real packaging;
+   - tapping the drawing ticks the step, like tapping its text.
+10. [ ] **Routine with TalkBack** (Settings → Accessibility → TalkBack).
+        Pass: a step reads as its title, "checkbox", ticked or not, and its
+        reason. TalkBack doesn't stop on the drawing or read
+        "Illustration of…" for it.
+11. [ ] **Paywall.**
+        Pass: on each plan, the billed price is the largest text; "Best
+        value" sits on a small coral pill under it. The terms under the
+        button are plain body text. Close, Restore purchases, Terms and
+        Privacy Policy are all visible.
+12. [ ] **Settings and Delete my account.**
+        Pass: each section is a peach card. Switches are coral when on.
+        **Delete my account** is a deep pink-red button, clearly different
+        from the coral ones.
+13. [ ] **Error and empty states.** Look back at the offline screens in
+        section 8, and at the Progress tab after 9.9.
+        Pass: a full-screen error shows a quiet grey badge and an outlined
+        Try again, never red. "No scans yet" shows the sun mark above it.
+14. [ ] **Dark theme.** Turn on Dark theme and repeat 3, 6, 9 and 11
+        quickly.
+        Pass: backgrounds are a deep warm brown-black, the coral is
+        brighter, and main buttons have dark text. Every word is readable,
+        and the routine drawings show clearly on their dark tiles.
+15. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
+        11 and 12.
+        Pass: no text is cut off or overlaps. A long button label, such as
+        "Delete all my scan photos", wraps onto two lines inside its button
+        instead of ending in "…". Routine text wraps beside its drawing.
+16. [ ] **Smallest font.** Set Font size to the smallest and look at Home and
+        Routine.
+        Pass: text is small but every button and tick box is still a large,
+        easy target. Set the font size back afterwards.
 
 ## After the run
 

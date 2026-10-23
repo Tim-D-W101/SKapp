@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Card, Icon, Text } from '@/components/ui';
+import { Card, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { weeklyStreak } from '@/lib/streak';
 import { sizes, spacing } from '@/theme/tokens';
@@ -20,7 +20,7 @@ export function StreakCard({ scanDates }: StreakCardProps) {
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
-        <Icon name="sparkle" size={sizes.icon.md} color="accent" />
+        <SunMark width={sizes.sunMark.sm} />
         <Text variant="h3" accessibilityRole="header">
           {copy.progress.streak.title}
         </Text>

@@ -4,8 +4,11 @@ import { Card, Icon, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { hapticImpact } from '@/lib/haptics';
 import { tickKey } from '@/lib/routine';
+import { illustrationForStep } from '@/lib/routineIllustration';
 import { opacity, radius, sizes, spacing, useColors } from '@/theme/tokens';
 import type { RoutineSlot, RoutineStep } from '@/types/routine';
+
+import { ProductIllustration } from './ProductIllustration';
 
 export interface RoutineSectionProps {
   slot: RoutineSlot;
@@ -45,7 +48,11 @@ export function RoutineSection({
         <Text variant="bodySmall" color="textSecondary">
           {count}
         </Text>
-        <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={sizes.icon.md} />
+        <Icon
+          name={expanded ? 'chevronUp' : 'chevronDown'}
+          size={sizes.icon.md}
+          color="accentText"
+        />
       </Pressable>
 
       {expanded
@@ -69,13 +76,18 @@ export function RoutineSection({
                     styles.box,
                     isDone
                       ? { backgroundColor: palette.accent, borderColor: palette.accent }
-                      : { borderColor: palette.border },
+                      : {
+                          backgroundColor: palette.surfaceElevated,
+                          borderColor: palette.borderStrong,
+                        },
                   ]}
                 >
                   {isDone ? (
                     <Icon name="check" size={sizes.icon.sm} tint={palette.textInverse} />
                   ) : null}
                 </View>
+                {/* The title already names the product, so the drawing stays quiet. */}
+                <ProductIllustration kind={illustrationForStep(step)} decorative />
                 <View style={styles.stepText}>
                   <Text variant="label" color={isDone ? 'textSecondary' : 'textPrimary'}>
                     {step.title}
@@ -110,10 +122,11 @@ const styles = StyleSheet.create({
   },
   step: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: spacing.md,
     minHeight: sizes.minTouchTarget,
     paddingVertical: spacing.sm,
+    borderRadius: radius.md,
   },
   box: {
     width: sizes.checkbox,

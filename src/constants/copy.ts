@@ -473,6 +473,19 @@ export const copy = {
     },
     saveFailed: "That didn't save. We'll try again when you're back online.",
     tickFailed: "That didn't save. Try again.",
+    /** Screen reader labels for the product drawings, one per kind of step. */
+    illustrations: {
+      makeupRemover: 'Illustration of a makeup remover bottle and cotton pad',
+      cleanser: 'Illustration of a cleanser pump bottle',
+      toner: 'Illustration of a toner bottle',
+      serum: 'Illustration of a serum dropper bottle',
+      eyeCream: 'Illustration of an eye cream tube',
+      moisturiser: 'Illustration of a moisturiser jar',
+      faceOil: 'Illustration of a face oil bottle',
+      lipBalm: 'Illustration of a lip balm',
+      sunscreen: 'Illustration of a sunscreen tube',
+      generic: 'Illustration of a skincare product',
+    },
   },
 
   notifications: {

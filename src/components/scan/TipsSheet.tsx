@@ -1,9 +1,9 @@
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Icon, Text } from '@/components/ui';
+import { Button, IconBadge, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { cameraColors, radius, sizes, spacing, useColors } from '@/theme/tokens';
+import { cameraColors, layout, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 export interface TipsSheetProps {
   visible: boolean;
@@ -42,6 +42,7 @@ export function TipsSheet({ visible, onClose }: TipsSheetProps) {
           ]}
           accessibilityViewIsModal
         >
+          <View style={[styles.handle, { backgroundColor: palette.border }]} />
           <Text variant="h2" accessibilityRole="header">
             {tips.title}
           </Text>
@@ -49,7 +50,7 @@ export function TipsSheet({ visible, onClose }: TipsSheetProps) {
           <View style={styles.points}>
             {tips.points.map((point) => (
               <View key={point} style={styles.point}>
-                <Icon name="check" size={sizes.icon.md} color="accent" />
+                <IconBadge name="check" tone="filled" />
                 <Text style={styles.pointText}>{point}</Text>
               </View>
             ))}
@@ -69,13 +70,21 @@ const styles = StyleSheet.create({
   },
   sheet: {
     gap: spacing.md,
-    paddingTop: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
+    paddingTop: spacing.sm,
+    paddingHorizontal: layout.gutter,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+  },
+  /** Decorative: the sheet closes with its button, the back gesture or a tap outside. */
+  handle: {
+    alignSelf: 'center',
+    width: sizes.sheetHandle.width,
+    height: sizes.sheetHandle.height,
+    marginBottom: spacing.sm,
+    borderRadius: radius.full,
   },
   points: {
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   point: {
     flexDirection: 'row',

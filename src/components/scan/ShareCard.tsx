@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
-import { Icon, Text } from '@/components/ui';
+import { SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { ATTRIBUTE_KEYS } from '@/constants/scan';
 import { SHARE_CARD_ATTRIBUTES, SHARE_FORMATS, type ShareFormat } from '@/constants/share';
@@ -129,7 +129,7 @@ export function CardHeader({ unit, detail }: { unit: number; detail: string }) {
   return (
     <View style={styles.header}>
       <View style={[styles.brand, { gap: shareCard.brandGap * unit }]}>
-        <Icon name="sparkle" size={shareCard.brandIcon * unit} tint={shareCard.colors.text} />
+        <SunMark width={shareCard.brandIcon * unit} />
         <CardText unit={unit} size={shareCard.type.brand} bold>
           {copy.share.cardBrand}
         </CardText>

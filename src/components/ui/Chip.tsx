@@ -43,13 +43,13 @@ export function Chip({
       style={[
         styles.base,
         {
-          backgroundColor: selected ? palette.accentSubtle : palette.surface,
+          backgroundColor: selected ? palette.accentSubtle : palette.surfaceElevated,
           borderColor: selected ? palette.accent : palette.border,
           opacity: disabled ? opacity.disabled : 1,
         },
       ]}
     >
-      <Text variant="bodySmall" color={selected ? 'accent' : 'textPrimary'}>
+      <Text variant="bodySmall" color={selected ? 'accentText' : 'textPrimary'}>
         {label}
       </Text>
     </Pressable>
@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-start',
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
+    // The same width selected or not, so a chip never shifts when tapped.
+    borderWidth: sizes.borderWidthStrong,
   },
 });

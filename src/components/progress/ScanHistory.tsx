@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: sizes.thumbnail.width,
     height: sizes.thumbnail.height,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
   },
   details: {
     flex: 1,

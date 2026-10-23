@@ -37,7 +37,7 @@ export function ScanPhoto({ path, style }: ScanPhotoProps) {
 
   return (
     <View
-      style={[styles.frame, { backgroundColor: palette.surface }, style]}
+      style={[styles.frame, { backgroundColor: palette.accentSubtle }, style]}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >

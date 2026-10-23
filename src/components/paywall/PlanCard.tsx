@@ -17,7 +17,8 @@ export interface PlanCardProps {
 
 /**
  * One plan, as a radio option. The billed amount is the most prominent thing
- * on it, and never a per-week equivalent.
+ * on it, and never a per-week equivalent. The "best value" line sits on a
+ * small pill, in smaller type than the price.
  */
 export function PlanCard({ plan, selected, badge, disabled, onSelect }: PlanCardProps) {
   const palette = useColors();
@@ -51,8 +52,8 @@ export function PlanCard({ plan, selected, badge, disabled, onSelect }: PlanCard
         style={[
           styles.mark,
           {
-            borderColor: selected ? palette.accent : palette.border,
-            backgroundColor: selected ? palette.accent : 'transparent',
+            borderColor: selected ? palette.accent : palette.borderStrong,
+            backgroundColor: selected ? palette.accent : palette.surfaceElevated,
           },
         ]}
       >
@@ -60,12 +61,19 @@ export function PlanCard({ plan, selected, badge, disabled, onSelect }: PlanCard
       </View>
       <View style={styles.text}>
         <Text variant="label">{name}</Text>
-        <Text>{price}</Text>
-        {notes.map((note) => (
-          <Text key={note} variant="bodySmall" color="accent">
-            {note}
+        <Text variant="h3">{price}</Text>
+        {badge ? (
+          <View style={[styles.badge, { backgroundColor: palette.accent }]}>
+            <Text variant="caption" color="textInverse">
+              {badge}
+            </Text>
+          </View>
+        ) : null}
+        {trial ? (
+          <Text variant="bodySmall" color="accentText">
+            {trial}
           </Text>
-        ))}
+        ) : null}
       </View>
     </Pressable>
   );
@@ -77,8 +85,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     padding: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    borderRadius: radius.lg,
+    borderWidth: sizes.borderWidthStrong,
   },
   mark: {
     width: sizes.checkbox,
@@ -91,5 +99,11 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     gap: spacing.xs,
+  },
+  badge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
   },
 });

@@ -2,11 +2,11 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, Icon, Screen, Text } from '@/components/ui';
+import { Button, Screen, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { parseEmailFlow } from '@/lib/auth';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 type Notice = { kind: 'sent' } | { kind: 'error'; message: string };
 
@@ -33,7 +33,7 @@ export default function CheckEmail() {
 
   return (
     <Screen scroll edges={['right', 'bottom', 'left']} contentStyle={styles.content}>
-      <Icon name="sparkle" size={sizes.icon.xl} color="accent" />
+      <SunMark />
       <View style={styles.intro}>
         <Text variant="h1" accessibilityRole="header">
           {copy.auth.checkEmail.title}

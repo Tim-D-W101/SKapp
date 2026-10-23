@@ -2,12 +2,12 @@ import { router } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, Icon, LoadingState, Screen, Text } from '@/components/ui';
+import { Button, IconBadge, LoadingState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { logInDevelopment } from '@/lib/errors';
 import { dataNoticeAcceptedBy, markDataNoticeAccepted } from '@/lib/preferences';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 export interface DataNoticeGateProps {
   children: ReactNode;
@@ -65,21 +65,21 @@ export function DataNoticeGate({ children }: DataNoticeGateProps) {
   return (
     <Screen scroll contentStyle={styles.content}>
       <View style={styles.body}>
-        <Icon name="info" size={sizes.icon.xl} color="accent" />
+        <IconBadge name="info" size="lg" />
         <Text variant="h1" accessibilityRole="header">
           {text.title}
         </Text>
         <View style={styles.points}>
           {text.points.map((point) => (
             <View key={point} style={styles.point}>
-              <Icon name="check" size={sizes.icon.md} color="accent" />
+              <IconBadge name="check" tone="filled" />
               <Text style={styles.pointText}>{point}</Text>
             </View>
           ))}
         </View>
       </View>
       <View style={styles.actions}>
-        <Button label={text.continue} onPress={accept} fullWidth />
+        <Button label={text.continue} onPress={accept} fullWidth size="lg" />
         <Button label={text.notNow} onPress={leave} variant="ghost" fullWidth />
       </View>
     </Screen>

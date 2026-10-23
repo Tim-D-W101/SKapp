@@ -1,6 +1,6 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ErrorState, Screen, Text } from '@/components/ui';
+import { ErrorState, Screen, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { spacing, useColors } from '@/theme/tokens';
 
@@ -20,6 +20,7 @@ export function StartupScreen({ error, onRetry }: StartupScreenProps) {
         <ErrorState message={error} onRetry={onRetry} />
       ) : (
         <View style={styles.loading} accessible accessibilityState={{ busy: true }}>
+          <SunMark />
           <ActivityIndicator size="large" color={palette.accent} />
           <Text variant="bodySmall" color="textSecondary" align="center">
             {copy.auth.starting}
@@ -36,6 +37,6 @@ const styles = StyleSheet.create({
   },
   loading: {
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.lg,
   },
 });

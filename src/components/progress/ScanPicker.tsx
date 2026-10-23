@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    borderRadius: radius.lg,
+    borderWidth: sizes.borderWidthStrong,
   },
   pressed: {
     opacity: opacity.pressed,
@@ -140,12 +140,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: sizes.minTouchTarget,
     padding: spacing.sm,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
   },
   thumbnail: {
     width: sizes.thumbnail.width,
     height: sizes.thumbnail.height,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
   },
   rowText: {
     flex: 1,

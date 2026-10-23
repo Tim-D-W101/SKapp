@@ -121,7 +121,7 @@ function ShareComposer({
           accessibilityRole="image"
           accessibilityLabel={copy.share.preview}
         >
-          <View style={styles.preview}>
+          <View style={[styles.preview, { borderColor: palette.borderSubtle }]}>
             <ShareCard
               format={format}
               width={shareCard.previewWidth}
@@ -135,7 +135,10 @@ function ShareComposer({
         <View style={styles.section}>
           <Text variant="label">{copy.share.format}</Text>
           <View
-            style={[styles.segments, { borderColor: palette.border }]}
+            style={[
+              styles.segments,
+              { borderColor: palette.border, backgroundColor: palette.surface },
+            ]}
             accessibilityRole="radiogroup"
             accessibilityLabel={copy.share.format}
           >
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
   },
   preview: {
     borderRadius: radius.lg,
+    borderWidth: sizes.borderWidth,
     overflow: 'hidden',
   },
   section: {
@@ -251,7 +255,7 @@ const styles = StyleSheet.create({
   },
   segments: {
     flexDirection: 'row',
-    borderWidth: sizes.borderWidth,
+    borderWidth: sizes.borderWidthStrong,
     borderRadius: radius.full,
     padding: spacing.xs,
     gap: spacing.xs,

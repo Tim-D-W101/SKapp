@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     minHeight: sizes.control.lg,
     paddingHorizontal: spacing.md,
     borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    // The same width focused or not, so the text never shifts.
+    borderWidth: sizes.borderWidthStrong,
   },
 });

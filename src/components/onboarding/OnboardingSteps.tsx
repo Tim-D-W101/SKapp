@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Chip, Icon, Text } from '@/components/ui';
+import { Chip, Icon, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import {
   AGE_BANDS,
@@ -15,7 +15,7 @@ import {
   type SkinType,
 } from '@/constants/onboarding';
 import type { OnboardingAnswers } from '@/lib/onboarding';
-import { sizes, spacing } from '@/theme/tokens';
+import { layout, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { ChoiceList, type ChoiceOption } from './ChoiceList';
 
@@ -40,17 +40,20 @@ const GOAL_OPTIONS: readonly ChoiceOption<Goal>[] = GOALS.map((goal) => ({
 interface StepBodyProps {
   title: string;
   body?: string;
+  /** Shows the sun mark above the title, on the first and last steps. */
+  mark?: boolean;
   children?: ReactNode;
 }
 
 /** Title, intro line and content for one step. Scrolls when a small screen needs it. */
-function StepBody({ title, body, children }: StepBodyProps) {
+function StepBody({ title, body, mark = false, children }: StepBodyProps) {
   return (
     <ScrollView
       contentContainerStyle={styles.body}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
+      {mark ? <SunMark /> : null}
       <View style={styles.intro}>
         <Text variant="h1" accessibilityRole="header">
           {title}
@@ -63,10 +66,11 @@ function StepBody({ title, body, children }: StepBodyProps) {
 }
 
 export function WelcomeStep() {
+  const palette = useColors();
   return (
-    <StepBody title={text.welcome.title} body={text.welcome.body}>
-      <View style={styles.note}>
-        <Icon name="info" size={sizes.icon.sm} color="textSecondary" />
+    <StepBody title={text.welcome.title} body={text.welcome.body} mark>
+      <View style={[styles.note, { backgroundColor: palette.surface }]}>
+        <Icon name="info" size={sizes.icon.md} color="accentText" />
         <Text variant="bodySmall" color="textSecondary" style={styles.noteText}>
           {text.welcome.note}
         </Text>
@@ -161,18 +165,14 @@ export function ReadyStep({ answers }: { answers: OnboardingAnswers }) {
         : text.ready.summary(text.ready.skinTypes[answers.skinType], goal);
   }
 
-  return (
-    <StepBody title={text.ready.title} body={summary}>
-      <Icon name="sparkle" size={sizes.icon.xl} color="accent" />
-    </StepBody>
-  );
+  return <StepBody title={text.ready.title} body={summary} mark />;
 }
 
 const styles = StyleSheet.create({
   body: {
     flexGrow: 1,
     gap: spacing.lg,
-    padding: spacing.md,
+    padding: layout.gutter,
   },
   intro: {
     gap: spacing.sm,
@@ -181,6 +181,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radius.md,
   },
   noteText: {
     flex: 1,

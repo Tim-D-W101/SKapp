@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
-import { spacing, useColors } from '@/theme/tokens';
+import { layout, useColors } from '@/theme/tokens';
 
 export interface ScreenProps {
   children: ReactNode;
@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   padded: {
-    padding: spacing.md,
+    padding: layout.gutter,
   },
 });

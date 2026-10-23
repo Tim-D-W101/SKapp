@@ -7,7 +7,7 @@ import { Button, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { logInDevelopment } from '@/lib/errors';
 import { useScanStore } from '@/stores/useScanStore';
-import { spacing } from '@/theme/tokens';
+import { radius, spacing, useColors } from '@/theme/tokens';
 
 /** Shows the photo before anything is sent. "Use this" is the only way forward. */
 export function CaptureConfirm() {
@@ -18,6 +18,7 @@ export function CaptureConfirm() {
   const discardCapture = useScanStore((state) => state.discardCapture);
   const [kilobytes, setKilobytes] = useState<number | null>(null);
   const submitted = useRef(false);
+  const palette = useColors();
 
   // Development only: the file size, to check the photo stays well under 500 KB.
   useEffect(() => {
@@ -55,7 +56,7 @@ export function CaptureConfirm() {
       <Text variant="h2" accessibilityRole="header">
         {copy.scan.confirm.title}
       </Text>
-      <View style={styles.photoArea}>
+      <View style={[styles.photoArea, { backgroundColor: palette.surface }]}>
         <Image
           source={{ uri: capture.uri }}
           style={styles.photo}
@@ -83,6 +84,8 @@ const styles = StyleSheet.create({
   },
   photoArea: {
     flex: 1,
+    borderRadius: radius.xl,
+    overflow: 'hidden',
   },
   photo: {
     width: '100%',

@@ -1,10 +1,10 @@
 import { StyleSheet, View } from 'react-native';
 
 import { copy } from '@/constants/copy';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 import { Button } from './Button';
-import { Icon } from './Icon';
+import { IconBadge } from './IconBadge';
 import { Text } from './Text';
 
 export interface ErrorStateProps {
@@ -18,7 +18,7 @@ export interface ErrorStateProps {
 export function ErrorState({ message, onRetry, retryLabel = copy.common.retry }: ErrorStateProps) {
   return (
     <View style={styles.container} accessibilityRole="alert">
-      <Icon name="alert" size={sizes.icon.xl} color="textSecondary" />
+      <IconBadge name="alert" size="lg" tone="neutral" />
       <Text variant="body" align="center">
         {message}
       </Text>
@@ -34,7 +34,7 @@ export function ErrorState({ message, onRetry, retryLabel = copy.common.retry }:
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
     padding: spacing.lg,
   },
   action: {

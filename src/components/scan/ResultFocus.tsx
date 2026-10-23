@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Icon, Text } from '@/components/ui';
+import { SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { radius, sizes, spacing, useColors } from '@/theme/tokens';
+import { layout, radius, sizes, spacing, useColors } from '@/theme/tokens';
 import type { AttributeKey } from '@/types/scan';
 
 export interface ResultFocusProps {
@@ -20,7 +20,7 @@ export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
   return (
     <View style={[styles.container, { backgroundColor: palette.accentSubtle }]}>
       <View style={styles.header}>
-        <Icon name="sparkle" size={sizes.icon.md} color="accent" />
+        <SunMark width={sizes.sunMark.sm} />
         <Text variant="h3" accessibilityRole="header">
           {copy.results.focusTitle}
         </Text>
@@ -37,7 +37,7 @@ export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
             accessibilityLabel={`${copy.results.attributes[key]}, ${scores[key]}`}
           >
             <Text variant="label">{copy.results.attributes[key]}</Text>
-            <Text variant="label" color="accent">
+            <Text variant="label" color="accentText">
               {scores[key]}
             </Text>
           </View>
@@ -53,7 +53,7 @@ export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
 const styles = StyleSheet.create({
   container: {
     gap: spacing.md,
-    padding: spacing.md,
+    padding: layout.cardPadding,
     borderRadius: radius.lg,
   },
   header: {
@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
     minHeight: sizes.chip,
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
+    borderWidth: sizes.borderWidthStrong,
   },
 });

@@ -37,7 +37,7 @@ export function LegalLink({ label, url, onFail }: LegalLinkProps) {
       accessibilityLabel={label}
       style={({ pressed }) => ({ opacity: pressed ? opacity.pressed : 1 })}
     >
-      <Text variant="bodySmall" color="accent" style={styles.text}>
+      <Text variant="bodySmall" color="accentText" style={styles.text}>
         {label}
       </Text>
     </Pressable>
