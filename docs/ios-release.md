@@ -301,17 +301,17 @@ ID. App Store products have no base plans, so an iPhone would show the
 fallback name. Match the entitlement's product against the current offering's
 packages instead.
 
-### 4. Telling people their photo goes to Google's AI
+### 4. Telling people their photo goes to Anthropic's AI
 
 - **What Apple asks:** guideline 5.1.2(i) asks apps to say clearly when
   personal data goes to a third-party AI service, and to get permission
   first.
 - **What the app says now:** the notice before the first photo says it is
-  "uploaded and analysed" and "never shared", but not that Google's Gemini
-  does the analysis.
+  "uploaded and analysed" and "never shared", but not that Anthropic's
+  Claude API does the analysis.
 - **Suggested change** to `scan.dataNotice.points`:
-  - **First point:** "Your photo is sent to Google's Gemini AI service, which
-    estimates how your skin looks."
+  - **First point:** "Your photo is sent to Anthropic's Claude AI service,
+    which estimates how your skin looks."
   - **Third point:** "Apart from that, it is never shared, never sold and
     never used for advertising."
 - **Where it applies:** this is worth doing for Android too.
@@ -396,7 +396,7 @@ Work through this in order. Steps 1 and 2 are the one-time setup above.
    - the same purposes.
 
    Include what the SDKs collect for you: RevenueCat, PostHog, Sentry, and
-   Google (Gemini) for the photos.
+   Anthropic (the Claude API) for the photos.
 
 8. **Pricing and Availability:**
    - **Price:** free (the subscriptions carry the price).
@@ -423,7 +423,7 @@ Work through this in order. Steps 1 and 2 are the one-time setup above.
         tracking a skincare routine.
       - The first scan is free. Later scans need the subscription, which can
         be bought with a sandbox account.
-      - The photo is sent to Google's Gemini API for the estimate.
+      - The photo is sent to Anthropic's Claude API for the estimate.
       - Settings → Delete my account deletes everything.
       - Any clear, front-facing photo of a face works.
     - **Sign in with Apple:** not needed. The only sign-in is an emailed
