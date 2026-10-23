@@ -202,9 +202,8 @@ Five things need checking on an iPhone.
 
 - **Screens:** every screen is wrapped in `Screen`, which keeps content inside
   the safe area on all four sides.
-- **Tab screens (Home, Progress):** these keep top, left and right. The
-  floating tab bar pads itself above the home indicator with the bottom
-  safe-area inset. The routine and Settings open over the tabs as full
+- **Tab screens (Home, Progress):** these keep top, left and right. The tab
+  bar pads itself above the home indicator with the bottom safe-area inset. The routine and Settings open over the tabs as full
   screens, inset on all four sides.
 - **The camera:** the camera screen runs edge to edge and pads its controls by
   the safe-area insets. The close button clears the Dynamic Island, and the
@@ -215,8 +214,7 @@ Five things need checking on an iPhone.
   - The paywall's Close stays visible.
 - **Absolute positioning:** nothing is absolutely positioned against the top
   or bottom of the screen. The absolute elements are all inside content: the
-  chart tooltip, the comparison slider, the off-screen share card, and the
-  Scan button raised out of the middle of the tab bar.
+  chart tooltip, the comparison slider and the off-screen share card.
 
 ### No back button
 

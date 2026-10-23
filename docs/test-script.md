@@ -22,9 +22,10 @@ comes last, because it wipes everything.
 - If the app was installed before: uninstall it first, so this is a fresh
   install.
 
-The tab bar has two tabs, **Home** and **Progress**, either side of a large
-round **Scan** button. **Settings** opens from the round profile button at
-the top right of Home, and **the routine** from "Today's routine" on Home.
+The tab bar has two tabs, **Home** and **Progress**. A new scan starts from
+the large **Scan my skin** card at the top of Home. **Settings** opens from
+the round profile button at the top right of Home, and **the routine** from
+"Today's routine" on Home.
 
 Mark each step `[x]` as it passes.
 
@@ -136,7 +137,7 @@ The free scan must survive every one of these.
 1. [ ] **On the Progress tab, find the trend.**
        Pass: the latest score shows, plus "Your trend and comparisons" with
        **See plans**. That part is locked.
-2. [ ] **Start a second scan with the round Scan button.**
+2. [ ] **Start a second scan with Scan my skin on Home.**
        Pass: the plans open instead of the camera. There's no free second scan.
 3. [ ] **Look at the plans without buying.**
        Pass:
@@ -264,74 +265,117 @@ The free scan must survive every one of these.
 ## Navigation check (6 minutes)
 
 Run this once on any build that changes how screens are reached, such as
-the three-tab layout. It needs an account with at least one scan and a
-routine, so run it after section 4. Like the look and feel check, it sits
-apart from the numbered sections so their step numbers don't move.
+the two-tab layout with **Scan my skin** on Home. It needs an account with at
+least one scan and a routine, so run it after section 4. Like the look and
+feel check, it sits apart from the numbered sections so their step numbers
+don't move.
 
 1. [ ] **The tab bar.**
-       Pass: a floating, rounded bar with **Home**, a large round **Scan**
-       button raised out of the middle, and **Progress**. Each has an icon
-       and a label, and the three labels sit on one line. The open tab's icon
-       sits on a pale mint pill and its label is teal. The bar clears the
-       phone's own navigation bar or gesture line, and nothing on the screen
-       is hidden behind it.
+       Pass: a plain bar along the bottom with two tabs, **Home** and
+       **Progress**, each an icon over a label, and nothing between them: no
+       round or raised button. The open tab's icon sits on a pale mint pill
+       and its label is teal and bolder. The bar clears the phone's own
+       navigation bar or gesture line, and nothing on the screen is hidden
+       behind it.
 2. [ ] **Tap Progress, then Home.**
        Pass: each opens, and the pill moves with it.
-3. [ ] **Tap the Scan button, once in its middle and once on its top edge
-       (the part above the bar).**
-       Pass: both taps open the camera, or the plans once the free scan is
-       used without a subscription, exactly as **Take a scan** on Home does.
-       Closing it comes back to the screen you were on.
-4. [ ] **Look at "Today's routine" on Home, then tap Evening.**
+3. [ ] **Find Scan my skin on Home.**
+       Pass: a large teal card at the top, under the title and the profile
+       button, with the sun mark, "Scan my skin", a short line under it and a
+       yellow camera badge. It shows before the first scan too (fresh
+       install), and when the latest scan didn't load.
+4. [ ] **Tap Scan my skin.**
+       Pass: it opens the camera, or the plans once the free scan is used
+       without a subscription, exactly as **Take a scan** on Progress does.
+       Closing it comes back to Home.
+5. [ ] **Look at "Today's routine" on Home, then tap Evening.**
        Pass: Home shows how many steps are done today, and a Morning and an
        Evening row, each with a count and a progress bar. Evening opens the
        routine with the evening steps showing and a **Back** button at the
        top. Tick a step and tap Back: the Evening row shows one more done.
-5. [ ] **Tap the round profile button at the top right of Home.**
+6. [ ] **Tap the round profile button at the top right of Home.**
        Pass: Settings opens, with Account, Subscription, Reminders, Your data
        and About, and a **Back** button that stays at the top while you
-       scroll. Back goes to Home.
-6. [ ] **Open everything that lives in Settings.**
+       scroll. Back goes to Home. (A preview build with the premium preview
+       turned on also shows Testing; see the Premium preview check.)
+7. [ ] **Open everything that lives in Settings.**
        Pass: Save my progress (sign-in), Manage subscription, Download my
        data, Delete all my scan photos (cancel it), Delete my account (open
        it, then Close without deleting), Privacy Policy, Terms and Contact
        support all open as before. After Save my progress, tapping the link
        in the email brings you back to Settings.
-7. [ ] **Before the first scan** (fresh install, before 3.1, or after 9.9).
-       Pass: Home shows "No scans yet" and still has the profile button, so
-       Settings opens before any scan.
-8. [ ] **Android's back button.**
+8. [ ] **Before the first scan** (fresh install, before 3.1, or after 9.9).
+       Pass: Home shows Scan my skin, then "No scans yet" with no second scan
+       button, and still has the profile button, so Settings opens before
+       any scan.
+9. [ ] **Android's back button.**
        Pass:
    - on Progress, back goes to Home;
    - on Home, back leaves the app;
    - on the routine and on Settings, back goes to Home;
    - on the plans, back closes them;
    - on the results of a scan, back leaves for Home, as before.
-9. [ ] **The plans, while the subscriptions aren't set up in Play Console
-       yet.** Open Progress → See plans.
-       Pass: in place of the plans, "Plans aren't available yet on this
-       device. Please try again soon." with **Try again** and **Go back**.
-       Try again shows the loading lines briefly, then the plans if the store
-       has them, or the same message. No price shows anywhere. Go back and
-       Close both leave. The value points, Restore purchases, Terms and
-       Privacy Policy are still there. Once the subscriptions exist, the
-       plans show with their store prices instead.
-10. [ ] **TalkBack** (Settings → Accessibility → TalkBack).
-        Pass: the tabs read as "Home, tab, selected" and "Progress, tab"; the
-        Scan button as "Take a scan, button"; the profile button as
-        "Settings and account, button"; a routine row as, for example,
-        "Morning routine, 2 of 4 done, button". The word "Scan" under the
-        button isn't read on its own.
-11. [ ] **Largest font.** Set Font size to the largest and look at the tab
+10. [ ] **The plans, while the subscriptions aren't set up in Play Console
+        yet.** Open Progress → See plans.
+        Pass: in place of the plans, "Plans aren't available yet on this
+        device. Please try again soon." with **Try again** and **Go back**.
+        Try again shows the loading lines briefly, then the plans if the
+        store has them, or the same message. No price shows anywhere. Go
+        back and Close both leave. The value points, Restore purchases,
+        Terms and Privacy Policy are still there. Once the subscriptions
+        exist, the plans show with their store prices instead.
+11. [ ] **TalkBack** (Settings → Accessibility → TalkBack).
+        Pass: the tabs read as "Home, tab, selected" and "Progress, tab";
+        Scan my skin as "Scan my skin, button", with "Opens the camera for a
+        new scan"; the profile button as "Settings and account, button"; a
+        routine row as, for example, "Morning routine, 2 of 4 done, button".
+12. [ ] **Largest font.** Set Font size to the largest and look at the tab
         bar and Home.
-        Pass: the tab labels aren't cut off, the Scan button still sits in
-        the middle, and the routine rows' text wraps without overlapping.
-        Set the font size back afterwards.
+        Pass: the tab labels aren't cut off; on Scan my skin, the title and
+        its line wrap inside the card, beside the mark and the camera badge,
+        without overlapping; the routine rows' text wraps without
+        overlapping. Set the font size back afterwards.
+
+## Premium preview check (test builds only, 5 minutes)
+
+Only on a **preview** build whose update was published with
+`EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW=true` in the EAS `preview` environment
+(docs/ota-updates.md, "Testing premium on the preview build"). It needs an
+account whose free scan is used, without a subscription. Never on a
+production or Play Store build: there, step 1 must find no Testing section.
+
+1. [ ] **Open Settings and scroll down.**
+       Pass: a **Testing** section with a coral gear badge, saying it's only
+       in test builds, a **Preview premium** switch (off), and a note that
+       scans still follow the server's free-scan limit. On a production or
+       Play Store build there's no Testing section at all.
+2. [ ] **With the switch off, check the locks.**
+       Pass: Progress shows "Your trend and comparisons" with **See plans**,
+       and Scan my skin opens the plans.
+3. [ ] **Turn Preview premium on, go Back, and open Progress.**
+       Pass: the trend ("Over time", with the score chips and chart) and
+       "Before and after" replace the locked card. With two or more scans,
+       Compare two scans opens the comparison.
+4. [ ] **Close the app completely and reopen it.**
+       Pass: the switch is still on and Progress is still unlocked. It's
+       saved on this phone only.
+5. [ ] **Tap Scan my skin and take a photo.**
+       Pass: the camera opens instead of the plans. After Use this, the
+       server turns the scan down: "This scan needs a subscription" with a
+       note that Preview premium only changes what this phone shows, and the
+       plans open. That's expected: the server still needs a real
+       subscription.
+6. [ ] **Settings → Subscription.**
+       Pass: still "No active subscription": the preview isn't a
+       subscription.
+7. [ ] **Turn Preview premium off.**
+       Pass: Progress is locked again and Scan my skin opens the plans.
 
 ## Look and feel check (10 minutes)
 
-Run this once on any build that changes the app's look, such as the restyle
-in the launcher icon's teal and mint. It needs an account with at least two scans and a
+Run this once on any build that changes the app's look, such as the
+supporting colours (sun yellow, coral, lavender and sky blue) beside the
+launcher icon's teal and mint. It needs an account with at least two scans and a
 routine, so run it after section 8 and before section 9 wipes the account.
 It sits apart from the numbered sections so their step numbers don't move.
 
@@ -350,10 +394,14 @@ in light mode.
        Pass: the email field's outline turns teal while typing. A bad
        address shows its message in a deep pink-red, not teal.
 3. [ ] **Home.**
-       Pass: the small sun mark sits beside "Home". Cards are a soft mint on
-       white, with rounded corners. The main button is a teal pill with
-       white text; outlined buttons have teal text. The Scan button in the
-       tab bar looks like the app icon: a cream sun over mint arcs on teal.
+       Pass: the screen is white, and the small sun mark sits beside
+       "Home". Scan my skin is a teal card that looks like the app icon (a
+       cream sun over mint arcs) with a sun-yellow camera badge. Below it,
+       each card has its own soft colour, with rounded corners: the latest
+       score sky blue, Today's routine mint with a sun-yellow Morning row and
+       a lavender Evening row (each with a matching badge and progress bar),
+       and Your next scan coral. Main buttons are teal pills with white text;
+       outlined buttons have teal text. Every word is easy to read.
 4. [ ] **Camera and tips.**
        Pass: the face oval turns mint at "Looking good". **Why?** opens a
        sheet with rounded top corners, a grab bar and teal tick badges.
@@ -365,21 +413,30 @@ in light mode.
        photos for now", if you reach it, looks the same, with Go back.
 6. [ ] **Results.**
        Pass: the ring and bars run from pale mint (low) to deep teal (high);
-       nothing looks red or alarming. "Where to focus" sits on a pale mint
-       panel. The full disclaimer, with its info icon, is visible
-       without scrolling past anything collapsed.
+       nothing looks red or alarming. The seven scores sit on a sky-blue
+       card, "Where to focus" on a sun-yellow panel, and "Since your last
+       scan" on a lavender card. The full disclaimer, with its info icon, is
+       visible without scrolling past anything collapsed.
 7. [ ] **Share.**
        Pass: the preview is a light mint card with the sun mark beside
        "GlowTrack". The shared image looks the same as the preview.
 8. [ ] **Progress and compare.**
-       Pass: the chart line and points are teal. History thumbnails show
-       (or show a mint placeholder). On "Before and after", there is no
-       coloured strip down the left edge of the screen.
+       Pass: the latest score sits on a sky-blue card, "Over time" (or the
+       locked "Your trend and comparisons") on a lavender card with a
+       lavender chart line and points, "Before and after" on a coral card,
+       and the weekly streak on a sun-yellow card. History thumbnails show
+       (or show a mint placeholder). On the "Before and after" screen, there
+       is no coloured strip down the left edge of the screen.
 9. [ ] **Routine pictures.** Open Morning, then Evening.
        Pass:
    - every step shows a drawing between its tick box and its text, and
      still shows its title and its one-line reason;
-   - the drawings are in teal and mint, on a pale mint tile;
+   - Morning is a sun-yellow card and Evening a lavender one, each with a
+     matching badge, and ticked boxes in the section's colour;
+   - each kind of step has its own colour, its drawing in that colour on a
+     tile of the same soft colour: sunscreen and face oil yellow, serum and
+     lip balm coral, eye cream and makeup remover lavender, cleanser and
+     toner blue, moisturiser mint;
    - each drawing matches the step: makeup remover and cotton pad,
      cleanser pump, toner bottle, serum dropper, eye cream tube,
      moisturiser jar, face oil bottle, lip balm, sunscreen tube with a sun;
@@ -395,7 +452,9 @@ in light mode.
         button are plain body text. Close, Restore purchases, Terms and
         Privacy Policy are all visible.
 12. [ ] **Settings and Delete my account.**
-        Pass: each section is a mint card. Switches are teal when on.
+        Pass: each section is a mint card with a coloured badge beside its
+        title: Account blue, Subscription yellow, Reminders coral, Your data
+        lavender, About mint. Switches are teal when on.
         **Delete my account** is a deep pink-red button, clearly different
         from the teal ones.
 13. [ ] **Error and empty states.** Look back at the offline screens in
@@ -406,9 +465,10 @@ in light mode.
         quickly.
         Pass: backgrounds are a deep teal-black, the accent is the icon's
         bright mint, and main buttons have dark text. The sun mark beside
-        "Home" has a cream sun, and the Scan button is mint with a dark mark.
-        Every word is readable, and the routine drawings show clearly on
-        their dark tiles.
+        "Home" has a cream sun, and Scan my skin is mint with a dark mark and
+        dark text. The coloured cards turn deep and muted (navy, brown, plum)
+        with their colours bright on top. Every word is readable, and the
+        routine drawings show clearly on their dark tiles.
 15. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
         11 and 12.
         Pass: no text is cut off or overlaps. A long button label, such as

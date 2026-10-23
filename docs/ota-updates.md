@@ -71,6 +71,55 @@ To see what's published, run `npx eas-cli update:list --branch preview`, or
 open the project's Updates page on expo.dev. To undo an update, check out the
 last good commit and publish it again the same way.
 
+## Testing premium on the preview build
+
+Until the subscriptions exist in Google Play, nothing can be bought, so the
+premium screens can't be reached for real. A preview build can offer a
+tester-only switch instead: **Settings → Testing → Preview premium**. While
+it's on, the phone's own checks count you as subscribed, so the trend, the
+before-and-after comparison and the camera after your free scan open
+instead of the plans.
+
+It's controlled by one variable:
+
+| Variable                             | Value  | Where                                  |
+| ------------------------------------ | ------ | -------------------------------------- |
+| `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` | `true` | The EAS **`preview`** environment only |
+
+- **Set it once, in the `preview` environment only:**
+
+  ```bash
+  npx eas-cli env:create --environment preview --name EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW --value true --visibility plaintext
+  ```
+
+  Then publish to the preview channel as usual (`--environment preview`). The
+  value is written into the update, so the installed preview APK gets the
+  Testing section with no new build. To take it away again, delete the
+  variable (`npx eas-cli env:delete`) and publish again.
+
+- **Never set it for production.** Not in the EAS `production`
+  environment, not in `eas.json`, not in `app.json`. Check it's absent before
+  every production build or update:
+
+  ```bash
+  npx eas-cli env:list --environment production
+  ```
+
+  `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` must not be in that list. As a second
+  guard, the app never shows the switch in a build on the `production`
+  channel, even if the variable were set by mistake. `npm test`
+  (`src/lib/premiumPreview.test.ts`) checks both rules, and that
+  `eas.json`, `app.json` and `.env.example` don't set it.
+
+- **What it can't do.** It only changes what the phone shows. The server
+  (the analyze-scan Edge Function) still checks the real subscription with
+  RevenueCat, so after your free scan a new scan is still turned down with
+  "This scan needs a subscription". Purchases, restores and the
+  subscription shown in Settings are unchanged, and analytics keep reporting
+  the real subscription. The switch is saved on the phone only.
+
+The steps to check it are in `docs/test-script.md`, "Premium preview check".
+
 ## What an update can't do
 
 An update replaces the JavaScript bundle and the images and fonts it imports.

@@ -6,8 +6,10 @@ import {
   colors,
   getScoreColor,
   iconColors,
+  illustrationColors,
   shareCardColors,
   sunMarkColors,
+  TINT_NAMES,
   type ColorName,
   type ColorSchemeName,
 } from './colors.ts';
@@ -65,6 +67,7 @@ describe('palette contrast', () => {
       }
     }
 
+    // Buttons, and the "Scan my skin" card's title and line (accent, and accentPressed while pressed).
     for (const fill of ['accent', 'accentPressed', 'danger'] as const) {
       it(`${scheme}: button text on ${fill} meets ${TEXT}:1`, () => {
         const ratio = contrast(palette.textInverse, palette[fill]);
@@ -103,6 +106,98 @@ describe('palette contrast', () => {
   });
 });
 
+describe('supporting colours', () => {
+  for (const scheme of SCHEMES) {
+    const palette = colors[scheme];
+
+    for (const name of TINT_NAMES) {
+      const tint = palette.tints[name];
+
+      // Every card can be tinted, so every text colour must read on every tint.
+      for (const text of TEXT_COLORS) {
+        it(`${scheme}: ${text} on the ${name} card meets ${TEXT}:1`, () => {
+          const ratio = contrast(palette[text], tint.soft);
+          assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+        });
+      }
+
+      for (const background of [...BACKGROUNDS, 'tint'] as const) {
+        it(`${scheme}: ${name} text on ${background} meets ${TEXT}:1`, () => {
+          const behind = background === 'tint' ? tint.soft : palette[background];
+          const ratio = contrast(tint.text, behind);
+          assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+        });
+      }
+
+      it(`${scheme}: icons on the ${name} badge meet ${TEXT}:1`, () => {
+        const ratio = contrast(tint.onFill, tint.fill);
+        assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+      });
+
+      it(`${scheme}: a tick on a ${name} tick box meets ${TEXT}:1`, () => {
+        const ratio = contrast(palette.textInverse, tint.text);
+        assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+      });
+
+      // Unticked boxes, switches, chips and outlined buttons sit on tinted cards too.
+      for (const graphic of ['accent', 'borderStrong'] as const) {
+        it(`${scheme}: ${graphic} on the ${name} card meets ${GRAPHIC}:1`, () => {
+          const ratio = contrast(palette[graphic], tint.soft);
+          assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+        });
+      }
+
+      it(`${scheme}: a ${name} progress bar shows on its track (${GRAPHIC}:1)`, () => {
+        const ratio = contrast(tint.text, palette.background);
+        assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+      });
+    }
+
+    it(`${scheme}: mint is the brand's own tint`, () => {
+      assert.equal(palette.tints.mint.soft, palette.accentSubtle);
+      assert.equal(palette.tints.mint.text, palette.accentText);
+      assert.equal(palette.tints.mint.fill, iconColors.mint);
+    });
+
+    it(`${scheme}: every supporting colour is its own colour`, () => {
+      for (const strength of ['soft', 'fill', 'text'] as const) {
+        const values = TINT_NAMES.map((name) => palette.tints[name][strength]);
+        assert.equal(new Set(values).size, values.length, strength);
+      }
+    });
+  }
+
+  for (const name of TINT_NAMES) {
+    const ink = illustrationColors[name];
+
+    it(`${name} drawings: the outline shows on the light tile (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(ink.outline, colors.light.tints[name].soft);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
+
+    it(`${name} drawings: the body colour shows on the dark tile (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(ink.secondary, colors.dark.tints[name].soft);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
+  }
+
+  it('light screens stay pure white', () => {
+    assert.equal(luminance(colors.light.background), 1);
+    assert.equal(luminance(colors.light.surfaceElevated), 1);
+  });
+
+  it('the score scale stays mint to teal, with no supporting colour in it', () => {
+    for (const scheme of SCHEMES) {
+      const tintColors = TINT_NAMES.filter((name) => name !== 'mint').flatMap((name) =>
+        Object.values(colors[scheme].tints[name]),
+      );
+      for (const step of colors[scheme].score) {
+        assert.ok(!tintColors.includes(step), `${scheme}: ${step}`);
+      }
+    }
+  });
+});
+
 describe('palette and app icon', () => {
   it("uses the icon's teal as the light accent, unchanged", () => {
     assert.equal(colors.light.accent, iconColors.teal);
@@ -133,7 +228,7 @@ describe('palette and app icon', () => {
   });
 
   for (const scheme of SCHEMES) {
-    it(`${scheme}: the sun mark on the scan button meets ${GRAPHIC}:1`, () => {
+    it(`${scheme}: the sun mark on Home's scan card meets ${GRAPHIC}:1`, () => {
       for (const color of Object.values(sunMarkColors.onAccent[scheme])) {
         const ratio = contrast(color, colors[scheme].accent);
         assert.ok(ratio >= GRAPHIC, `${color}: ${ratio.toFixed(2)}:1`);
