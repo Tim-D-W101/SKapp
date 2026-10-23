@@ -20,6 +20,8 @@ export type Database = {
           concerns: string[]
           created_at: string
           display_name: string | null
+          free_attempts: number
+          free_attempts_since: string | null
           free_scan_used: boolean
           id: string
           onboarding_completed_at: string | null
@@ -36,6 +38,8 @@ export type Database = {
           concerns?: string[]
           created_at?: string
           display_name?: string | null
+          free_attempts?: number
+          free_attempts_since?: string | null
           free_scan_used?: boolean
           id: string
           onboarding_completed_at?: string | null
@@ -52,6 +56,8 @@ export type Database = {
           concerns?: string[]
           created_at?: string
           display_name?: string | null
+          free_attempts?: number
+          free_attempts_since?: string | null
           free_scan_used?: boolean
           id?: string
           onboarding_completed_at?: string | null
