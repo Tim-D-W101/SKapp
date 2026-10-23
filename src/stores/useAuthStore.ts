@@ -9,7 +9,12 @@ import { AppState } from 'react-native';
 import { create } from 'zustand';
 
 import { copy } from '@/constants/copy';
-import { clearCachedAccount, readCachedAccount, writeCachedAccount } from '@/lib/accountCache';
+import {
+  clearCachedAccount,
+  readCachedAccount,
+  readStoredSessionUserId,
+  writeCachedAccount,
+} from '@/lib/accountCache';
 import { authRedirectUrl } from '@/lib/auth';
 import { isConnectionFailure, logInDevelopment, toUserMessage } from '@/lib/errors';
 import { removeStoredPhotos } from '@/lib/personalData';
@@ -272,9 +277,14 @@ export const useAuthStore = create<AuthState>()((set, get) => {
           });
         } catch (error: unknown) {
           // The server can't be reached. A returning user starts from the copy
-          // saved on the phone, as long as it's the account the phone still holds.
+          // saved on the phone, but only when it belongs to the same user as the
+          // session the phone still holds. If getSession() itself failed, that
+          // session is read straight from storage. Anything unverified counts
+          // as having no copy at all.
           const cached = isConnectionFailure(error) ? await readCachedAccount() : null;
-          if (cached && stored !== null && (!stored || stored.user.id === cached.user.id)) {
+          const storedUserId =
+            cached && stored === undefined ? await readStoredSessionUserId() : stored?.user.id;
+          if (cached && storedUserId === cached.user.id) {
             const user = stored?.user ?? cached.user;
             set({
               session: stored ?? null,

@@ -76,6 +76,13 @@ export const secureChunkedStorage: SupportedStorage = {
   },
 };
 
+/**
+ * Where supabase-js keeps the session in `secureChunkedStorage`. This is the
+ * library's own default key, set explicitly so the app can read the stored
+ * session without a network call (`src/lib/accountCache.ts`).
+ */
+export const SESSION_STORAGE_KEY = `sb-${new URL(supabaseUrl).hostname.split('.')[0]}-auth-token`;
+
 const PUBLIC_KEY_BEARER = `Bearer ${supabaseKey}`;
 
 /**
@@ -100,6 +107,7 @@ function fetchAsUser(input: RequestInfo | URL, init?: RequestInit): Promise<Resp
 export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     storage: secureChunkedStorage,
+    storageKey: SESSION_STORAGE_KEY,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

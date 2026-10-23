@@ -1,7 +1,7 @@
 import type { User } from '@supabase/supabase-js';
 
 import { logInDevelopment } from '@/lib/errors';
-import { secureChunkedStorage } from '@/lib/supabase';
+import { SESSION_STORAGE_KEY, secureChunkedStorage } from '@/lib/supabase';
 import type { Profile } from '@/types/profile';
 
 /**
@@ -56,6 +56,24 @@ export async function readCachedAccount(): Promise<CachedAccount | null> {
   } catch (error: unknown) {
     // A damaged copy is dropped: the next launch with a connection writes a new one.
     logInDevelopment('Could not read the saved account', error);
+    return null;
+  }
+}
+
+/**
+ * The user id of the session supabase-js has stored on the phone, read
+ * straight from storage with no network call, or null if there is none or it
+ * can't be read. For when getSession() couldn't answer.
+ */
+export async function readStoredSessionUserId(): Promise<string | null> {
+  try {
+    const stored = await secureChunkedStorage.getItem(SESSION_STORAGE_KEY);
+    if (stored === null) return null;
+    const parsed: unknown = JSON.parse(stored);
+    if (!isRecord(parsed) || typeof parsed.refresh_token !== 'string') return null;
+    return isUser(parsed.user) ? parsed.user.id : null;
+  } catch (error: unknown) {
+    logInDevelopment('Could not read the stored session', error);
     return null;
   }
 }
