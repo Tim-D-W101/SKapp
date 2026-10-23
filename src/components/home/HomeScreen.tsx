@@ -22,6 +22,9 @@ import { useProgressStore } from '@/stores/useProgressStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 
+/** Skeleton lines shown until the first load finishes. */
+const LOADING_LINES = 4;
+
 /**
  * Where things stand today: the latest score, when the next weekly scan is
  * suggested, and how today's routine is going. Each card leads to the screen
@@ -63,7 +66,7 @@ export function HomeScreen() {
             }}
           />
         ) : (
-          <LoadingState lines={4} />
+          <LoadingState lines={LOADING_LINES} />
         )}
       </Screen>
     );
