@@ -19,8 +19,10 @@ export {
   cameraColors,
   colors,
   getScoreColor,
+  iconColors,
   illustrationColors,
   shareCardColors,
+  sunMarkColors,
   type ColorName,
   type ColorPalette,
   type ColorSchemeName,
@@ -302,8 +304,8 @@ export type ShadowStyle = Pick<
   'shadowColor' | 'shadowOffset' | 'shadowOpacity' | 'shadowRadius' | 'elevation'
 >;
 
-/** A warm brown rather than black, so shadows under peach cards stay soft. */
-const SHADOW_COLOR = '#6B2E1C';
+/** A deep teal rather than black, so shadows under mint cards stay soft. */
+const SHADOW_COLOR = '#0E3A35';
 
 /** Android reads `elevation`; iOS reads the shadow* properties. Each level sets both. */
 export const shadows: Record<ShadowLevel, ShadowStyle> = {

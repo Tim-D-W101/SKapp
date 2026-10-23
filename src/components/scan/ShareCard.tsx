@@ -129,7 +129,7 @@ export function CardHeader({ unit, detail }: { unit: number; detail: string }) {
   return (
     <View style={styles.header}>
       <View style={[styles.brand, { gap: shareCard.brandGap * unit }]}>
-        <SunMark width={shareCard.brandIcon * unit} />
+        <SunMark width={shareCard.brandIcon * unit} on="light" />
         <CardText unit={unit} size={shareCard.type.brand} bold>
           {copy.share.cardBrand}
         </CardText>

@@ -14,7 +14,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        // Labels are text, so the active one uses the text-safe coral.
+        // Labels are text, so the active one uses the text-safe accent.
         tabBarActiveTintColor: palette.accentText,
         tabBarInactiveTintColor: palette.textSecondary,
         tabBarLabelStyle: typography.caption,

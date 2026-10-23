@@ -21,7 +21,7 @@ export interface CardProps {
   style?: StyleProp<ViewStyle>;
 }
 
-/** A soft peach surface with rounded corners. */
+/** A soft mint surface with rounded corners. */
 export function Card({
   children,
   padding,

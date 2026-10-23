@@ -1,19 +1,30 @@
+import { useColorScheme } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { illustrationColors, sizes } from '@/theme/tokens';
+import { sizes, sunMarkColors } from '@/theme/tokens';
 
 export interface SunMarkProps {
   /** Width in dp. The height follows the artwork's proportions. */
   width?: number;
+  /**
+   * What it's drawn on. `light` gives the teal sun, `dark` the icon's cream
+   * sun, and `accent` colours that suit the accent fill in either mode.
+   * Defaults to the phone's light or dark setting; set it on a surface that
+   * doesn't follow the theme, such as the share card.
+   */
+  on?: 'light' | 'dark' | 'accent';
 }
 
 /**
  * The app's mark, as on the launcher icon: a sun rising over a gentle arc,
- * drawn here in the coral palette. The geometry matches assets/source/icon.svg
+ * in the icon's own colours. The geometry matches assets/source/icon.svg
  * (same 1024-unit grid), cropped to the artwork. Decorative and hidden from
  * screen readers: it always sits beside text that carries the meaning.
  */
-export function SunMark({ width = sizes.sunMark.lg }: SunMarkProps) {
+export function SunMark({ width = sizes.sunMark.lg, on }: SunMarkProps) {
+  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
+  const ink = on === 'accent' ? sunMarkColors.onAccent[scheme] : sunMarkColors[on ?? scheme];
+
   return (
     <Svg
       width={width}
@@ -22,18 +33,18 @@ export function SunMark({ width = sizes.sunMark.lg }: SunMarkProps) {
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      <Path d={SUN} fill={illustrationColors.coral} />
+      <Path d={SUN} fill={ink.sun} />
       <Path
         d={UPPER_ARC}
         fill="none"
-        stroke={illustrationColors.peachDeep}
+        stroke={ink.arcs}
         strokeWidth={ARC_STROKE}
         strokeLinecap="round"
       />
       <Path
         d={LOWER_ARC}
         fill="none"
-        stroke={illustrationColors.peachDeep}
+        stroke={ink.arcs}
         strokeWidth={ARC_STROKE}
         strokeLinecap="round"
       />

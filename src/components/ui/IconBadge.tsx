@@ -11,8 +11,8 @@ export interface IconBadgeProps {
   /** `sm` beside a line of text; `lg` above a screen's title. */
   size?: 'sm' | 'lg';
   /**
-   * `filled` is a coral disc with a white icon, `soft` a peach disc with a
-   * coral icon, and `neutral` a quiet one for calm, recoverable moments.
+   * `filled` is a teal disc with a white icon, `soft` a mint disc with a
+   * teal icon, and `neutral` a quiet one for calm, recoverable moments.
    */
   tone?: IconBadgeTone;
 }
