@@ -17,6 +17,7 @@ session needs to work from belongs in `docs/reference/`, committed.
 ```
 docs/
   README.md              this file
+  ota-updates.md         sending code and UI changes to installed builds
   reference/             source documents — PDFs, specs, briefs
 ```
 
