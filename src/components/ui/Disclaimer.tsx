@@ -27,7 +27,7 @@ export function Disclaimer({ variant = 'short' }: DisclaimerProps) {
       accessible
       accessibilityRole="text"
     >
-      <Icon name="info" size={sizes.icon.sm} color="textSecondary" />
+      <Icon name="info" size={sizes.icon.md} color="accentText" />
       <Text
         variant={variant === 'full' ? 'bodySmall' : 'caption'}
         color="textSecondary"
@@ -44,8 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    padding: spacing.md,
     borderRadius: radius.md,
     borderWidth: sizes.borderWidth,
   },

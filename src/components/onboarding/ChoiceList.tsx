@@ -76,7 +76,9 @@ function ChoiceRow({ label, description, selected, onPress }: ChoiceRowProps) {
       ]}
     >
       <View style={styles.text}>
-        <Text color={selected ? 'accent' : 'textPrimary'}>{label}</Text>
+        <Text variant="label" color={selected ? 'accentText' : 'textPrimary'}>
+          {label}
+        </Text>
         {description ? (
           <Text variant="bodySmall" color="textSecondary">
             {description}
@@ -87,8 +89,8 @@ function ChoiceRow({ label, description, selected, onPress }: ChoiceRowProps) {
         style={[
           styles.indicator,
           {
-            borderColor: selected ? palette.accent : palette.border,
-            backgroundColor: selected ? palette.accent : palette.surface,
+            borderColor: selected ? palette.accent : palette.borderStrong,
+            backgroundColor: selected ? palette.accent : palette.surfaceElevated,
           },
         ]}
       >
@@ -106,11 +108,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    minHeight: sizes.minTouchTarget,
+    minHeight: sizes.control.lg,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    borderRadius: radius.lg,
+    borderWidth: sizes.borderWidthStrong,
   },
   text: {
     flex: 1,
@@ -122,6 +124,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
+    borderWidth: sizes.borderWidthStrong,
   },
 });

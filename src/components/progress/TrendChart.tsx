@@ -161,7 +161,8 @@ export function TrendChart({
                   cy={point.y}
                   r={index === selectedIndex ? chart.selectedRadius : chart.pointRadius}
                   fill={palette.accent}
-                  stroke={palette.surfaceElevated}
+                  // The card's own colour, so each point sits in a clean ring.
+                  stroke={palette.surface}
                   strokeWidth={chart.pointRing}
                 />
               ))}

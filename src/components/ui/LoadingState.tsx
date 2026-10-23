@@ -95,11 +95,11 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   skeleton: {
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   line: {
     height: sizes.skeletonLine,
-    borderRadius: radius.sm,
+    borderRadius: radius.full,
   },
   shortLine: {
     width: sizes.skeletonShortLine,

@@ -9,7 +9,7 @@ import {
   type LayoutChangeEvent,
 } from 'react-native';
 
-import { Button, Icon, Screen, Text } from '@/components/ui';
+import { Button, IconBadge, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { SCAN_SLOW_MS, SCAN_STILL_WORKING_MS } from '@/constants/scan';
 import { openPaywall } from '@/lib/access';
@@ -64,6 +64,7 @@ function useWaitLevel(startedAt: number | null): WaitLevel {
  * there is one, the same photo carries on without being taken again.
  */
 export function AnalysingScreen() {
+  const palette = useColors();
   const analysis = useScanStore((state) => state.analysis);
   const capture = useScanStore((state) => state.capture);
   const retryAnalysis = useScanStore((state) => state.retryAnalysis);
@@ -253,7 +254,7 @@ export function AnalysingScreen() {
 
       {analysis.stage === 'complete' ? (
         <View style={styles.panel}>
-          <ActivityIndicator accessibilityLabel={copy.common.loading} />
+          <ActivityIndicator accessibilityLabel={copy.common.loading} color={palette.accent} />
         </View>
       ) : null}
     </Screen>
@@ -296,10 +297,10 @@ function StepList({ current }: { current: InProgress['stage'] }) {
         return (
           <View key={step.stage} style={styles.step}>
             <View style={styles.stepMarker}>
-              {done ? <Icon name="check" size={sizes.icon.md} color="accent" /> : null}
+              {done ? <IconBadge name="check" tone="filled" /> : null}
               {active ? <ActivityIndicator size="small" color={palette.accent} /> : null}
               {!done && !active ? (
-                <View style={[styles.stepDot, { borderColor: palette.border }]} />
+                <View style={[styles.stepDot, { borderColor: palette.borderStrong }]} />
               ) : null}
             </View>
             <Text
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
   },
   photo: {
     flex: 1,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     overflow: 'hidden',
   },
   panel: {
@@ -340,8 +341,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   stepMarker: {
-    width: sizes.icon.lg,
-    height: sizes.icon.lg,
+    width: sizes.iconBadge.sm,
+    height: sizes.iconBadge.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     width: sizes.icon.sm,
     height: sizes.icon.sm,
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
+    borderWidth: sizes.borderWidthStrong,
   },
   actions: {
     gap: spacing.sm,

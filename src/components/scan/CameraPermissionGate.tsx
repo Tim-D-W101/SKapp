@@ -4,10 +4,10 @@ import { router } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { AppState, StyleSheet, View } from 'react-native';
 
-import { Button, Icon, LoadingState, Screen, Text } from '@/components/ui';
+import { Button, LoadingState, Screen, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { logInDevelopment } from '@/lib/errors';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 export interface CameraPermissionGateProps {
   children: ReactNode;
@@ -67,7 +67,7 @@ export function CameraPermissionGate({ children }: CameraPermissionGateProps) {
   return (
     <Screen contentStyle={styles.content}>
       <View style={styles.body}>
-        <Icon name="sparkle" size={sizes.icon.xl} color="accent" />
+        <SunMark />
         <Text variant="h1" accessibilityRole="header">
           {denied ? text.deniedTitle : text.title}
         </Text>

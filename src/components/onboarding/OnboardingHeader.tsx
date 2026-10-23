@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { COUNTED_STEPS } from '@/lib/onboarding';
-import { radius, sizes, spacing, useColors } from '@/theme/tokens';
+import { layout, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 export interface OnboardingHeaderProps {
   /** Zero-based index into ONBOARDING_STEPS. */
@@ -68,7 +68,7 @@ export function OnboardingHeader({
 const styles = StyleSheet.create({
   container: {
     gap: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: layout.gutter,
     paddingTop: spacing.sm,
   },
   row: {
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     flexDirection: 'row',
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   segment: {
     flex: 1,

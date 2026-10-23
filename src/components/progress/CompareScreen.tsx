@@ -21,7 +21,7 @@ import { logInDevelopment } from '@/lib/errors';
 import type { ScanRecord } from '@/lib/progress';
 import { captureCard, confirmPhotoShare, openShareSheet } from '@/lib/shareImage';
 import { useProgressStore } from '@/stores/useProgressStore';
-import { sizes, spacing, useColors } from '@/theme/tokens';
+import { layout, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { CompareCard } from './CompareCard';
 import { CompareScores } from './CompareScores';
@@ -314,5 +314,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: '100%',
+    // This sits inside the screen's gutter, so without the margin the
+    // card's last gutter-width would show at the left edge.
+    marginRight: layout.gutter,
   },
 });

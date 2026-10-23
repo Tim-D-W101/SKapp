@@ -2,10 +2,10 @@ import { router, useFocusEffect, type Href } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { BackHandler, StyleSheet, View } from 'react-native';
 
-import { Button, Icon, Screen, Text } from '@/components/ui';
+import { Button, Screen, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { useReminderStore } from '@/stores/useReminderStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 export interface RemindersIntroScreenProps {
   /** Where to go next, whichever the answer. */
@@ -47,7 +47,7 @@ export function RemindersIntroScreen({ next }: RemindersIntroScreenProps) {
   return (
     <Screen contentStyle={styles.content}>
       <View style={styles.body}>
-        <Icon name="sparkle" size={sizes.icon.xl} color="accent" />
+        <SunMark />
         <Text variant="h2" align="center" accessibilityRole="header">
           {copy.notifications.permission.title}
         </Text>

@@ -11,6 +11,7 @@ import {
   LoadingState,
   Screen,
   ScoreRing,
+  SunMark,
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
@@ -20,7 +21,7 @@ import { nextScanDate } from '@/lib/progress';
 import { tickKey } from '@/lib/routine';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
-import { spacing } from '@/theme/tokens';
+import { sizes, spacing } from '@/theme/tokens';
 
 /** Skeleton lines shown until the first load finishes. */
 const LOADING_LINES = 4;
@@ -80,9 +81,12 @@ export function HomeScreen() {
 
   return (
     <Screen scroll edges={['top', 'right', 'left']} contentStyle={styles.content}>
-      <Text variant="h1" accessibilityRole="header">
-        {copy.home.title}
-      </Text>
+      <View style={styles.header}>
+        <SunMark width={sizes.sunMark.sm} />
+        <Text variant="h1" accessibilityRole="header">
+          {copy.home.title}
+        </Text>
+      </View>
 
       {refreshFailed ? (
         <View style={styles.notice} accessibilityLiveRegion="polite">
@@ -93,7 +97,7 @@ export function HomeScreen() {
         </View>
       ) : null}
 
-      <Card style={styles.latest}>
+      <Card style={styles.latest} elevation="md">
         <ScoreRing score={latest.overall} label={copy.progress.latest} />
         <Text variant="bodySmall" color="textSecondary" align="center">
           {copy.home.latestDate(formatShortDate(latest.createdAt))}
@@ -148,6 +152,11 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   notice: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -158,7 +167,7 @@ const styles = StyleSheet.create({
   },
   latest: {
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   card: {
     gap: spacing.sm,

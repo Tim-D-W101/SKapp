@@ -3,7 +3,9 @@ import { StyleSheet, View } from 'react-native';
 import { sizes, spacing } from '@/theme/tokens';
 
 import { Button } from './Button';
-import { Icon, type IconName } from './Icon';
+import { IconBadge } from './IconBadge';
+import type { IconName } from './Icon';
+import { SunMark } from './SunMark';
 import { Text } from './Text';
 
 export interface EmptyStateAction {
@@ -14,15 +16,18 @@ export interface EmptyStateAction {
 export interface EmptyStateProps {
   title: string;
   body: string;
+  /** Shown on a soft badge. Without one, the sun mark stands in. */
   icon?: IconName;
   action?: EmptyStateAction;
 }
 
-export function EmptyState({ title, body, icon = 'sparkle', action }: EmptyStateProps) {
+export function EmptyState({ title, body, icon, action }: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Icon name={icon} size={sizes.icon.xl} color="accent" />
-      <Text variant="h3" align="center" accessibilityRole="header">
+      <View style={styles.art}>
+        {icon ? <IconBadge name={icon} size="lg" /> : <SunMark width={sizes.sunMark.lg} />}
+      </View>
+      <Text variant="h2" align="center" accessibilityRole="header">
         {title}
       </Text>
       <Text variant="body" color="textSecondary" align="center">
@@ -30,7 +35,7 @@ export function EmptyState({ title, body, icon = 'sparkle', action }: EmptyState
       </Text>
       {action ? (
         <View style={styles.action}>
-          <Button label={action.label} onPress={action.onPress} />
+          <Button label={action.label} onPress={action.onPress} size="lg" />
         </View>
       ) : null}
     </View>
@@ -43,7 +48,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.lg,
   },
+  art: {
+    marginBottom: spacing.sm,
+  },
   action: {
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
   },
 });

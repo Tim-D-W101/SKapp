@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { Button, Card, Icon, Screen, Text } from '@/components/ui';
+import { Button, Card, IconBadge, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import type { PaywallTrigger } from '@/constants/subscription';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
 
 export interface SubscribedPanelProps {
   trigger: PaywallTrigger;
@@ -31,7 +31,7 @@ export function SubscribedPanel({ trigger, restored }: SubscribedPanelProps) {
   return (
     <Screen scroll contentStyle={styles.content}>
       <View style={styles.header}>
-        <Icon name="check" size={sizes.icon.xl} color="accent" />
+        <IconBadge name="check" size="lg" tone="filled" />
         <Text variant="h1" align="center" accessibilityRole="header">
           {restored ? copy.paywall.subscribed.restoredTitle : copy.paywall.subscribed.title}
         </Text>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   card: {
     gap: spacing.md,

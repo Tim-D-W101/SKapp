@@ -6,11 +6,13 @@ import {
   motion,
   opacity,
   radius,
+  shadows,
   sizes,
   spacing,
   useColors,
   type ColorName,
   type ColorPalette,
+  type TypographyVariant,
 } from '@/theme/tokens';
 
 import { Icon, type IconName } from './Icon';
@@ -42,9 +44,21 @@ const HORIZONTAL_PADDING: Record<ButtonSize, number> = {
 
 const ICON_SIZE: Record<ButtonSize, number> = {
   sm: sizes.icon.sm,
-  md: sizes.icon.sm,
+  md: sizes.icon.md,
   lg: sizes.icon.md,
 };
+
+const LABEL_VARIANT: Record<ButtonSize, TypographyVariant> = {
+  sm: 'label',
+  md: 'label',
+  lg: 'labelLarge',
+};
+
+/**
+ * A label may wrap onto a second line rather than be cut off, which only
+ * happens at the phone's largest font sizes. The button grows to fit.
+ */
+const LABEL_LINES = 2;
 
 interface VariantColors {
   background: string;
@@ -61,13 +75,13 @@ function variantColors(variant: ButtonVariant, pressed: boolean, palette: ColorP
     },
     secondary: {
       background: pressed ? palette.accentSubtle : palette.surfaceElevated,
-      border: palette.border,
-      text: 'textPrimary',
+      border: palette.accent,
+      text: 'accentText',
     },
     ghost: {
       background: pressed ? palette.accentSubtle : 'transparent',
       border: 'transparent',
-      text: 'accent',
+      text: 'accentText',
     },
     destructive: {
       background: palette.danger,
@@ -135,11 +149,13 @@ export function Button({
               style={[
                 styles.base,
                 {
-                  height,
+                  minHeight: height,
                   paddingHorizontal: HORIZONTAL_PADDING[size],
                   backgroundColor: colors.background,
                   borderColor: colors.border,
                 },
+                // A soft lift on the main action, so it reads as the one to tap.
+                variant === 'primary' && !disabled ? shadows.md : null,
               ]}
             >
               {loading ? (
@@ -149,7 +165,13 @@ export function Button({
                   {leadingIcon ? (
                     <Icon name={leadingIcon} size={ICON_SIZE[size]} color={colors.text} />
                   ) : null}
-                  <Text variant="label" color={colors.text} numberOfLines={1}>
+                  <Text
+                    variant={LABEL_VARIANT[size]}
+                    color={colors.text}
+                    align="center"
+                    numberOfLines={LABEL_LINES}
+                    style={styles.label}
+                  >
                     {label}
                   </Text>
                 </>
@@ -174,7 +196,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
+    // Every variant has the same border width, so they all line up at one height.
+    borderWidth: sizes.borderWidthStrong,
+  },
+  label: {
+    flexShrink: 1,
   },
 });

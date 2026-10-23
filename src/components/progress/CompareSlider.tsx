@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   frame: {
     width: '100%',
     aspectRatio: COMPARE_FRAME_ASPECT,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     overflow: 'hidden',
     backgroundColor: cameraColors.background,
   },

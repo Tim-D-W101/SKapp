@@ -14,10 +14,14 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: palette.accent,
+        // Labels are text, so the active one uses the text-safe coral.
+        tabBarActiveTintColor: palette.accentText,
         tabBarInactiveTintColor: palette.textSecondary,
         tabBarLabelStyle: typography.caption,
-        tabBarStyle: { backgroundColor: palette.surface, borderTopColor: palette.borderSubtle },
+        tabBarStyle: {
+          backgroundColor: palette.surfaceElevated,
+          borderTopColor: palette.borderSubtle,
+        },
         sceneStyle: { backgroundColor: palette.background },
       }}
     >
@@ -26,7 +30,11 @@ export default function TabsLayout() {
         options={{
           title: copy.tabs.home,
           tabBarIcon: ({ focused }) => (
-            <Icon name="home" size={sizes.icon.lg} color={focused ? 'accent' : 'textSecondary'} />
+            <Icon
+              name="home"
+              size={sizes.icon.lg}
+              color={focused ? 'accentText' : 'textSecondary'}
+            />
           ),
         }}
       />
@@ -35,7 +43,11 @@ export default function TabsLayout() {
         options={{
           title: copy.tabs.progress,
           tabBarIcon: ({ focused }) => (
-            <Icon name="chart" size={sizes.icon.lg} color={focused ? 'accent' : 'textSecondary'} />
+            <Icon
+              name="chart"
+              size={sizes.icon.lg}
+              color={focused ? 'accentText' : 'textSecondary'}
+            />
           ),
         }}
       />
@@ -44,7 +56,11 @@ export default function TabsLayout() {
         options={{
           title: copy.tabs.routine,
           tabBarIcon: ({ focused }) => (
-            <Icon name="list" size={sizes.icon.lg} color={focused ? 'accent' : 'textSecondary'} />
+            <Icon
+              name="list"
+              size={sizes.icon.lg}
+              color={focused ? 'accentText' : 'textSecondary'}
+            />
           ),
         }}
       />
@@ -56,7 +72,7 @@ export default function TabsLayout() {
             <Icon
               name="settings"
               size={sizes.icon.lg}
-              color={focused ? 'accent' : 'textSecondary'}
+              color={focused ? 'accentText' : 'textSecondary'}
             />
           ),
         }}

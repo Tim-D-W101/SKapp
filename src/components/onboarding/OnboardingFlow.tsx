@@ -24,7 +24,7 @@ import {
   type OnboardingStep,
 } from '@/lib/onboarding';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { motion, spacing } from '@/theme/tokens';
+import { layout, motion, spacing } from '@/theme/tokens';
 import type { Profile, ProfileUpdate } from '@/types/profile';
 
 import { OnboardingHeader } from './OnboardingHeader';
@@ -282,6 +282,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     gap: spacing.sm,
-    padding: spacing.md,
+    padding: layout.gutter,
   },
 });

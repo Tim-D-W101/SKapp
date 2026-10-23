@@ -2,7 +2,15 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button, ErrorState, Icon, LoadingState, Screen, Text } from '@/components/ui';
+import {
+  Button,
+  ErrorState,
+  IconBadge,
+  LoadingState,
+  Screen,
+  SunMark,
+  Text,
+} from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { LEGAL_LINKS } from '@/constants/links';
 import { DEFAULT_PLAN, type PaywallTrigger, type PlanId } from '@/constants/subscription';
@@ -17,7 +25,7 @@ import {
   type RestoreOutcome,
 } from '@/lib/purchases';
 import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
-import { sizes, spacing } from '@/theme/tokens';
+import { layout, sizes, spacing } from '@/theme/tokens';
 
 import { LegalLink } from './LegalLink';
 import { PlanCard } from './PlanCard';
@@ -156,6 +164,7 @@ export function PaywallScreen({ trigger }: PaywallScreenProps) {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
+        <SunMark width={sizes.sunMark.sm} />
         <Text variant="h1" accessibilityRole="header">
           {copy.paywall.title}
         </Text>
@@ -164,7 +173,7 @@ export function PaywallScreen({ trigger }: PaywallScreenProps) {
         <View style={styles.points}>
           {copy.paywall.valuePoints.map((point) => (
             <View key={point} style={styles.point}>
-              <Icon name="check" size={sizes.icon.md} color="accent" />
+              <IconBadge name="check" tone="filled" />
               <Text style={styles.pointText}>{point}</Text>
             </View>
           ))}
@@ -245,15 +254,15 @@ export function PaywallScreen({ trigger }: PaywallScreenProps) {
 const styles = StyleSheet.create({
   topBar: {
     alignItems: 'flex-start',
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: layout.gutter,
     paddingTop: spacing.sm,
   },
   content: {
     gap: spacing.lg,
-    padding: spacing.md,
+    padding: layout.gutter,
   },
   points: {
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   point: {
     flexDirection: 'row',

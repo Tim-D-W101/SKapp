@@ -45,7 +45,11 @@ export function RoutineSection({
         <Text variant="bodySmall" color="textSecondary">
           {count}
         </Text>
-        <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={sizes.icon.md} />
+        <Icon
+          name={expanded ? 'chevronUp' : 'chevronDown'}
+          size={sizes.icon.md}
+          color="accentText"
+        />
       </Pressable>
 
       {expanded
@@ -69,7 +73,10 @@ export function RoutineSection({
                     styles.box,
                     isDone
                       ? { backgroundColor: palette.accent, borderColor: palette.accent }
-                      : { borderColor: palette.border },
+                      : {
+                          backgroundColor: palette.surfaceElevated,
+                          borderColor: palette.borderStrong,
+                        },
                   ]}
                 >
                   {isDone ? (
@@ -114,6 +121,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: sizes.minTouchTarget,
     paddingVertical: spacing.sm,
+    borderRadius: radius.md,
   },
   box: {
     width: sizes.checkbox,
