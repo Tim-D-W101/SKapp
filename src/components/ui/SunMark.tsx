@@ -10,7 +10,8 @@ export interface SunMarkProps {
    * What it's drawn on. `light` gives the teal sun, `dark` the icon's cream
    * sun, and `accent` colours that suit the accent fill in either mode.
    * Defaults to the phone's light or dark setting; set it on a surface that
-   * doesn't follow the theme, such as the share card.
+   * doesn't follow the theme, such as the share card, and to `accent` on the
+   * accent fill, such as Home's "Scan my skin" card.
    */
   on?: 'light' | 'dark' | 'accent';
 }

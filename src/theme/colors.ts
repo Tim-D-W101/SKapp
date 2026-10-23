@@ -51,7 +51,7 @@ export type ScoreScale = readonly [string, string, string, string, string];
 /**
  * The supporting colours, each used for one kind of thing on every screen:
  * - mint: the brand's own tint, for anything without a colour of its own
- * - sun: the morning routine, the scan button's camera, where to focus, the
+ * - sun: the morning routine, the camera on Home's scan card, where to focus, the
  *   weekly streak, the subscription
  * - coral: the next scan, comparisons, reminders
  * - lavender: the evening routine, the trend over time, changes since the
@@ -95,7 +95,7 @@ export interface ColorPalette {
   textTertiary: string;
   /** Text on accent or danger fills. */
   textInverse: string;
-  /** The brand fill: primary buttons, the scan button, ticks, rings and highlights. */
+  /** The brand fill: primary buttons, Home's scan card, the routine's ring and highlights. */
   accent: string;
   /** Pale mint behind selected and highlighted things, such as the active tab. */
   accentSubtle: string;
@@ -230,9 +230,9 @@ export const sunMarkColors = {
   light: { sun: iconColors.teal, arcs: iconColors.mint },
   dark: { sun: iconColors.cream, arcs: iconColors.mint },
   /**
-   * On the accent fill, such as the scan button. In light mode that fill is
-   * the icon's teal, so the mark looks exactly like the launcher icon; in
-   * dark mode it's mint, so the mark turns dark ink and teal.
+   * On the accent fill, such as Home's "Scan my skin" card. In light mode
+   * that fill is the icon's teal, so the mark looks exactly like the launcher
+   * icon; in dark mode it's mint, so the mark turns dark ink and teal.
    */
   onAccent: {
     light: { sun: iconColors.cream, arcs: iconColors.mint },

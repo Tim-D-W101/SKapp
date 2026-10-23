@@ -109,18 +109,18 @@ export const sizes = {
   progressSegment: 4,
   /** Height of the morning and evening progress bars on Home. */
   routineProgress: 6,
-  /**
-   * The floating tab bar, and the round scan button raised out of its
-   * middle. The pill behind the active tab's icon is `indicator`.
-   */
+  /** The tab bar, not counting the safe area below it. The pill behind the open tab's icon is `indicator`. */
   tabBar: {
     height: 64,
     indicator: { width: 56, height: 32 },
-    scanButton: 60,
-    /** A ring in the screen's colour around the scan button, so it reads as set into the bar. */
-    scanButtonRing: 4,
-    /** Width of the sun mark on the scan button. */
-    scanButtonMark: 34,
+  },
+  /**
+   * The "Scan my skin" card at the top of Home: the width of its sun mark,
+   * and the round camera badge at its end.
+   */
+  scanCard: {
+    mark: 56,
+    camera: 48,
   },
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',

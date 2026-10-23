@@ -28,7 +28,8 @@ export type IconName =
   | 'sun'
   | 'moon'
   | 'bell'
-  | 'calendar';
+  | 'calendar'
+  | 'camera';
 
 export interface IconProps {
   name: IconName;
@@ -167,6 +168,13 @@ function renderGlyph(name: IconName) {
         <>
           <Path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z" />
           <Path d="M10 20.5a2 2 0 0 0 4 0" />
+        </>
+      );
+    case 'camera':
+      return (
+        <>
+          <Path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" />
+          <Circle cx={12} cy={12.5} r={3.5} />
         </>
       );
     case 'calendar':

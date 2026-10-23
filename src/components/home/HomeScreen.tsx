@@ -15,7 +15,6 @@ import {
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { startScan } from '@/lib/access';
 import { formatShortDate } from '@/lib/dates';
 import { nextScanDate } from '@/lib/progress';
 import { useProgressStore } from '@/stores/useProgressStore';
@@ -23,17 +22,20 @@ import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 
 import { HomeHeader } from './HomeHeader';
+import { ScanCard } from './ScanCard';
 import { TodayRoutine } from './TodayRoutine';
 
 /** Skeleton lines shown until the first load finishes. */
 const LOADING_LINES = 4;
 
 /**
- * Where things stand today: the latest score, today's routine, and when the
- * next weekly scan is suggested. Each card leads to the screen with the
- * detail, and the profile button in the header opens Settings. It reads the
- * same stores as the Progress tab and the routine and refreshes them on each
- * visit, so all three always agree.
+ * Where things stand today, under the big "Scan my skin" card that starts a
+ * scan: the latest score, today's routine, and when the next weekly scan is
+ * suggested. Each card leads to the screen with the detail, and the profile
+ * button in the header opens Settings. The header and the scan card show in
+ * every state, so scanning and Settings are always one tap away. It reads
+ * the same stores as the Progress tab and the routine and refreshes them on
+ * each visit, so all three always agree.
  */
 export function HomeScreen() {
   const status = useProgressStore((state) => state.status);
@@ -55,21 +57,15 @@ export function HomeScreen() {
 
   if (records.length === 0) {
     return (
-      <Screen edges={['top', 'right', 'left']} contentStyle={styles.content}>
-        {/* Always there, so Settings is reachable before the first scan too. */}
+      <Screen scroll edges={['top', 'right', 'left']} contentStyle={[styles.content, styles.grow]}>
         <HomeHeader />
+        <ScanCard />
         <View style={styles.centered}>
           {status === 'error' ? (
             <ErrorState message={copy.home.loadFailed} onRetry={retry} />
           ) : status === 'ready' ? (
-            <EmptyState
-              title={copy.progress.noScans.title}
-              body={copy.progress.noScans.body}
-              action={{
-                label: copy.progress.noScans.cta,
-                onPress: startScan,
-              }}
-            />
+            // The scan card above is the way to the first scan.
+            <EmptyState title={copy.progress.noScans.title} body={copy.progress.noScans.body} />
           ) : (
             <LoadingState lines={LOADING_LINES} />
           )}
@@ -94,6 +90,8 @@ export function HomeScreen() {
         </View>
       ) : null}
 
+      <ScanCard />
+
       <Card style={styles.latest} elevation="md" tint="sky">
         <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
         <Text variant="bodySmall" color="textSecondary" align="center">
@@ -114,12 +112,6 @@ export function HomeScreen() {
         <Text color="textSecondary">
           {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
         </Text>
-        <Button
-          label={copy.home.nextScan.cta}
-          onPress={startScan}
-          variant={next ? 'secondary' : 'primary'}
-          fullWidth
-        />
       </Card>
 
       <Disclaimer />
@@ -134,6 +126,9 @@ const styles = StyleSheet.create({
   },
   content: {
     gap: spacing.lg,
+  },
+  grow: {
+    flexGrow: 1,
   },
   notice: {
     flexDirection: 'row',

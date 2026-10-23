@@ -595,13 +595,18 @@ export const copy = {
 
   home: {
     title: 'Home',
+    /** The large card at the top of Home that starts a scan. */
+    scan: {
+      title: 'Scan my skin',
+      body: 'A quick photo, then your cosmetic scores for today.',
+      hint: 'Opens the camera for a new scan',
+    },
     latestDate: (date: string) => `From your scan on ${date}`,
     seeResults: 'See these results',
     nextScan: {
       title: 'Your next scan',
       on: (date: string) => `Suggested for ${date}, a week after your last one.`,
-      now: 'Your next scan is ready whenever you are.',
-      cta: 'Take a scan',
+      now: 'Your next scan is ready whenever you are. Tap Scan my skin at the top.',
     },
     routine: {
       title: "Today's routine",
@@ -622,10 +627,6 @@ export const copy = {
   tabs: {
     home: 'Home',
     progress: 'Progress',
-    /** Under the round scan button in the middle of the tab bar. */
-    scan: 'Scan',
-    scanLabel: 'Take a scan',
-    scanHint: 'Starts a new scan',
   },
 
   settings: {
