@@ -2,26 +2,14 @@ import { StyleSheet } from 'react-native';
 
 import { Button, Card, ScoreRing, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { SUGGESTED_SCAN_INTERVAL_DAYS } from '@/constants/progress';
 import { startScan } from '@/lib/access';
-import { calendarDaysBetween, formatShortDate } from '@/lib/dates';
-import type { ScanRecord } from '@/lib/progress';
+import { calendarDaysBetween } from '@/lib/dates';
+import { nextScanDate, type ScanRecord } from '@/lib/progress';
 import { spacing } from '@/theme/tokens';
 
 export interface ProgressHeroProps {
   /** Oldest first, at least one. */
   records: ScanRecord[];
-}
-
-/** When the next weekly scan is due, or null if it already is. */
-function nextScanDate(latest: string): string | null {
-  const created = new Date(latest);
-  const due = new Date(
-    created.getFullYear(),
-    created.getMonth(),
-    created.getDate() + SUGGESTED_SCAN_INTERVAL_DAYS,
-  );
-  return due.getTime() > Date.now() ? formatShortDate(due.toISOString()) : null;
 }
 
 /**

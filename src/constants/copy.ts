@@ -288,6 +288,10 @@ export const copy = {
       title: 'Something went wrong',
       body: "Your scan didn't finish. This didn't use up your free scan.",
     },
+    /** The server's 24-hour limit on free attempts. The message is errors.scan.FREE_ATTEMPTS_USED. */
+    freeAttemptsUsed: {
+      title: "That's enough photos for now",
+    },
     /** The server turned the scan down: the free scan is used and there's no subscription. */
     subscriptionNeeded: {
       title: 'This scan needs a subscription',
@@ -299,12 +303,16 @@ export const copy = {
   results: {
     title: 'Your results',
     overall: 'Overall',
+    /**
+     * Every score is higher-is-better, so each label names the good end. Otherwise
+     * "Up 5" would read as more of what a person wants less of.
+     */
     attributes: {
       clarity: 'Clarity',
       texture: 'Texture',
-      pores: 'Pores',
+      pores: 'Refined pores',
       hydration: 'Hydration',
-      redness: 'Redness',
+      redness: 'Calm tone',
       evenness: 'Evenness',
       firmness: 'Firmness',
     },
@@ -569,6 +577,23 @@ export const copy = {
     },
   },
 
+  home: {
+    title: 'Home',
+    latestDate: (date: string) => `From your scan on ${date}`,
+    seeResults: 'See these results',
+    nextScan: {
+      title: 'Your next scan',
+      on: (date: string) => `Suggested for ${date}, a week after your last one.`,
+      now: 'Your next scan is ready whenever you are.',
+      cta: 'Take a scan',
+    },
+    routine: {
+      title: "Today's routine",
+      open: 'Open my routine',
+    },
+    loadFailed: "Your latest scan didn't load. Check your connection and try again.",
+  },
+
   tabs: {
     home: 'Home',
     progress: 'Progress',
@@ -697,6 +722,8 @@ export const copy = {
       MODEL_TIMEOUT: 'Your scan took too long to process. Try again.',
       MODEL_INVALID_RESPONSE: "Your scan didn't finish properly. Try again.",
       SUBSCRIPTION_REQUIRED: 'Subscribe to take another scan.',
+      FREE_ATTEMPTS_USED:
+        "You've tried several photos recently. Try again in 24 hours, facing a window in daylight if you can.",
       ENTITLEMENT_UNAVAILABLE:
         "We couldn't check your subscription just now. Try again in a moment.",
       INTERNAL: 'Something went wrong on our side. Try again in a moment.',
