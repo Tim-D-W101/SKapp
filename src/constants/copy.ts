@@ -536,7 +536,10 @@ export const copy = {
     plansLabel: 'Choose a plan',
     loadingPlans: 'Loading plans',
     plansFailed: "The plans didn't load. Check your connection and try again.",
-    unavailable: "Subscriptions aren't available on this phone right now.",
+    /** No plans from the store. Expected until the subscriptions are set up in Google Play. */
+    unavailable: "Plans aren't available yet on this device. Please try again soon.",
+    /** Under Try again when the plans can't load. */
+    back: 'Go back',
     plans: {
       weekly: 'Weekly',
       monthly: 'Monthly',

@@ -2,15 +2,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import {
-  Button,
-  ErrorState,
-  IconBadge,
-  LoadingState,
-  Screen,
-  SunMark,
-  Text,
-} from '@/components/ui';
+import { Button, IconBadge, LoadingState, Screen, SunMark, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { LEGAL_LINKS } from '@/constants/links';
 import { DEFAULT_PLAN, type PaywallTrigger, type PlanId } from '@/constants/subscription';
@@ -29,6 +21,7 @@ import { layout, sizes, spacing } from '@/theme/tokens';
 
 import { LegalLink } from './LegalLink';
 import { PlanCard } from './PlanCard';
+import { PlansUnavailable } from './PlansUnavailable';
 import { SubscribedPanel } from './SubscribedPanel';
 
 export interface PaywallScreenProps {
@@ -218,7 +211,12 @@ export function PaywallScreen({ trigger }: PaywallScreenProps) {
             </View>
           </>
         ) : offerings.status === 'error' ? (
-          <ErrorState message={offerings.message} onRetry={() => void loadOfferings()} />
+          <PlansUnavailable
+            message={offerings.message}
+            onRetry={() => void loadOfferings()}
+            onBack={close}
+            disabled={busy !== null}
+          />
         ) : (
           <LoadingState lines={4} accessibilityLabel={copy.paywall.loadingPlans} />
         )}
