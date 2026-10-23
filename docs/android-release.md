@@ -3,13 +3,12 @@
 Everything builds in Expo's cloud with EAS, so nothing needs installing
 beyond Node and the EAS command line.
 
-## Before the first store build: replace the placeholder art
+## App icon and splash art
 
-`assets/icon.png`, the three `assets/android-icon-*.png` layers and
-`assets/splash-icon.png` are still **Expo's template images**, and the app
-icon is the Expo logo. Play will reject a listing that uses someone else's
-logo. Replace them before uploading. Keep the file names, or update
-`app.json`.
+The icon set is GlowTrack's own mark: a sun rising over a gentle arc, on the
+brand teal `#1D655D`. Each PNG has a source SVG in `assets/source/`. To change
+the art, edit the SVG, export it at the size noted in its comment, and keep
+these specs:
 
 | File                                 | What it is                                     | Spec                                                                                                       |
 | ------------------------------------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -19,9 +18,8 @@ logo. Replace them before uploading. Keep the file names, or update
 | `assets/android-icon-monochrome.png` | Themed icon (Android 13+)                      | 1024×1024 PNG, one colour on transparency                                                                  |
 | `assets/splash-icon.png`             | Splash logo, shown at 200 dp on the app colour | PNG with transparency, square                                                                              |
 
-When the icon is final, change `android.adaptiveIcon.backgroundColor` in
-`app.json` from the template's `#E6F4FE` to the brand colour. That was
-decision 4 of the compliance audit.
+`android.adaptiveIcon.backgroundColor` in `app.json` copies the brand colour
+(`accent` in `src/theme/tokens.ts`). Change both together.
 
 ## One-time setup
 
