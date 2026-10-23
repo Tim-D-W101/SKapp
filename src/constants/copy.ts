@@ -296,6 +296,9 @@ export const copy = {
     subscriptionNeeded: {
       title: 'This scan needs a subscription',
       body: 'Subscribe to get the results for this photo and keep scanning. Your photo is saved, so you can carry on right here.',
+      /** Test builds only, while Preview premium is on in Settings. */
+      previewNote:
+        'Preview premium is on, but it only changes what this phone shows. The server still needs a real subscription to give results for a scan after your free one.',
       seePlans: 'See plans',
     },
   },
@@ -595,13 +598,18 @@ export const copy = {
 
   home: {
     title: 'Home',
+    /** The large card at the top of Home that starts a scan. */
+    scan: {
+      title: 'Scan my skin',
+      body: 'A quick photo, then your cosmetic scores for today.',
+      hint: 'Opens the camera for a new scan',
+    },
     latestDate: (date: string) => `From your scan on ${date}`,
     seeResults: 'See these results',
     nextScan: {
       title: 'Your next scan',
       on: (date: string) => `Suggested for ${date}, a week after your last one.`,
-      now: 'Your next scan is ready whenever you are.',
-      cta: 'Take a scan',
+      now: 'Your next scan is ready whenever you are. Tap Scan my skin at the top.',
     },
     routine: {
       title: "Today's routine",
@@ -622,10 +630,6 @@ export const copy = {
   tabs: {
     home: 'Home',
     progress: 'Progress',
-    /** Under the round scan button in the middle of the tab bar. */
-    scan: 'Scan',
-    scanLabel: 'Take a scan',
-    scanHint: 'Starts a new scan',
   },
 
   settings: {
@@ -721,6 +725,21 @@ export const copy = {
       confirm: 'Delete everything',
       deleting: 'Deleting your account',
       done: 'Your account and all your data have been deleted.',
+    },
+    /**
+     * Test builds only (EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW). The Play Store
+     * app never shows this section.
+     */
+    testing: {
+      title: 'Testing',
+      intro: 'This section is only in test builds. The Play Store app never shows it.',
+      premiumPreview: 'Preview premium',
+      premiumPreviewHint:
+        'Unlocks the premium screens on this phone, such as your trend and before-and-after comparisons, so you can look around. It is not a subscription, and nothing is bought.',
+      serverNote:
+        "Scans still follow the server's free-scan limit. After your free scan, the server only gives results for a new scan with a real subscription, even with this switch on.",
+      loadFailed: "The saved setting couldn't be read on this phone, so the preview is off.",
+      saveFailed: "That didn't save on this phone. Try again.",
     },
     about: {
       title: 'About',

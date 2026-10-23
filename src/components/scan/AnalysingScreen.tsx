@@ -14,6 +14,7 @@ import { copy } from '@/constants/copy';
 import { SCAN_SLOW_MS, SCAN_STILL_WORKING_MS } from '@/constants/scan';
 import { openPaywall } from '@/lib/access';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { usePremiumPreviewStore } from '@/stores/usePremiumPreviewStore';
 import { useScanStore, type AnalysisState } from '@/stores/useScanStore';
 import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
 import { radius, sizes, spacing, useColors } from '@/theme/tokens';
@@ -70,7 +71,10 @@ export function AnalysingScreen() {
   const retryAnalysis = useScanStore((state) => state.retryAnalysis);
   const endScanFlow = useScanStore((state) => state.endScanFlow);
   const freeScanUsed = useAuthStore((state) => state.profile?.free_scan_used ?? false);
+  // RevenueCat's own answer, never the premium preview: the server checks
+  // the real subscription, so only a real one can carry this scan on.
   const isPremium = useSubscriptionStore((state) => state.isPremium);
+  const previewOn = usePremiumPreviewStore((state) => state.enabled);
   const [photoHeight, setPhotoHeight] = useState(0);
   const paywallOpenedFor = useRef<string | null>(null);
   const resumedFor = useRef<string | null>(null);
@@ -214,6 +218,11 @@ export function AnalysingScreen() {
             {copy.scan.subscriptionNeeded.title}
           </Text>
           <Text accessibilityLiveRegion="polite">{copy.scan.subscriptionNeeded.body}</Text>
+          {previewOn ? (
+            <Text variant="bodySmall" color="textSecondary">
+              {copy.scan.subscriptionNeeded.previewNote}
+            </Text>
+          ) : null}
           <View style={styles.actions}>
             {isPremium ? (
               <Button label={copy.common.retry} onPress={retry} fullWidth size="lg" />

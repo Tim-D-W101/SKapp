@@ -15,10 +15,10 @@ export interface ResultAttributesProps {
   clock: SharedValue<number>;
 }
 
-/** The seven attribute scores as bars, arriving one after another. */
+/** The seven attribute scores as bars, arriving one after another, on a sky-blue score card. */
 export function ResultAttributes({ scores, clock }: ResultAttributesProps) {
   return (
-    <Card style={styles.card}>
+    <Card style={styles.card} tint="sky">
       {ATTRIBUTE_KEYS.map((key, index) => (
         <AttributeBar
           key={key}
@@ -56,7 +56,8 @@ function AttributeBar({
           <Text variant="bodySmall">{label}</Text>
           <Text variant="label">{score}</Text>
         </View>
-        <View style={[styles.track, { backgroundColor: palette.borderSubtle }]}>
+        {/* The screen's colour, so the empty part shows against the tinted card. */}
+        <View style={[styles.track, { backgroundColor: palette.background }]}>
           <Animated.View
             style={[styles.fill, { backgroundColor: getScoreColor(score, palette) }, fillStyle]}
           />

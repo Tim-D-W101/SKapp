@@ -3,11 +3,13 @@ import { describe, it } from 'node:test';
 
 import { BANNED_TERMS, ROUTINE_STEP_KEYS } from '../../supabase/functions/analyze-scan/prompt.ts';
 import { copy } from '../constants/copy.ts';
+import { TINT_NAMES } from '../theme/colors.ts';
 import type { RoutineStep } from '../types/routine.ts';
 
 import {
   illustrationForStep,
   PRODUCT_ILLUSTRATIONS,
+  tintForIllustration,
   type ProductIllustration,
 } from './routineIllustration.ts';
 
@@ -79,5 +81,24 @@ describe('drawing labels', () => {
         assert.doesNotMatch(labels[kind], new RegExp(`\\b${term}`, 'i'), `${kind}: "${term}"`);
       }
     }
+  });
+});
+
+describe('drawing colours', () => {
+  it('draws every product in one of the supporting colours', () => {
+    for (const kind of PRODUCT_ILLUSTRATIONS) {
+      assert.ok(TINT_NAMES.includes(tintForIllustration(kind)), kind);
+    }
+  });
+
+  it('uses every supporting colour', () => {
+    const used = new Set(PRODUCT_ILLUSTRATIONS.map(tintForIllustration));
+    assert.deepEqual([...used].sort(), [...TINT_NAMES].sort());
+  });
+
+  it('shows a usual morning in four different colours', () => {
+    const morning = ['cleanse', 'serum', 'moisturise', 'sunscreen'];
+    const tints = morning.map((key) => tintForIllustration(illustrationForStep(step(key))));
+    assert.equal(new Set(tints).size, morning.length, tints.join(', '));
   });
 });

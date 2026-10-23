@@ -28,3 +28,18 @@ export async function dataNoticeAcceptedBy(): Promise<string | null> {
 export async function markDataNoticeAccepted(userId: string): Promise<void> {
   await SecureStore.setItemAsync(DATA_NOTICE_KEY, userId);
 }
+
+const PREMIUM_PREVIEW_KEY = 'glowtrack.premium-preview-on';
+
+/**
+ * The tester-only "Preview premium" switch (lib/premiumPreview.ts). Kept on
+ * this phone only, never sent anywhere.
+ */
+export async function isPremiumPreviewSaved(): Promise<boolean> {
+  return (await SecureStore.getItemAsync(PREMIUM_PREVIEW_KEY)) === 'true';
+}
+
+export async function savePremiumPreview(on: boolean): Promise<void> {
+  if (on) await SecureStore.setItemAsync(PREMIUM_PREVIEW_KEY, 'true');
+  else await SecureStore.deleteItemAsync(PREMIUM_PREVIEW_KEY);
+}

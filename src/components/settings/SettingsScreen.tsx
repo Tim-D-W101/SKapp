@@ -4,6 +4,7 @@ import { BackBar } from '@/components/navigation/BackBar';
 import { Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { useBackToHome } from '@/lib/navigation';
+import { PREMIUM_PREVIEW_AVAILABLE } from '@/stores/usePremiumPreviewStore';
 import { layout, spacing } from '@/theme/tokens';
 
 import { AboutSection } from './AboutSection';
@@ -11,10 +12,13 @@ import { AccountSection } from './AccountSection';
 import { DataSection } from './DataSection';
 import { RemindersSection } from './RemindersSection';
 import { SubscriptionSection } from './SubscriptionSection';
+import { TestingSection } from './TestingSection';
 
 /**
  * Account, subscription, reminders, the person's data, and the legal pages.
- * It opens from the profile button at the top of Home.
+ * It opens from the profile button at the top of Home. Test builds that
+ * offer the premium preview also get a Testing section; no other build
+ * shows it.
  */
 export function SettingsScreen() {
   useBackToHome();
@@ -30,6 +34,7 @@ export function SettingsScreen() {
         <SubscriptionSection />
         <RemindersSection />
         <DataSection />
+        {PREMIUM_PREVIEW_AVAILABLE ? <TestingSection /> : null}
         <AboutSection />
       </ScrollView>
     </Screen>

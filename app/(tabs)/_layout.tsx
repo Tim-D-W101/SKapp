@@ -6,8 +6,8 @@ import { copy } from '@/constants/copy';
 import { sizes, useColors } from '@/theme/tokens';
 
 /**
- * Home and Progress, either side of the round scan button that TabBar draws
- * in the middle. The routine and Settings open from Home.
+ * Two tabs, Home and Progress, in the plain bar TabBar draws. Scanning, the
+ * routine and Settings all open from Home.
  */
 export default function TabsLayout() {
   const palette = useColors();

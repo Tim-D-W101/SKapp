@@ -1,18 +1,13 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Button, Card, Icon, IconBadge, LoadingState, Text, type IconName } from '@/components/ui';
+import { Button, Card, Icon, IconBadge, LoadingState, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { ROUTINE_SLOTS } from '@/constants/routine';
+import { ROUTINE_SLOT_ICONS, ROUTINE_SLOT_TINTS, ROUTINE_SLOTS } from '@/constants/routine';
 import { tickKey } from '@/lib/routine';
 import { useRoutineStore } from '@/stores/useRoutineStore';
 import { opacity, radius, sizes, spacing, useColors } from '@/theme/tokens';
-import type { RoutineSlot, RoutineStep } from '@/types/routine';
-
-const SLOT_ICONS = {
-  morning: 'sun',
-  evening: 'moon',
-} as const satisfies Record<RoutineSlot, IconName>;
+import type { RoutineStep } from '@/types/routine';
 
 /** Skeleton lines shown until the routine's first load finishes. */
 const LOADING_LINES = 2;
@@ -36,16 +31,12 @@ export function TodayRoutine() {
 
   return (
     <Card style={styles.card}>
-      <View>
-        <Text variant="h3" accessibilityRole="header">
-          {copy.home.routine.title}
+      <SectionTitle title={copy.home.routine.title} icon="check" tint="mint" />
+      {routine ? (
+        <Text color="textSecondary">
+          {copy.routine.completion(routine.steps.filter(isTicked).length, routine.steps.length)}
         </Text>
-        {routine ? (
-          <Text color="textSecondary">
-            {copy.routine.completion(routine.steps.filter(isTicked).length, routine.steps.length)}
-          </Text>
-        ) : null}
-      </View>
+      ) : null}
 
       {routine ? (
         ROUTINE_SLOTS.map((slot) => {
@@ -54,6 +45,7 @@ export function TodayRoutine() {
           const title = copy.routine[slot];
           const progress = copy.home.routine.progress(done, steps.length);
           const fraction = steps.length > 0 ? done / steps.length : 0;
+          const tint = palette.tints[ROUTINE_SLOT_TINTS[slot]];
 
           return (
             <Pressable
@@ -64,26 +56,31 @@ export function TodayRoutine() {
               accessibilityHint={copy.home.routine.openHint}
               style={({ pressed }) => [
                 styles.row,
-                { backgroundColor: palette.surfaceElevated, borderColor: palette.borderSubtle },
+                { backgroundColor: tint.soft, borderColor: tint.soft },
                 pressed ? styles.pressed : null,
               ]}
             >
-              <IconBadge name={SLOT_ICONS[slot]} />
+              <IconBadge
+                name={ROUTINE_SLOT_ICONS[slot]}
+                size="md"
+                tone="filled"
+                tint={ROUTINE_SLOT_TINTS[slot]}
+              />
               <View style={styles.rowText}>
                 <Text variant="label">{title}</Text>
                 <Text variant="bodySmall" color="textSecondary">
                   {progress}
                 </Text>
-                <View style={[styles.track, { backgroundColor: palette.borderSubtle }]}>
+                <View style={[styles.track, { backgroundColor: palette.background }]}>
                   <View
                     style={[
                       styles.fill,
-                      { width: `${fraction * 100}%`, backgroundColor: palette.accent },
+                      { width: `${fraction * 100}%`, backgroundColor: tint.text },
                     ]}
                   />
                 </View>
               </View>
-              <Icon name="chevronRight" size={sizes.icon.md} color="accentText" />
+              <Icon name="chevronRight" size={sizes.icon.md} tint={tint.text} />
             </Pressable>
           );
         })

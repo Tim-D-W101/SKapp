@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
 
 import type { PaywallTrigger } from '@/constants/subscription';
+import { entitlementWithPreview } from '@/lib/premiumPreview';
 import type { EntitlementStatus } from '@/lib/purchases';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { usePremiumPreviewStore } from '@/stores/usePremiumPreviewStore';
 import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
 
 /**
@@ -14,6 +16,11 @@ import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
  *
  * These checks only decide what the app shows. The analyze-scan Edge Function
  * enforces the scan rule itself before it spends anything.
+ *
+ * On a test build with "Preview premium" switched on (lib/premiumPreview.ts),
+ * these checks count the user as subscribed. The server's own check doesn't
+ * change, so it still turns down a scan after the free one without a real
+ * subscription.
  */
 
 /** Whether a new scan can start: yes, not without subscribing, or not known yet. */
@@ -36,15 +43,22 @@ export function trendsAccess(entitlement: EntitlementStatus, isLoading: boolean)
   return entitlement === 'unknown' && isLoading ? 'checking' : 'locked';
 }
 
+/** RevenueCat's entitlement, or active while the tester-only premium preview is on. */
+function useAccessEntitlement(): EntitlementStatus {
+  const entitlement = useSubscriptionStore((state) => state.entitlement);
+  const previewOn = usePremiumPreviewStore((state) => state.enabled);
+  return entitlementWithPreview(entitlement, previewOn);
+}
+
 export function useScanAccess(): ScanAccess {
   const freeScanUsed = useAuthStore((state) => state.profile?.free_scan_used ?? false);
-  const entitlement = useSubscriptionStore((state) => state.entitlement);
+  const entitlement = useAccessEntitlement();
   const isLoading = useSubscriptionStore((state) => state.isLoading);
   return scanAccess(freeScanUsed, entitlement, isLoading);
 }
 
 export function useTrendsAccess(): TrendsAccess {
-  const entitlement = useSubscriptionStore((state) => state.entitlement);
+  const entitlement = useAccessEntitlement();
   const isLoading = useSubscriptionStore((state) => state.isLoading);
   return trendsAccess(entitlement, isLoading);
 }
@@ -57,7 +71,11 @@ export function openPaywall(trigger: PaywallTrigger): void {
 export function startScan(): void {
   const freeScanUsed = useAuthStore.getState().profile?.free_scan_used ?? false;
   const { entitlement, isLoading } = useSubscriptionStore.getState();
-  if (scanAccess(freeScanUsed, entitlement, isLoading) === 'subscribe') {
+  const previewOn = usePremiumPreviewStore.getState().enabled;
+  if (
+    scanAccess(freeScanUsed, entitlementWithPreview(entitlement, previewOn), isLoading) ===
+    'subscribe'
+  ) {
     openPaywall('scan');
   } else {
     // While it's still being checked, the camera screen waits for the answer.

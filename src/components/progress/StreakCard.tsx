@@ -18,7 +18,7 @@ export function StreakCard({ scanDates }: StreakCardProps) {
   const weeks = weeklyStreak(scanDates);
 
   return (
-    <Card style={styles.card}>
+    <Card style={styles.card} tint="sun">
       <View style={styles.header}>
         <SunMark width={sizes.sunMark.sm} />
         <Text variant="h3" accessibilityRole="header">

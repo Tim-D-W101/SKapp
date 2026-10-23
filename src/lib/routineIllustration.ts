@@ -1,3 +1,4 @@
+import type { TintName } from '@/theme/colors';
 import type { RoutineStep } from '@/types/routine';
 
 /**
@@ -46,4 +47,29 @@ const BY_STEP_KEY = new Map<string, ProductIllustration>([
  */
 export function illustrationForStep(step: Pick<RoutineStep, 'key'>): ProductIllustration {
   return BY_STEP_KEY.get(step.key.trim().toLowerCase()) ?? 'generic';
+}
+
+/**
+ * Each drawing's colour, so the kinds of step are told apart at a glance: a
+ * sunny sunscreen and face oil, coral serum and lip balm, lavender for the
+ * eyes and makeup removal, sky-blue cleanser and toner, and the brand mint
+ * for moisturiser and anything else. A usual morning (cleanser, serum,
+ * moisturiser, sunscreen) shows four different colours.
+ */
+const TINTS: Record<ProductIllustration, TintName> = {
+  makeupRemover: 'lavender',
+  cleanser: 'sky',
+  toner: 'sky',
+  serum: 'coral',
+  eyeCream: 'lavender',
+  moisturiser: 'mint',
+  faceOil: 'sun',
+  lipBalm: 'coral',
+  sunscreen: 'sun',
+  generic: 'mint',
+};
+
+/** The colour a product drawing is drawn in, and its tile's colour. */
+export function tintForIllustration(kind: ProductIllustration): TintName {
+  return TINTS[kind];
 }

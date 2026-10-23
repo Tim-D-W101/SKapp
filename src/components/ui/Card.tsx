@@ -9,6 +9,7 @@ import {
   spacing,
   useColors,
   type ShadowLevel,
+  type TintName,
 } from '@/theme/tokens';
 
 export interface CardProps {
@@ -18,15 +19,21 @@ export interface CardProps {
   radius?: keyof typeof radius;
   /** `none` renders a flat, bordered surface; the others add a soft shadow. */
   elevation?: ShadowLevel | 'none';
+  /**
+   * Gives the card one of the supporting colours' soft backgrounds, by what
+   * it shows (see TintName). Without one, it's the soft mint surface.
+   */
+  tint?: TintName;
   style?: StyleProp<ViewStyle>;
 }
 
-/** A soft mint surface with rounded corners. */
+/** A soft surface with rounded corners: mint, or the soft background of its tint. */
 export function Card({
   children,
   padding,
   radius: radiusKey = 'lg',
   elevation = 'sm',
+  tint,
   style,
 }: CardProps) {
   const palette = useColors();
@@ -39,8 +46,9 @@ export function Card({
         {
           padding: padding ? spacing[padding] : layout.cardPadding,
           borderRadius: radius[radiusKey],
-          backgroundColor: palette.surface,
-          borderColor: palette.borderSubtle,
+          backgroundColor: tint ? palette.tints[tint].soft : palette.surface,
+          // A tinted card is set apart by its colour; the border keeps its size, unseen.
+          borderColor: tint ? palette.tints[tint].soft : palette.borderSubtle,
         },
         flat ? null : shadows[elevation],
         style,

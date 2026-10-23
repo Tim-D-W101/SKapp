@@ -1,4 +1,4 @@
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { sizes, useColors, type ColorName } from '@/theme/tokens';
 
@@ -26,13 +26,19 @@ export type IconName =
   | 'chevronRight'
   | 'user'
   | 'sun'
-  | 'moon';
+  | 'moon'
+  | 'bell'
+  | 'calendar'
+  | 'camera';
 
 export interface IconProps {
   name: IconName;
   size?: number;
   color?: ColorName;
-  /** A raw colour that overrides `color`, for icons over a camera feed where theme colours don't apply. */
+  /**
+   * A raw colour that overrides `color`: for icons over a camera feed, where
+   * theme colours don't apply, and for icons in a supporting colour (`tints`).
+   */
   tint?: string;
 }
 
@@ -157,6 +163,28 @@ function renderGlyph(name: IconName) {
       );
     case 'moon':
       return <Path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z" />;
+    case 'bell':
+      return (
+        <>
+          <Path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z" />
+          <Path d="M10 20.5a2 2 0 0 0 4 0" />
+        </>
+      );
+    case 'camera':
+      return (
+        <>
+          <Path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" />
+          <Circle cx={12} cy={12.5} r={3.5} />
+        </>
+      );
+    case 'calendar':
+      return (
+        <>
+          <Rect x={4} y={5.5} width={16} height={14.5} rx={3} />
+          <Path d="M4 10h16" />
+          <Path d="M8.5 3.5v4M15.5 3.5v4" />
+        </>
+      );
     case 'drag':
       return (
         <>

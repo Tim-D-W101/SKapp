@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Button, Card, LoadingState, Text } from '@/components/ui';
+import { Button, Card, LoadingState, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { PLAY_SUBSCRIPTIONS_URL } from '@/constants/links';
 import { formatShortDate } from '@/lib/dates';
@@ -72,9 +72,7 @@ export function SubscriptionSection() {
 
   return (
     <Card style={styles.card}>
-      <Text variant="h3" accessibilityRole="header">
-        {copy.settings.subscription.title}
-      </Text>
+      <SectionTitle title={copy.settings.subscription.title} icon="sparkle" tint="sun" />
       {body}
       {details || entitlement === 'lapsed' ? (
         <Button

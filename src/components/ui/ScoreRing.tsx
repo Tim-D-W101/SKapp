@@ -18,6 +18,7 @@ import {
   sizes,
   spacing,
   useColors,
+  type ColorName,
   type TypographyVariant,
 } from '@/theme/tokens';
 
@@ -41,6 +42,11 @@ export interface ScoreRingProps {
    * the ring can be one part of a longer sequence.
    */
   progress?: SharedValue<number>;
+  /**
+   * The empty part of the ring. On a tinted card, `background` keeps it
+   * visible against the card's colour.
+   */
+  trackColor?: ColorName;
 }
 
 function clampScore(score: number): number {
@@ -60,6 +66,7 @@ export function ScoreRing({
   label,
   animate = true,
   progress,
+  trackColor = 'borderSubtle',
 }: ScoreRingProps) {
   const palette = useColors();
   const target = clampScore(score);
@@ -117,7 +124,7 @@ export function ScoreRing({
             cx={center}
             cy={center}
             r={ringRadius}
-            stroke={palette.borderSubtle}
+            stroke={palette[trackColor]}
             strokeWidth={strokeWidth}
             fill="none"
           />

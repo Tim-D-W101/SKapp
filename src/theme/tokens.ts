@@ -23,10 +23,14 @@ export {
   illustrationColors,
   shareCardColors,
   sunMarkColors,
+  TINT_NAMES,
   type ColorName,
   type ColorPalette,
   type ColorSchemeName,
+  type IllustrationInk,
   type ScoreScale,
+  type Tint,
+  type TintName,
 } from './colors';
 
 /** Returns the palette for the device's current light/dark setting. */
@@ -90,8 +94,8 @@ export const sizes = {
   /** The tick box on a routine step, and its border. */
   checkbox: 28,
   checkboxBorder: 2,
-  /** An icon on a soft round badge: beside a list point, or above a screen's title. */
-  iconBadge: { sm: 28, lg: 72 },
+  /** An icon on a soft round badge: beside a list point, beside a card's title, or above a screen's title. */
+  iconBadge: { sm: 28, md: 36, lg: 72 },
   /** Width of the sun mark: beside a screen title, or above it. Its height follows the artwork. */
   sunMark: { sm: 36, lg: 112 },
   /** The product drawing on a routine step, on its tile. */
@@ -105,18 +109,18 @@ export const sizes = {
   progressSegment: 4,
   /** Height of the morning and evening progress bars on Home. */
   routineProgress: 6,
-  /**
-   * The floating tab bar, and the round scan button raised out of its
-   * middle. The pill behind the active tab's icon is `indicator`.
-   */
+  /** The tab bar, not counting the safe area below it. The pill behind the open tab's icon is `indicator`. */
   tabBar: {
     height: 64,
     indicator: { width: 56, height: 32 },
-    scanButton: 60,
-    /** A ring in the screen's colour around the scan button, so it reads as set into the bar. */
-    scanButtonRing: 4,
-    /** Width of the sun mark on the scan button. */
-    scanButtonMark: 34,
+  },
+  /**
+   * The "Scan my skin" card at the top of Home: the width of its sun mark,
+   * and the round camera badge at its end.
+   */
+  scanCard: {
+    mark: 56,
+    camera: 48,
   },
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',
@@ -158,9 +162,9 @@ export const scanSweep = {
 } as const;
 
 /**
- * The progress trend chart. One series, so it follows the accent colour:
- * a 3dp line, 5dp points with a 2dp ring in the card colour, hairline
- * gridlines, and the noise band as a faint wash of the same hue.
+ * The progress trend chart. One series, in its card's tint: a 3dp line, 5dp
+ * points with a 2dp ring in the card colour, hairline gridlines, and the
+ * noise band as a faint wash of the same hue.
  */
 export const chart = {
   /** Height of the plot, not counting the date labels below it. */

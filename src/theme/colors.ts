@@ -3,14 +3,20 @@
  * of the design tokens live in tokens.ts, which re-exports all of this, so
  * components keep importing from '@/theme/tokens'.
  *
- * The app is the colour of its icon. The palette is built around the three
+ * The brand is the colour of its icon. The palette is built around the three
  * colours of the launcher icon (`iconColors`): its teal is the accent, its
  * mint is the soft tint behind cards and highlights, and its cream is the
  * sun in the brand mark. Screens stay clean white; text is a deep teal ink.
  *
+ * Alongside the brand, four friendly supporting colours (`tints`: sun, coral,
+ * lavender and sky) give each kind of card its own colour, so screens aren't
+ * all one teal. They are used by meaning, the same way on every screen (see
+ * `TintName`). The brand teal keeps the primary buttons, the tab bar and the
+ * sun mark.
+ *
  * Contrast (WCAG AA) is checked by colors.test.ts for every text colour on
- * every background below, and for white text on the teal fill. Run
- * `npm test` after changing a value.
+ * every background below, tinted ones included, and for white text on the
+ * teal fill. Run `npm test` after changing a value.
  *
  * This file has no imports, so the contrast test can load it directly.
  */
@@ -42,6 +48,36 @@ export const iconColors = {
  */
 export type ScoreScale = readonly [string, string, string, string, string];
 
+/**
+ * The supporting colours, each used for one kind of thing on every screen:
+ * - mint: the brand's own tint, for anything without a colour of its own
+ * - sun: the morning routine, the camera on Home's scan card, where to focus, the
+ *   weekly streak, the subscription
+ * - coral: the next scan, comparisons, reminders
+ * - lavender: the evening routine, the trend over time, changes since the
+ *   last scan
+ * - sky: scores, and the account
+ */
+export type TintName = 'mint' | 'sun' | 'coral' | 'lavender' | 'sky';
+
+export const TINT_NAMES: readonly TintName[] = ['mint', 'sun', 'coral', 'lavender', 'sky'];
+
+/** One supporting colour, in the four strengths it's used at. */
+export interface Tint {
+  /** The soft background of a card, row or tile in this colour. */
+  soft: string;
+  /** The bright colour itself: icon discs and other decoration. Not for text. */
+  fill: string;
+  /**
+   * Text, icons, ticks, chart lines and progress bars in this colour: deep
+   * in light mode, pale in dark mode. Meets 4.5:1 on its soft background and
+   * on every screen background.
+   */
+  text: string;
+  /** Icons and text drawn on `fill`. Meets 4.5:1 on it. */
+  onFill: string;
+}
+
 export interface ColorPalette {
   /** Screen background — white in light mode, deep teal ink in dark mode. */
   background: string;
@@ -59,7 +95,7 @@ export interface ColorPalette {
   textTertiary: string;
   /** Text on accent or danger fills. */
   textInverse: string;
-  /** The brand fill: primary buttons, the scan button, ticks, rings and highlights. */
+  /** The brand fill: primary buttons, Home's scan card, the routine's ring and highlights. */
   accent: string;
   /** Pale mint behind selected and highlighted things, such as the active tab. */
   accentSubtle: string;
@@ -70,10 +106,11 @@ export interface ColorPalette {
   warning: string;
   danger: string;
   score: ScoreScale;
+  tints: Record<TintName, Tint>;
 }
 
-/** Semantic colour names usable for text and fills (everything except the score scale). */
-export type ColorName = Exclude<keyof ColorPalette, 'score'>;
+/** Semantic colour names usable for text and fills (everything except the score scale and tints). */
+export type ColorName = Exclude<keyof ColorPalette, 'score' | 'tints'>;
 
 export type ColorSchemeName = 'light' | 'dark';
 
@@ -98,6 +135,14 @@ const lightColors: ColorPalette = {
   // Raspberry: warm against the cool teal, so it never reads as the accent.
   danger: '#B0203F',
   score: [iconColors.mint, '#6BC3B6', '#40A395', '#2A8478', iconColors.teal],
+  tints: {
+    mint: { soft: '#DDF3EF', fill: iconColors.mint, text: iconColors.teal, onFill: '#112E2A' },
+    // A warm sun yellow. Its text variant is a deep golden brown.
+    sun: { soft: '#FFF4D6', fill: '#FFC83D', text: '#7A5300', onFill: '#4A3300' },
+    coral: { soft: '#FFE9E4', fill: '#FF8F7A', text: '#A63A2A', onFill: '#5C1A10' },
+    lavender: { soft: '#F0EBFF', fill: '#B9A6F5', text: '#5B45A8', onFill: '#2E1F66' },
+    sky: { soft: '#E3F2FF', fill: '#7CC3F7', text: '#1F5F96', onFill: '#0D3357' },
+  },
 };
 
 const darkColors: ColorPalette = {
@@ -120,6 +165,14 @@ const darkColors: ColorPalette = {
   warning: '#F2B661',
   danger: '#FF91B4',
   score: ['#285B54', '#317468', '#43998C', '#69C2B5', '#A8E3DA'],
+  // Deep, quiet tinted surfaces, with each colour bright and pale on top.
+  tints: {
+    mint: { soft: '#173A35', fill: iconColors.mint, text: '#A3E1D8', onFill: '#0C1615' },
+    sun: { soft: '#2B2412', fill: '#FFD466', text: '#FFDA80', onFill: '#0C1615' },
+    coral: { soft: '#2E1C19', fill: '#FF9E8C', text: '#FFB3A6', onFill: '#0C1615' },
+    lavender: { soft: '#231F35', fill: '#C3B3FA', text: '#CFC3FF', onFill: '#0C1615' },
+    sky: { soft: '#142838', fill: '#8DCDF9', text: '#A6D8FB', onFill: '#0C1615' },
+  },
 };
 
 export const colors: Record<ColorSchemeName, ColorPalette> = {
@@ -177,9 +230,9 @@ export const sunMarkColors = {
   light: { sun: iconColors.teal, arcs: iconColors.mint },
   dark: { sun: iconColors.cream, arcs: iconColors.mint },
   /**
-   * On the accent fill, such as the scan button. In light mode that fill is
-   * the icon's teal, so the mark looks exactly like the launcher icon; in
-   * dark mode it's mint, so the mark turns dark ink and teal.
+   * On the accent fill, such as Home's "Scan my skin" card. In light mode
+   * that fill is the icon's teal, so the mark looks exactly like the launcher
+   * icon; in dark mode it's mint, so the mark turns dark ink and teal.
    */
   onAccent: {
     light: { sun: iconColors.cream, arcs: iconColors.mint },
@@ -187,19 +240,73 @@ export const sunMarkColors = {
   },
 } as const;
 
+/** The colours of one product drawing, named by role so each tint has the same set. */
+export interface IllustrationInk {
+  /** The outline every shape shares. */
+  outline: string;
+  primary: string;
+  primaryDeep: string;
+  secondaryDeep: string;
+  /** The main body colour: the tint's own bright colour. */
+  secondary: string;
+  secondaryLight: string;
+  cream: string;
+  highlight: string;
+}
+
+const illustrationBase = { cream: iconColors.cream, highlight: '#FFFFFF' } as const;
+
 /**
- * The product drawings on the routine screen. They are pictures, so they keep
- * the same colours in light and dark mode; only the tile behind a product
- * follows the theme (`accentSubtle`). Named by role, not hue, so the palette
- * can change without renaming them.
+ * The product drawings on the routine screen, one family of colours per tint:
+ * each kind of step is drawn in its own colour (routineIllustration.ts picks
+ * which), on a tile of the same tint. They are pictures, so they keep the
+ * same colours in light and dark mode; only the tile behind a product
+ * follows the theme.
  */
-export const illustrationColors = {
-  outline: '#164A44',
-  primary: '#33A091',
-  primaryDeep: iconColors.teal,
-  secondaryDeep: '#6CC6B9',
-  secondary: iconColors.mint,
-  secondaryLight: '#CDEFE9',
-  cream: iconColors.cream,
-  highlight: '#FFFFFF',
-} as const;
+export const illustrationColors: Record<TintName, IllustrationInk> = {
+  mint: {
+    ...illustrationBase,
+    outline: '#164A44',
+    primary: '#33A091',
+    primaryDeep: iconColors.teal,
+    secondaryDeep: '#6CC6B9',
+    secondary: iconColors.mint,
+    secondaryLight: '#CDEFE9',
+  },
+  sun: {
+    ...illustrationBase,
+    outline: '#6B4A00',
+    primary: '#F2A900',
+    primaryDeep: '#C98400',
+    secondaryDeep: '#FFB81F',
+    secondary: '#FFD45C',
+    secondaryLight: '#FFEDB8',
+  },
+  coral: {
+    ...illustrationBase,
+    outline: '#7A2A1E',
+    primary: '#F2715C',
+    primaryDeep: '#D2503B',
+    secondaryDeep: '#FF9A87',
+    secondary: '#FFB8A9',
+    secondaryLight: '#FFDAD2',
+  },
+  lavender: {
+    ...illustrationBase,
+    outline: '#3E2E80',
+    primary: '#8E74E0',
+    primaryDeep: '#6B52C4',
+    secondaryDeep: '#A895F0',
+    secondary: '#C9BBFA',
+    secondaryLight: '#E6DFFF',
+  },
+  sky: {
+    ...illustrationBase,
+    outline: '#134A78',
+    primary: '#3D9BE0',
+    primaryDeep: '#2275B8',
+    secondaryDeep: '#79BEF2',
+    secondary: '#A5D4F7',
+    secondaryLight: '#D3EAFB',
+  },
+};

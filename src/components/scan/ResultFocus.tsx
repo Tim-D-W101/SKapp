@@ -12,13 +12,15 @@ export interface ResultFocusProps {
 
 /**
  * The one to three attributes to prioritise, set apart from the other scores
- * and framed as room to improve, never as a shortfall.
+ * on a warm sun-yellow panel, and framed as room to improve, never as a
+ * shortfall.
  */
 export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
   const palette = useColors();
+  const tint = palette.tints.sun;
 
   return (
-    <View style={[styles.container, { backgroundColor: palette.accentSubtle }]}>
+    <View style={[styles.container, { backgroundColor: tint.soft }]}>
       <View style={styles.header}>
         <SunMark width={sizes.sunMark.sm} />
         <Text variant="h3" accessibilityRole="header">
@@ -31,13 +33,13 @@ export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
             key={key}
             style={[
               styles.area,
-              { backgroundColor: palette.surfaceElevated, borderColor: palette.accent },
+              { backgroundColor: palette.surfaceElevated, borderColor: tint.text },
             ]}
             accessible
             accessibilityLabel={`${copy.results.attributes[key]}, ${scores[key]}`}
           >
             <Text variant="label">{copy.results.attributes[key]}</Text>
-            <Text variant="label" color="accentText">
+            <Text variant="label" tint="sun">
               {scores[key]}
             </Text>
           </View>
