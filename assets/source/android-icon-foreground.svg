@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Adaptive icon front layer. Artwork stays inside the central 61% circle, the safe zone for every launcher mask. -->
+  <defs>
+    <radialGradient id="glow" cx="480" cy="544" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(122.88 122.88) scale(0.76)">
+    <circle cx="480" cy="544" r="380" fill="url(#glow)"/>
+    <path d="M480 256Q543.4 480.6 768 544Q543.4 607.4 480 832Q416.6 607.4 192 544Q416.6 480.6 480 256Z" fill="#F8F5F1" stroke="#F8F5F1" stroke-width="28" stroke-linejoin="round"/>
+    <path d="M724 200Q746 278 824 300Q746 322 724 400Q702 322 624 300Q702 278 724 200Z" fill="#96DAD0" stroke="#96DAD0" stroke-width="16.8" stroke-linejoin="round"/>
+  </g>
+</svg>
