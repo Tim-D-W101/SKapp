@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Button, Card, Text } from '@/components/ui';
+import { Button, Card, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { spacing } from '@/theme/tokens';
@@ -29,9 +29,7 @@ export function AccountSection() {
 
   return (
     <Card style={styles.card}>
-      <Text variant="h3" accessibilityRole="header">
-        {copy.settings.account.title}
-      </Text>
+      <SectionTitle title={copy.settings.account.title} icon="user" tint="sky" />
       {isAnonymous ? (
         <>
           <Text color="textSecondary">{copy.settings.account.anonymous}</Text>

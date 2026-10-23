@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Linking, StyleSheet, Switch, View } from 'react-native';
 
-import { Button, Card, Chip, Text } from '@/components/ui';
+import { Button, Card, Chip, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { ROUTINE_VISITS_BEFORE_OFFER } from '@/constants/reminders';
 import { formatHour } from '@/lib/dates';
@@ -48,11 +48,7 @@ export function RemindersSection() {
     });
   };
 
-  const title = (
-    <Text variant="h3" accessibilityRole="header">
-      {copy.settings.reminders.title}
-    </Text>
-  );
+  const title = <SectionTitle title={copy.settings.reminders.title} icon="bell" tint="coral" />;
 
   if (permission === 'denied') {
     return (

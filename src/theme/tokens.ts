@@ -23,10 +23,14 @@ export {
   illustrationColors,
   shareCardColors,
   sunMarkColors,
+  TINT_NAMES,
   type ColorName,
   type ColorPalette,
   type ColorSchemeName,
+  type IllustrationInk,
   type ScoreScale,
+  type Tint,
+  type TintName,
 } from './colors';
 
 /** Returns the palette for the device's current light/dark setting. */
@@ -90,8 +94,8 @@ export const sizes = {
   /** The tick box on a routine step, and its border. */
   checkbox: 28,
   checkboxBorder: 2,
-  /** An icon on a soft round badge: beside a list point, or above a screen's title. */
-  iconBadge: { sm: 28, lg: 72 },
+  /** An icon on a soft round badge: beside a list point, beside a card's title, or above a screen's title. */
+  iconBadge: { sm: 28, md: 36, lg: 72 },
   /** Width of the sun mark: beside a screen title, or above it. Its height follows the artwork. */
   sunMark: { sm: 36, lg: 112 },
   /** The product drawing on a routine step, on its tile. */
@@ -158,9 +162,9 @@ export const scanSweep = {
 } as const;
 
 /**
- * The progress trend chart. One series, so it follows the accent colour:
- * a 3dp line, 5dp points with a 2dp ring in the card colour, hairline
- * gridlines, and the noise band as a faint wash of the same hue.
+ * The progress trend chart. One series, in its card's tint: a 3dp line, 5dp
+ * points with a 2dp ring in the card colour, hairline gridlines, and the
+ * noise band as a faint wash of the same hue.
  */
 export const chart = {
   /** Height of the plot, not counting the date labels below it. */

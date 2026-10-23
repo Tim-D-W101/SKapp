@@ -11,6 +11,7 @@ import {
   LoadingState,
   Screen,
   ScoreRing,
+  SectionTitle,
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
@@ -93,8 +94,8 @@ export function HomeScreen() {
         </View>
       ) : null}
 
-      <Card style={styles.latest} elevation="md">
-        <ScoreRing score={latest.overall} label={copy.progress.latest} />
+      <Card style={styles.latest} elevation="md" tint="sky">
+        <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
         <Text variant="bodySmall" color="textSecondary" align="center">
           {copy.home.latestDate(formatShortDate(latest.createdAt))}
         </Text>
@@ -108,10 +109,8 @@ export function HomeScreen() {
 
       <TodayRoutine />
 
-      <Card style={styles.card}>
-        <Text variant="h3" accessibilityRole="header">
-          {copy.home.nextScan.title}
-        </Text>
+      <Card style={styles.card} tint="coral">
+        <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="coral" />
         <Text color="textSecondary">
           {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
         </Text>

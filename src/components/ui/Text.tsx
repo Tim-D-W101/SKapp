@@ -5,12 +5,15 @@ import {
   typography,
   useColors,
   type ColorName,
+  type TintName,
   type TypographyVariant,
 } from '@/theme/tokens';
 
 export interface TextProps extends RNTextProps {
   variant?: TypographyVariant;
   color?: ColorName;
+  /** Text in a supporting colour (its `text` strength), in place of `color`. */
+  tint?: TintName;
   align?: TextStyle['textAlign'];
 }
 
@@ -18,6 +21,7 @@ export interface TextProps extends RNTextProps {
 export function Text({
   variant = 'body',
   color = 'textPrimary',
+  tint,
   align,
   style,
   ...rest
@@ -28,7 +32,11 @@ export function Text({
     <RNText
       maxFontSizeMultiplier={maxFontScale}
       {...rest}
-      style={[typography[variant], { color: palette[color], textAlign: align }, style]}
+      style={[
+        typography[variant],
+        { color: tint ? palette.tints[tint].text : palette[color], textAlign: align },
+        style,
+      ]}
     />
   );
 }

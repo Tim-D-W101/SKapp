@@ -12,7 +12,7 @@ import Svg, { Circle, ClipPath, Defs, Line, Path, Rect } from 'react-native-svg'
 import { Text } from '@/components/ui';
 import { SCORE_NOISE_POINTS } from '@/constants/progress';
 import { monotoneBandPath, monotonePath, nearestIndex, scoreToY, timeToX } from '@/lib/chart';
-import { chart, sizes, typography, useColors } from '@/theme/tokens';
+import { chart, sizes, typography, useColors, type TintName } from '@/theme/tokens';
 
 export interface TrendPoint {
   /** Milliseconds since the epoch. */
@@ -24,6 +24,8 @@ export interface TrendPoint {
 export interface TrendChartProps {
   /** Oldest first. Needs at least two to draw a line. */
   points: TrendPoint[];
+  /** The colour of the card it sits on. The line, points and band are drawn in it. */
+  tint: TintName;
   selectedIndex: number;
   onSelect: (index: number) => void;
   /** Dates for the first and last point, already formatted. */
@@ -45,6 +47,7 @@ export interface TrendChartProps {
  */
 export function TrendChart({
   points,
+  tint,
   selectedIndex,
   onSelect,
   firstLabel,
@@ -54,6 +57,7 @@ export function TrendChart({
   accessibilityHint,
 }: TrendChartProps) {
   const palette = useColors();
+  const ink = palette.tints[tint];
   const [width, setWidth] = useState(0);
 
   const left = chart.yLabelWidth + chart.inset;
@@ -128,7 +132,7 @@ export function TrendChart({
 
               <Path
                 d={monotoneBandPath(plotted, noise)}
-                fill={palette.accent}
+                fill={ink.text}
                 fillOpacity={chart.bandOpacity}
                 clipPath="url(#trend-plot)"
               />
@@ -146,7 +150,7 @@ export function TrendChart({
 
               <Path
                 d={monotonePath(plotted)}
-                stroke={palette.accent}
+                stroke={ink.text}
                 strokeWidth={chart.lineWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -160,9 +164,9 @@ export function TrendChart({
                   cx={point.x}
                   cy={point.y}
                   r={index === selectedIndex ? chart.selectedRadius : chart.pointRadius}
-                  fill={palette.accent}
+                  fill={ink.text}
                   // The card's own colour, so each point sits in a clean ring.
-                  stroke={palette.surface}
+                  stroke={ink.soft}
                   strokeWidth={chart.pointRing}
                 />
               ))}

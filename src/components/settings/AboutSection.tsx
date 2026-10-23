@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { LegalLink } from '@/components/paywall/LegalLink';
-import { Button, Card, Disclaimer, Text } from '@/components/ui';
+import { Button, Card, Disclaimer, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { LEGAL_LINKS, SUPPORT_EMAIL } from '@/constants/links';
 import { logInDevelopment } from '@/lib/errors';
@@ -29,9 +29,7 @@ export function AboutSection() {
 
   return (
     <Card style={styles.card}>
-      <Text variant="h3" accessibilityRole="header">
-        {copy.settings.about.title}
-      </Text>
+      <SectionTitle title={copy.settings.about.title} icon="info" tint="mint" />
 
       <View style={styles.links}>
         <LegalLink label={copy.settings.about.privacy} url={LEGAL_LINKS.privacy} onFail={failed} />

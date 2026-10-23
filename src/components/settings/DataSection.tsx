@@ -4,7 +4,7 @@ import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
-import { Button, Card, Text } from '@/components/ui';
+import { Button, Card, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { logInDevelopment } from '@/lib/errors';
 import { buildDataExport, removeStoredPhotos, shareDataExport } from '@/lib/personalData';
@@ -76,9 +76,7 @@ export function DataSection() {
 
   return (
     <Card style={styles.card}>
-      <Text variant="h3" accessibilityRole="header">
-        {copy.settings.data.title}
-      </Text>
+      <SectionTitle title={copy.settings.data.title} icon="list" tint="lavender" />
 
       <View style={styles.item}>
         <Text color="textSecondary">{copy.settings.data.downloadBody}</Text>
