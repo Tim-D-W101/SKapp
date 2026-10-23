@@ -102,6 +102,8 @@ export const sizes = {
   productIllustration: 56,
   /** The grab bar at the top of a bottom sheet. */
   sheetHandle: { width: 40, height: 4 },
+  /** The most of the screen a tall bottom sheet covers; its content scrolls beyond that. */
+  sheetMaxHeight: '85%',
   /** Scan photo thumbnails, in the photos' 3:4 shape. */
   thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,

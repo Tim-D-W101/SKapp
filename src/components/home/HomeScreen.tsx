@@ -22,6 +22,7 @@ import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 
 import { HomeHeader } from './HomeHeader';
+import { RemindersCard } from './RemindersCard';
 import { ScanCard } from './ScanCard';
 import { TodayRoutine } from './TodayRoutine';
 
@@ -30,8 +31,8 @@ const LOADING_LINES = 4;
 
 /**
  * Where things stand today, under the big "Scan my skin" card that starts a
- * scan: the latest score, today's routine, and when the next weekly scan is
- * suggested. Each card leads to the screen with the detail, and the profile
+ * scan: the latest score, today's routine, the next reminder, and when the
+ * next weekly scan is suggested. Each card leads to the screen with the detail, and the profile
  * button in the header opens Settings. The header and the scan card show in
  * every state, so scanning and Settings are always one tap away. It reads
  * the same stores as the Progress tab and the routine and refreshes them on
@@ -106,6 +107,8 @@ export function HomeScreen() {
       </Card>
 
       <TodayRoutine />
+
+      <RemindersCard />
 
       <Card style={styles.card} tint="coral">
         <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="coral" />
