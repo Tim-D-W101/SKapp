@@ -44,7 +44,8 @@ Checked before anything costs money, never trusting the app:
    function instance, so a cold start simply asks again.
 6. If RevenueCat can't be reached, or answers with something unexpected, the
    answer is `503 ENTITLEMENT_UNAVAILABLE`: the scan waits rather than running
-   for free. For a free scan past today's attempts, it's `429` instead.
+   for free. That includes a free scan past its free attempts, so a subscriber
+   is never told their free attempts are used up.
 
 ## Files
 

@@ -236,8 +236,9 @@ async function checkAccess(
     if (await hasActiveEntitlement(userId, REVENUECAT_SECRET_KEY)) return 'allowed';
   } catch (checkError: unknown) {
     log('error', { scanId, stage: 'entitlement', message: describe(checkError) });
-    // Almost everyone here has never subscribed, so the day's limit is the answer.
-    return freeScan ? 'FREE_ATTEMPTS_USED' : 'ENTITLEMENT_UNAVAILABLE';
+    // A temporary refusal either way: telling a subscriber their free attempts
+    // are used up would be wrong, and the check may well work on a retry.
+    return 'ENTITLEMENT_UNAVAILABLE';
   }
   const refusal = freeScan ? 'FREE_ATTEMPTS_USED' : 'SUBSCRIPTION_REQUIRED';
   log('info', { scanId, stage: 'access', outcome: refusal.toLowerCase() });
