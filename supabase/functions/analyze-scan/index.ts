@@ -6,8 +6,8 @@
  *   200 { ok: true } once the scan is finished, or 4xx/5xx { ok: false, code }.
  *   402 SUBSCRIPTION_REQUIRED when the free scan is used and there's no
  *   active subscription; the scan stays pending.
- *   429 FREE_ATTEMPTS_USED when the free scan is still unused but today's free
- *   attempts are; the scan stays pending.
+ *   429 FREE_ATTEMPTS_USED when the free scan is still unused but its free
+ *   attempts for the current 24 hours are; the scan stays pending.
  *   The app follows the scan row through Realtime, not through this response.
  *
  * The Gemini key, the service role key and the RevenueCat secret key exist
@@ -62,7 +62,7 @@ const DOWNLOAD_TIMEOUT_MS = 15_000;
 const SUPPORTED_MIME_TYPES = new Set(['image/jpeg', 'image/webp']);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /**
- * Free analyses one account may run in a day while its free scan is unused.
+ * Free analyses one account may run in 24 hours while its free scan is unused.
  * Enough for a run of photos in poor light, and a firm limit on what a
  * modified app could spend. Counted by take_free_attempt() (0005_free_attempts.sql).
  */
@@ -186,11 +186,11 @@ async function downloadImage(path: string): Promise<{ base64: string; mimeType: 
  * Whether this scan may be analysed: the free scan, or an active
  * subscription. The free scan is only used up by complete_scan, once a scan
  * finishes with scores, so a rejected or failed scan leaves it available.
- * Each free analysis takes one of the day's free attempts, so that can't be
- * repeated without limit. Once the free scan or the day's attempts are used
- * up, the subscription is checked with RevenueCat, not taken from the app.
- * If RevenueCat can't answer, the scan is refused for now rather than
- * analysed for free.
+ * Each free analysis takes one of the free attempts for the current 24 hours,
+ * so that can't be repeated without limit. Once the free scan or those
+ * attempts are used up, the subscription is checked with RevenueCat, not
+ * taken from the app. If RevenueCat can't answer, the scan is refused for
+ * now rather than analysed for free.
  */
 async function checkAccess(
   scanId: string,
@@ -229,7 +229,8 @@ async function checkAccess(
       return 'INTERNAL';
     }
     if (taken) return 'allowed';
-    // Today's free attempts are used up. A subscription still covers the scan.
+    // The free attempts for these 24 hours are used up. A subscription still
+    // covers the scan.
   }
 
   try {
@@ -361,7 +362,8 @@ Deno.serve(async (request) => {
 
   // 4. Who pays for it: the free scan or a subscription. Checked before
   //    anything costs money. A refusal leaves the scan pending, so the same
-  //    photo can go ahead once the user subscribes, or the next day.
+  //    photo can go ahead once the user subscribes, or once the free attempts
+  //    reset.
   const access = await checkAccess(scanId, userId);
   if (access !== 'allowed') return errorResponse(access);
 

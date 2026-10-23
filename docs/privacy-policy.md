@@ -79,8 +79,8 @@ still the phone was, and which camera was used. This helps read results in
 context.
 
 **Free scan attempts.** Until your free scan is used, how many free attempts
-you've made in the last day and when the first of them was. This stops one
-account from sending unlimited photos for free.
+you've made in the last 24 hours and when the first of them was. This stops
+one account from sending unlimited photos for free.
 
 **Your settings.** Your time zone, and your reminder choices (which reminders,
 which day and hour).

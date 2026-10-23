@@ -13,7 +13,7 @@ pending -> processing -> complete   (scores and routine saved, free scan used up
                       -> rejected   (photo unusable, free scan kept)
                       -> failed     (anything else, free scan kept)
 pending, unchanged: 402 SUBSCRIPTION_REQUIRED (free scan used, no subscription)
-pending, unchanged: 429 FREE_ATTEMPTS_USED    (free scan unused, today's attempts used)
+pending, unchanged: 429 FREE_ATTEMPTS_USED    (free scan unused, free attempts used)
 ```
 
 ## Who may scan
@@ -23,20 +23,20 @@ Checked before anything costs money, never trusting the app:
 1. If `profiles.free_scan_used` is false, the scan is the free one. It is only
    used up by `complete_scan()`, once a scan finishes with scores, so a
    rejected photo or a failure leaves it available.
-2. Each free analysis takes one of the day's free attempts first, through
-   `take_free_attempt()` (5 a day, set by `FREE_ATTEMPTS_PER_DAY` in
-   `index.ts`). Without a limit, a modified app could keep sending unusable
-   photos, or several at once, and each would cost a model call. The count is
-   kept on the profile, where only the server can change it, so deleting
-   scans doesn't reset it.
-3. Otherwise (the free scan used, or today's attempts) the user needs an
+2. Each free analysis takes one of the free attempts first, through
+   `take_free_attempt()` (5 in the 24 hours from the first, set by
+   `FREE_ATTEMPTS_PER_DAY` in `index.ts`). Without a limit, a modified app
+   could keep sending unusable photos, or several at once, and each would
+   cost a model call. The count is kept on the profile, where only the server
+   can change it, so deleting scans doesn't reset it.
+3. Otherwise (the free scan used, or its free attempts) the user needs an
    active `premium` entitlement, which the function asks RevenueCat's REST
    API for, with the user id (the app uses the Supabase user id as
    RevenueCat's app user id).
 4. Without one, the answer is `402 SUBSCRIPTION_REQUIRED` once the free scan
    is used, so the app can open the paywall and carry on with the same photo
    after a purchase. While it's unused, it's `429 FREE_ATTEMPTS_USED`, and the
-   app says to try again tomorrow. The scan stays `pending` either way.
+   app says to try again in 24 hours. The scan stays `pending` either way.
 5. An active entitlement is remembered for 5 minutes per user (or until it
    ends, if sooner), so a run of scans doesn't ask RevenueCat every time. Only
    an active answer is remembered: remembering a refusal would keep refusing
@@ -101,7 +101,7 @@ Each is safe to run twice.
   and adds `complete_scan()`, which the function calls.
 - `supabase/migrations/0004_routines.sql` (Phase 9) replaces `complete_scan()`
   with a version that also saves the routine, in the same transaction.
-- `supabase/migrations/0005_free_attempts.sql` adds the daily free-attempt
+- `supabase/migrations/0005_free_attempts.sql` adds the 24-hour free-attempt
   count to `profiles` and `take_free_attempt()`, which the function calls
   before each free analysis.
 
@@ -199,7 +199,7 @@ the `INTERNAL` message.
 | 400  | `BAD_REQUEST`             | The body has no valid `scanId`.                                  |
 | 401  | `UNAUTHORIZED`            | Missing or invalid access token.                                 |
 | 402  | `SUBSCRIPTION_REQUIRED`   | Free scan used, no active subscription. Stays `pending`.         |
-| 429  | `FREE_ATTEMPTS_USED`      | Free scan unused, today's 5 free attempts used. Stays `pending`. |
+| 429  | `FREE_ATTEMPTS_USED`      | Free scan unused, 5 free attempts in 24 h used. Stays `pending`. |
 | 403  | `FORBIDDEN`               | The scan belongs to someone else.                                |
 | 404  | `NOT_FOUND`               | No scan with that id.                                            |
 | 405  | `METHOD_NOT_ALLOWED`      | Anything other than POST.                                        |

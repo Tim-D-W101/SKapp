@@ -105,8 +105,9 @@ the Gemini key exists. To set it up:
    `supabase/migrations/0004_routines.sql`, then
    `supabase/migrations/0005_free_attempts.sql`, in the SQL editor. They turn
    on Realtime for `scans`, which the app uses to follow each scan, let each
-   scan save its routine alongside its scores, and cap free attempts at 5 a
-   day. Run all three before deploying the current version of the function.
+   scan save its routine alongside its scores, and cap free attempts at 5
+   every 24 hours. Run all three before deploying the current version of the
+   function.
 2. Set the `GEMINI_API_KEY` and `REVENUECAT_SECRET_KEY` secrets and deploy
    the function, as described in `supabase/functions/analyze-scan/README.md`.
    Before analysing a paid scan, the function checks the subscription with

@@ -288,9 +288,9 @@ export const copy = {
       title: 'Something went wrong',
       body: "Your scan didn't finish. This didn't use up your free scan.",
     },
-    /** The server's daily limit on free attempts. The message is errors.scan.FREE_ATTEMPTS_USED. */
+    /** The server's 24-hour limit on free attempts. The message is errors.scan.FREE_ATTEMPTS_USED. */
     freeAttemptsUsed: {
-      title: "That's enough photos for today",
+      title: "That's enough photos for now",
     },
     /** The server turned the scan down: the free scan is used and there's no subscription. */
     subscriptionNeeded: {
@@ -723,7 +723,7 @@ export const copy = {
       MODEL_INVALID_RESPONSE: "Your scan didn't finish properly. Try again.",
       SUBSCRIPTION_REQUIRED: 'Subscribe to take another scan.',
       FREE_ATTEMPTS_USED:
-        "You've tried several photos today. Try again tomorrow, facing a window in daylight if you can.",
+        "You've tried several photos recently. Try again in 24 hours, facing a window in daylight if you can.",
       ENTITLEMENT_UNAVAILABLE:
         "We couldn't check your subscription just now. Try again in a moment.",
       INTERNAL: 'Something went wrong on our side. Try again in a moment.',
