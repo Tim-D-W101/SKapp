@@ -8,6 +8,7 @@ import { StartupScreen } from '@/components/auth/StartupScreen';
 import { initCrashReporting } from '@/lib/crashReporting';
 import { isOnboarded } from '@/lib/onboarding';
 import { useAnalyticsSync } from '@/lib/useAnalyticsSync';
+import { useReminderSync } from '@/lib/useReminderSync';
 import { useSubscriptionSync } from '@/lib/useSubscriptionSync';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useColors } from '@/theme/tokens';
@@ -28,8 +29,10 @@ initCrashReporting();
  * crash reports use the same id.
  *
  * The guards then decide what is reachable. Until onboarding is complete only
- * the onboarding flow is; afterwards only the tabs are. When a guard flips, the
- * router moves to the first reachable group listed below.
+ * the onboarding flow is; afterwards only the tabs and the screens that open
+ * over them are. When a guard flips, the router moves to the first reachable
+ * group listed below. Reminders are managed from then on, whichever screen
+ * is showing.
  */
 export default function RootLayout() {
   const palette = useColors();
@@ -43,8 +46,11 @@ export default function RootLayout() {
     void initialise();
   }, [initialise]);
 
+  const showsApp = !startupError && !isLoading && hasProfile;
+
   useSubscriptionSync();
   useAnalyticsSync();
+  useReminderSync(showsApp && onboarded);
 
   let content;
   if (startupError) {
@@ -64,6 +70,8 @@ export default function RootLayout() {
         </Stack.Protected>
         <Stack.Protected guard={onboarded}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="routine" />
+          <Stack.Screen name="settings" />
           <Stack.Screen name="scan" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="progress" />
           <Stack.Screen name="paywall" options={{ animation: 'slide_from_bottom' }} />

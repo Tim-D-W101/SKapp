@@ -1,8 +1,18 @@
+import type { RoutineSlot } from '@/types/routine';
+
 /**
- * From this local hour, the routine tab opens on the evening section; before
- * it, on the morning section.
+ * From this local hour, the routine opens on the evening section; before it,
+ * on the morning section.
  */
 export const EVENING_FROM_HOUR = 14;
 
 /** Extra wait after local midnight before starting the new day, so the clock has certainly turned. */
 export const MIDNIGHT_GRACE_MS = 1000;
+
+/** In the order Home and the routine list them. */
+export const ROUTINE_SLOTS = ['morning', 'evening'] as const satisfies readonly RoutineSlot[];
+
+/** The section a link asks the routine to open on, if it names one. */
+export function parseRoutineSlot(value: unknown): RoutineSlot | undefined {
+  return ROUTINE_SLOTS.find((slot) => slot === value);
+}

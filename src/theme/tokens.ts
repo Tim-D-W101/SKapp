@@ -103,6 +103,21 @@ export const sizes = {
   skeletonLine: 14,
   /** Height of one segment of the onboarding progress bar. */
   progressSegment: 4,
+  /** Height of the morning and evening progress bars on Home. */
+  routineProgress: 6,
+  /**
+   * The floating tab bar, and the round scan button raised out of its
+   * middle. The pill behind the active tab's icon is `indicator`.
+   */
+  tabBar: {
+    height: 64,
+    indicator: { width: 56, height: 32 },
+    scanButton: 60,
+    /** A ring in the screen's colour around the scan button, so it reads as set into the bar. */
+    scanButtonRing: 4,
+    /** Width of the sun mark on the scan button. */
+    scanButtonMark: 34,
+  },
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',
 } as const;
