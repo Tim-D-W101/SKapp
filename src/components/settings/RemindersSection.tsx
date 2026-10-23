@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, StyleSheet, Switch, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 
 import { Button, Card, Chip, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
@@ -9,7 +9,9 @@ import { logInDevelopment } from '@/lib/errors';
 import type { RoutineReminderSlot } from '@/lib/reminderPlan';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useReminderStore, type WeeklyReminderChanges } from '@/stores/useReminderStore';
-import { sizes, spacing, useColors } from '@/theme/tokens';
+import { spacing } from '@/theme/tokens';
+
+import { SwitchRow } from './SwitchRow';
 
 const HOURS_IN_DAY = 24;
 const ROUTINE_SLOTS: readonly RoutineReminderSlot[] = ['off', 'morning', 'evening'];
@@ -199,40 +201,6 @@ export function RemindersSection() {
   );
 }
 
-function SwitchRow({
-  label,
-  hint,
-  value,
-  onChange,
-}: {
-  label: string;
-  hint?: string;
-  value: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  const palette = useColors();
-  return (
-    <View style={styles.switchBlock}>
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>{label}</Text>
-        <Switch
-          value={value}
-          onValueChange={onChange}
-          accessibilityLabel={label}
-          accessibilityHint={hint}
-          trackColor={{ false: palette.border, true: palette.accent }}
-          thumbColor={palette.surfaceElevated}
-        />
-      </View>
-      {hint ? (
-        <Text variant="caption" color="textSecondary">
-          {hint}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   card: {
     gap: spacing.md,
@@ -253,18 +221,5 @@ const styles = StyleSheet.create({
   hour: {
     flex: 1,
     textAlign: 'center',
-  },
-  switchBlock: {
-    gap: spacing.xs,
-  },
-  switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    minHeight: sizes.minTouchTarget,
-  },
-  switchLabel: {
-    flex: 1,
   },
 });

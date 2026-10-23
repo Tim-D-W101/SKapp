@@ -296,6 +296,9 @@ export const copy = {
     subscriptionNeeded: {
       title: 'This scan needs a subscription',
       body: 'Subscribe to get the results for this photo and keep scanning. Your photo is saved, so you can carry on right here.',
+      /** Test builds only, while Preview premium is on in Settings. */
+      previewNote:
+        'Preview premium is on, but it only changes what this phone shows. The server still needs a real subscription to give results for a scan after your free one.',
       seePlans: 'See plans',
     },
   },
@@ -722,6 +725,21 @@ export const copy = {
       confirm: 'Delete everything',
       deleting: 'Deleting your account',
       done: 'Your account and all your data have been deleted.',
+    },
+    /**
+     * Test builds only (EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW). The Play Store
+     * app never shows this section.
+     */
+    testing: {
+      title: 'Testing',
+      intro: 'This section is only in test builds. The Play Store app never shows it.',
+      premiumPreview: 'Preview premium',
+      premiumPreviewHint:
+        'Unlocks the premium screens on this phone, such as your trend and before-and-after comparisons, so you can look around. It is not a subscription, and nothing is bought.',
+      serverNote:
+        "Scans still follow the server's free-scan limit. After your free scan, the server only gives results for a new scan with a real subscription, even with this switch on.",
+      loadFailed: "The saved setting couldn't be read on this phone, so the preview is off.",
+      saveFailed: "That didn't save on this phone. Try again.",
     },
     about: {
       title: 'About',
