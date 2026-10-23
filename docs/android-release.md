@@ -18,8 +18,9 @@ these specs:
 | `assets/android-icon-monochrome.png` | Themed icon (Android 13+)                      | 1024×1024 PNG, one colour on transparency                                                                  |
 | `assets/splash-icon.png`             | Splash logo, shown at 200 dp on the app colour | PNG with transparency, square                                                                              |
 
-`android.adaptiveIcon.backgroundColor` in `app.json` copies the brand colour
-(`accent` in `src/theme/tokens.ts`). Change both together.
+`android.adaptiveIcon.backgroundColor` in `app.json` copies the brand teal
+from the icon SVGs. Change them together. The in-app palette
+(`src/theme/colors.ts`, coral and peach) is separate and doesn't include it.
 
 ## One-time setup
 
