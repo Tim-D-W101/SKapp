@@ -22,7 +22,7 @@
  * the Edge Function sends.
  */
 
-export const PROMPT_VERSION = 'v2.1.0';
+export const PROMPT_VERSION = 'v3.0.0';
 
 /** Scored attributes, in display order. The database has one column per key. */
 export const ATTRIBUTE_KEYS = [
@@ -275,50 +275,49 @@ export const RETRY_INSTRUCTION =
   'Your previous reply could not be used. Return only one valid JSON object that matches the response schema exactly, with no other text. Every field is required. Follow every rule in your instructions, including the banned vocabulary.';
 
 const routineSteps = (description: string) => ({
-  type: 'ARRAY',
-  maxItems: ROUTINE_MAX_STEPS,
+  type: 'array',
   description,
   items: {
-    type: 'OBJECT',
+    type: 'object',
     properties: {
-      key: { type: 'STRING', enum: [...ROUTINE_STEP_KEYS] },
-      title: { type: 'STRING', description: 'A generic product category in 2 to 5 words.' },
-      why: { type: 'STRING', description: 'One short sentence, offered, never instructed.' },
+      key: { type: 'string', enum: [...ROUTINE_STEP_KEYS] },
+      title: { type: 'string', description: 'A generic product category in 2 to 5 words.' },
+      why: { type: 'string', description: 'One short sentence, offered, never instructed.' },
     },
     required: ['key', 'title', 'why'],
-    propertyOrdering: ['key', 'title', 'why'],
+    additionalProperties: false,
   },
 });
 
 const scoreProperty = (description: string) => ({
-  type: 'INTEGER',
-  minimum: 0,
-  maximum: 100,
-  description,
+  type: 'integer',
+  description: `${description} From 0 to 100.`,
 });
 
 /**
- * Gemini responseSchema (an OpenAPI 3.0 subset). The model can only return
- * JSON in this shape. The property order puts the observations before the
- * scores, so the scores are written with the observations already in view.
+ * JSON Schema for the reply, sent as the Messages API's structured output
+ * format, so the model can only return JSON in this shape. Structured outputs
+ * accept a subset of JSON Schema: no number ranges or item limits, and every
+ * object closed with additionalProperties: false. The ranges and limits are
+ * in the descriptions instead, and are enforced on the reply (analysis.ts,
+ * routine.ts, scoring.ts). Every property is required, so the reply keeps the
+ * order written here: the observations come before the scores, so the scores
+ * are written with the observations already in view.
  */
 export const RESPONSE_SCHEMA = {
-  type: 'OBJECT',
+  type: 'object',
   properties: {
     usable: {
-      type: 'BOOLEAN',
+      type: 'boolean',
       description: 'False when the photo cannot be scored.',
     },
     reject_reason: {
-      type: 'STRING',
-      nullable: true,
-      enum: [...REJECT_REASONS],
+      anyOf: [{ type: 'string', enum: [...REJECT_REASONS] }, { type: 'null' }],
       description: 'Why the photo cannot be scored. Null when usable is true.',
     },
     observations: {
-      type: 'ARRAY',
-      items: { type: 'STRING' },
-      maxItems: 4,
+      type: 'array',
+      items: { type: 'string' },
       description: '2 to 4 short cosmetic observations, each naming one attribute.',
     },
     clarity: scoreProperty('Visible blemishes and marks. Higher means fewer.'),
@@ -330,26 +329,25 @@ export const RESPONSE_SCHEMA = {
     firmness: scoreProperty('Visible tone and definition. Higher means more defined.'),
     overall: scoreProperty('A single summary score for the whole face.'),
     headline: {
-      type: 'STRING',
+      type: 'string',
       description: 'One warm, specific sentence summarising the overall appearance.',
     },
     focus_areas: {
-      type: 'ARRAY',
-      items: { type: 'STRING', enum: [...ATTRIBUTE_KEYS] },
-      maxItems: 3,
+      type: 'array',
+      items: { type: 'string', enum: [...ATTRIBUTE_KEYS] },
       description: '1 to 3 attribute keys to focus on, ordered by impact.',
     },
     routine: {
-      type: 'OBJECT',
+      type: 'object',
       properties: {
         morning: routineSteps('3 to 5 morning steps, ending with sunscreen.'),
         evening: routineSteps('3 to 5 evening steps, never sunscreen.'),
       },
       required: ['morning', 'evening'],
-      propertyOrdering: ['morning', 'evening'],
+      additionalProperties: false,
     },
     refer_to_professional: {
-      type: 'BOOLEAN',
+      type: 'boolean',
       description: 'True when something is better looked at in person. Never described.',
     },
   },
@@ -364,15 +362,5 @@ export const RESPONSE_SCHEMA = {
     'routine',
     'refer_to_professional',
   ],
-  propertyOrdering: [
-    'usable',
-    'reject_reason',
-    'observations',
-    ...ATTRIBUTE_KEYS,
-    'overall',
-    'headline',
-    'focus_areas',
-    'routine',
-    'refer_to_professional',
-  ],
+  additionalProperties: false,
 } as const;

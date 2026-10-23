@@ -30,9 +30,12 @@ const DISAGREEMENT_POINTS = 8;
 /** The app sends photos of roughly this size; much larger fixtures may score differently. */
 const APP_PHOTO_BYTES = 500 * 1024;
 const LARGE_FIXTURE_BYTES = 3 * APP_PHOTO_BYTES;
-/** Gemini's inline image limit is 20 MB per request; stay well under it. */
-const MAX_FIXTURE_BYTES = 15 * 1024 * 1024;
-/** Waits between rate-limited retries of one run, before giving up on it. */
+/**
+ * Anthropic's limit is 10 MB per image once base64-encoded, which adds a
+ * third, so 7 MB of file stays under it.
+ */
+const MAX_FIXTURE_BYTES = 7 * 1024 * 1024;
+/** Waits between rate-limited or overloaded retries of one run, before giving up on it. */
 const RATE_LIMIT_WAITS_MS = [20_000, 40_000, 60_000];
 
 const FIXTURES_DIR = new URL('./fixtures/', import.meta.url);
@@ -86,9 +89,12 @@ async function listFixtures(): Promise<string[]> {
   return names.sort();
 }
 
+/** A rate limit (429) or an overloaded API (529): both pass with time. */
 function isRateLimited(error: unknown): boolean {
   return (
-    error instanceof AnalysisError && error.code === 'INTERNAL' && /HTTP 429/.test(error.message)
+    error instanceof AnalysisError &&
+    error.code === 'INTERNAL' &&
+    /HTTP (429|529)\b/.test(error.message)
   );
 }
 
@@ -102,7 +108,7 @@ async function runOnce(
       return analysis.usable ? { kind: 'scored', analysis } : { kind: 'rejected', analysis };
     } catch (error: unknown) {
       if (isRateLimited(error) && wait < RATE_LIMIT_WAITS_MS.length) {
-        console.log(`    rate limited, waiting ${RATE_LIMIT_WAITS_MS[wait] / 1000}s`);
+        console.log(`    rate limited or overloaded, waiting ${RATE_LIMIT_WAITS_MS[wait] / 1000}s`);
         await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAITS_MS[wait]));
         continue;
       }
@@ -372,7 +378,7 @@ function buildReport(fixtures: Fixture[], summary: Summary): string {
   return [
     '# Calibration report',
     '',
-    `Model \`${MODEL.name}\` (temperature ${MODEL.generation.temperature}, thinking ${MODEL.generation.thinkingLevel}), prompt \`${PROMPT_VERSION}\`, ${RUNS} runs per image, ${new Date().toISOString()}.`,
+    `Model \`${MODEL.name}\` (effort ${MODEL.generation.effort}, thinking ${MODEL.generation.thinking}), prompt \`${PROMPT_VERSION}\`, ${RUNS} runs per image, ${new Date().toISOString()}.`,
     '',
     'Scores are after server-side clamping, and `overall` is the recomputed weighted mean, exactly as the app would receive them. SD is the standard deviation across runs, in points; range is highest minus lowest.',
     '',
@@ -389,10 +395,10 @@ function buildReport(fixtures: Fixture[], summary: Summary): string {
 // ---------------------------------------------------------------------------
 
 async function main(): Promise<number> {
-  const apiKey = Deno.env.get('GEMINI_API_KEY');
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) {
     console.error(
-      'GEMINI_API_KEY is not set. Put it in supabase/functions/.env (see scripts/README.md).',
+      'ANTHROPIC_API_KEY is not set. Put it in supabase/functions/.env (see scripts/README.md).',
     );
     return 1;
   }

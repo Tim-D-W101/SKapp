@@ -8,7 +8,7 @@
  *   active subscription; the scan stays pending.
  *   The app follows the scan row through Realtime, not through this response.
  *
- * The Gemini key, the service role key and the RevenueCat secret key exist
+ * The Anthropic API key, the service role key and the RevenueCat secret key exist
  * only here, as Edge Function secrets. See README.md for setup and deployment.
  */
 import { Buffer } from 'node:buffer';
@@ -68,7 +68,7 @@ function requireSecret(name: string): string {
   return value;
 }
 
-const GEMINI_API_KEY = requireSecret('GEMINI_API_KEY');
+const ANTHROPIC_API_KEY = requireSecret('ANTHROPIC_API_KEY');
 const REVENUECAT_SECRET_KEY = requireSecret('REVENUECAT_SECRET_KEY');
 // Provided automatically to every hosted Edge Function.
 const SUPABASE_URL = requireSecret('SUPABASE_URL');
@@ -349,7 +349,7 @@ Deno.serve(async (request) => {
     const image = await downloadImage(scan.image_path);
 
     // 7-10. The model call, validation, one retry, clamping and overall.
-    const analysis = await analyseImage(image, GEMINI_API_KEY);
+    const analysis = await analyseImage(image, ANTHROPIC_API_KEY);
 
     if (!analysis.usable) {
       await finishWithoutScores(scanId, 'rejected', analysis.rejectReason);
