@@ -276,8 +276,12 @@ don't move.
        Pass: two big rounded buttons side by side, **Home** and
        **Progress**, filling the width of the screen, each an icon beside
        its label, and nothing between them: no round or raised button. The
-       open one is filled teal with white text and icon; the other is pale
-       mint with a thin outline and teal text. The bar clears the phone's
+       open one is filled teal with white text and a solid white icon; the
+       other is warm cream with a thin outline, teal text and the same icon
+       outlined in teal. Home is a house with a rounded roof and a door;
+       Progress is a rounded square with three rising bars. Each icon is
+       centred beside its label and the same size whether solid or
+       outlined, so nothing jumps when the tab changes. The bar clears the phone's
        own navigation bar or gesture line, and nothing on the screen is
        hidden behind it.
 2. [ ] **Tap Progress, then Home.**
@@ -333,7 +337,7 @@ don't move.
         the camera for a new scan"; the profile button as "Settings and
         account, button"; a routine row as, for example, "Morning routine, 2
         of 4 done, button"; the Reminders card as, for example, "Reminders.
-        Next reminder: Weekly scan, Sunday at 7:00 pm, button", with "Opens
+        Next reminder: Weekly scan, Sunday at 7:00 PM, button", with "Opens
         your reminder settings".
 12. [ ] **Largest font.** Set Font size to the largest and look at the
         bottom bar and Home.
@@ -367,7 +371,7 @@ the numbered sections so their step numbers don't move.
 3. [ ] **Find the Reminders card on Home,** under "Today's routine".
        Pass: a coral card with a bell badge, "Reminders" and "Change" with
        an arrow at the top right, and a line such as "Next reminder: Weekly
-       scan, Sunday at 7:00 pm". The reminder named is the one due soonest
+       scan, Sunday at 7:00 PM". The reminder named is the one due soonest
        of those switched on in Settings → Reminders, at the day and time
        set there. The disclaimer is still at the bottom of Home.
 4. [ ] **Tap the card.**
@@ -375,11 +379,15 @@ the numbered sections so their step numbers don't move.
        titled "Reminders", with exactly the controls of Settings →
        Reminders: Allow reminders, the weekly scan reminder with its day and
        time, the daily routine reminder, the streak reminder and "At most
-       one reminder a day…". Long content scrolls inside the sheet, and
-       **Done** stays at the bottom.
+       one reminder a day…", each group separated by a thin line. The seven
+       days sit in one even row (no day wraps onto a second line), and each
+       time shows large, such as "7:00 PM", in its own box with a clock
+       badge and **Change** beside it. Long content scrolls inside the
+       sheet, and **Done** stays at the bottom.
 5. [ ] **In the sheet, turn off the streak reminder, set the daily routine
        reminder to Off (if it's available), pick another day for the weekly
-       reminder and tap Later twice. Tap Done.**
+       reminder, then tap its time, pick an hour two hours later and tap
+       Save. Tap Done.**
        Pass: the sheet closes and the card shows "Weekly scan" on the new
        day, two hours later than before: the day's name, or its date when
        it's more than six days away. It's always at least a week after your
@@ -388,13 +396,15 @@ the numbered sections so their step numbers don't move.
 6. [ ] **Morning, then evening.** In the sheet, set the daily routine
        reminder to Morning, tap Done, then do the same with Evening. (It's
        locked until the routine has been opened a couple of times.)
-       Pass: with Morning, the card says "Next reminder: Morning routine,
-       today at 8:00 am" before 8 am, or "tomorrow at 8:00 am" after it;
-       with Evening, "Evening routine, today at 8:00 pm", or tomorrow after
-       8 pm. Two things can change the day, and both are expected: a
-       reminder already arrived today (there's at most one a day), or a
-       weekly scan or streak reminder is due first and takes the routine
-       reminder's place. Set it back to what you had afterwards.
+       Pass: choosing Morning or Evening shows its time under the choice:
+       8:00 AM for Morning and 8:00 PM for Evening until they're changed.
+       With Morning, the card says "Next reminder: Morning routine, today
+       at 8:00 AM" before 8 am, or "tomorrow at 8:00 AM" after it; with
+       Evening, "Evening routine, today at 8:00 PM", or tomorrow after 8 pm.
+       Two things can change the day, and both are expected: a reminder
+       already arrived today (there's at most one a day), or a weekly scan
+       or streak reminder is due first and takes the routine reminder's
+       place. Set it back to what you had afterwards.
 7. [ ] **In the sheet, turn off Allow reminders and tap Done.**
        Pass: the card says "Reminders are off", with "Turn on" at the top
        right.
@@ -426,11 +436,63 @@ the numbered sections so their step numbers don't move.
         Pass: each closes the sheet and stays on Home. Back with the sheet
         closed still leaves the app, as before.
 13. [ ] **Dark theme.** Turn on Dark theme and look at the bottom bar, the
-        card and the sheet.
-        Pass: the open button is bright mint with dark text and icon, the
-        other a dark button with a thin outline and mint text. The card is a
+        card, the sheet and the time picker.
+        Pass: the open button is bright mint with dark text and a solid dark
+        icon, the other a dark button with a thin outline, mint text and an
+        outlined mint icon. The time picker is a dark box with the time in
+        bright mint and the chosen hour filled mint. The card is a
         deep, muted brown-coral with light text and a pale coral "Change",
         and the sheet is dark with every word readable.
+
+## Reminder times check (6 minutes)
+
+Run this once on any build that changes how reminder times are shown or
+set. Same account as the check above: at least one scan, notifications
+allowed, and the routine opened a couple of times so the daily routine
+reminder is available.
+
+1. [ ] **Open Settings (the round profile button at the top right of
+       Home) → Reminders.**
+       Pass: the weekly time and, with Morning or Evening chosen, the
+       routine time each read cleanly, such as "7:00 PM" and "8:00 AM":
+       hours and minutes, then AM or PM in capitals, with no seconds and
+       no odd gaps. On a phone set to a language that uses a 24-hour
+       clock, they read "19:00" and "08:00" instead.
+2. [ ] **Choose Morning, then tap its time (anywhere on the box).**
+       Pass: a box opens over the screen titled "Morning routine
+       reminder", with the current time large at the top, an AM / PM
+       switch, the hours 12 and 1 to 11, and Cancel and Save. The current
+       hour is filled teal. (On a 24-hour phone there's no AM / PM switch,
+       and all 24 hours show, 00:00 to 23:00.)
+3. [ ] **Tap 7, then Cancel.**
+       Pass: the large time changed to 7:00 AM while picking, but after
+       Cancel the row still shows 8:00 AM. A tap on the dimmed area or
+       Android's back button cancels the same way.
+4. [ ] **Tap the time again, tap 7, then Save.**
+       Pass: the box closes and the row shows 7:00 AM. Home's Reminders
+       card says "Next reminder: Morning routine, … at 7:00 AM" (unless a
+       weekly scan or streak reminder takes that day).
+5. [ ] **Switch to Evening.**
+       Pass: the row shows the evening time, 8:00 PM, not 7:00 AM: each
+       keeps its own time. Tap it, tap PM if needed, pick 9 and Save: it
+       shows 9:00 PM. Switch back to Morning: it still shows 7:00 AM.
+6. [ ] **From Home.** Tap the Reminders card, then change the routine time
+       there the same way.
+       Pass: the same picker opens over the sheet, and after Save the sheet
+       shows the new time. Tap Done: Settings → Reminders shows it too.
+7. [ ] **Close the app completely and open it again.**
+       Pass: the morning and evening times you chose are still set, and
+       the Reminders card still names them.
+8. [ ] **Optional, the real thing.** Set the routine reminder to the next
+       full hour (reminders are on the hour) and lock the phone.
+       Pass: the notification arrives at that hour, unless that day already
+       had a reminder (at most one a day). Set your usual time back
+       afterwards.
+9. [ ] **Largest font.** Set Font size to the largest and open
+       Settings → Reminders and the picker.
+       Pass: the day row stays on one line (the day names may shrink a
+       little), times and "Change" don't overlap, and the picker scrolls if
+       it's taller than the screen, with Cancel and Save always visible.
 
 ## Premium preview check (test builds only, 5 minutes)
 
@@ -441,7 +503,7 @@ account whose free scan is used, without a subscription. Never on a
 production or Play Store build: there, step 1 must find no Testing section.
 
 1. [ ] **Open Settings and scroll down.**
-       Pass: a **Testing** section with a coral gear badge, saying it's only
+       Pass: a **Testing** section with a teal gear badge, saying it's only
        in test builds, a **Preview premium** switch (off), and a note that
        scans still follow the server's free-scan limit. On a production or
        Play Store build there's no Testing section at all.
@@ -470,8 +532,8 @@ production or Play Store build: there, step 1 must find no Testing section.
 ## Look and feel check (10 minutes)
 
 Run this once on any build that changes the app's look, such as the
-supporting colours (sun yellow, coral, lavender and sky blue) beside the
-launcher icon's teal and mint. It needs an account with at least two scans and a
+two warm supporting colours (sun yellow and coral) beside the launcher
+icon's teal, mint and cream. It needs an account with at least two scans and a
 routine, so run it after section 8 and before section 9 wipes the account.
 It sits apart from the numbered sections so their step numbers don't move.
 
@@ -493,12 +555,15 @@ in light mode.
        Pass: the screen is white, and the small sun mark sits beside
        "Home". Scan my skin is a teal card that looks like the app icon (a
        cream sun over mint arcs) with a sun-yellow camera badge. Below it,
-       each card has its own soft colour, with rounded corners: the latest
-       score sky blue, Today's routine mint with a sun-yellow Morning row and
-       a lavender Evening row (each with a matching badge and progress bar),
-       then Reminders and Your next scan coral. At the bottom, the open
-       button (Home) is filled teal and Progress is pale mint. Main buttons are teal pills with white text;
-       outlined buttons have teal text. Every word is easy to read.
+       most cards are a warm, paper-like cream with rounded corners and a
+       teal badge: the latest score (its ring teal), Today's routine (a
+       sun-yellow Morning row and a pale mint Evening row, each with a
+       matching badge and progress bar) and Your next scan. Reminders is
+       the one soft coral card. Colour sits in a few chosen places: no
+       purple or blue anywhere, no gradients, and nothing glows. At the
+       bottom, the open button (Home) is filled teal and Progress is cream.
+       Main buttons are teal pills with white text; outlined buttons have
+       teal text. Every word is easy to read.
 4. [ ] **Camera and tips.**
        Pass: the face oval turns mint at "Looking good". **Why?** opens a
        sheet with rounded top corners, a grab bar and teal tick badges.
@@ -510,30 +575,31 @@ in light mode.
        photos for now", if you reach it, looks the same, with Go back.
 6. [ ] **Results.**
        Pass: the ring and bars run from pale mint (low) to deep teal (high);
-       nothing looks red or alarming. The seven scores sit on a sky-blue
-       card, "Where to focus" on a sun-yellow panel, and "Since your last
-       scan" on a lavender card. The full disclaimer, with its info icon, is
+       nothing looks red or alarming. The seven scores sit on a cream card,
+       "Where to focus" on a sun-yellow panel, and "Since your last scan" on
+       a cream card. The full disclaimer, with its info icon, is
        visible without scrolling past anything collapsed.
 7. [ ] **Share.**
        Pass: the preview is a light mint card with the sun mark beside
        "GlowTrack". The shared image looks the same as the preview.
 8. [ ] **Progress and compare.**
-       Pass: the latest score sits on a sky-blue card, "Over time" (or the
-       locked "Your trend and comparisons") on a lavender card with a
-       lavender chart line and points, "Before and after" on a coral card,
-       and the weekly streak on a sun-yellow card. History thumbnails show
+       Pass: the latest score sits on a cream card, "Over time" (or the
+       locked "Your trend and comparisons") on a cream card with a teal
+       chart line and points, "Before and after" on a cream card with a
+       teal badge, and the weekly streak on a sun-yellow card. History thumbnails show
        (or show a mint placeholder). On the "Before and after" screen, there
        is no coloured strip down the left edge of the screen.
 9. [ ] **Routine pictures.** Open Morning, then Evening.
        Pass:
    - every step shows a drawing between its tick box and its text, and
      still shows its title and its one-line reason;
-   - Morning is a sun-yellow card and Evening a lavender one, each with a
+   - Morning is a sun-yellow card and Evening a pale mint one, each with a
      matching badge, and ticked boxes in the section's colour;
-   - each kind of step has its own colour, its drawing in that colour on a
-     tile of the same soft colour: sunscreen and face oil yellow, serum and
-     lip balm coral, eye cream and makeup remover lavender, cleanser and
-     toner blue, moisturiser mint;
+   - each kind of step is drawn in one of three colours on a tile of the
+     same soft colour: sunscreen and face oil yellow; serum, eye cream,
+     lip balm and makeup remover coral; cleanser, toner and moisturiser
+     mint. No two steps next to each other in a usual morning share a
+     colour;
    - each drawing matches the step: makeup remover and cotton pad,
      cleanser pump, toner bottle, serum dropper, eye cream tube,
      moisturiser jar, face oil bottle, lip balm, sunscreen tube with a sun;
@@ -549,9 +615,9 @@ in light mode.
         button are plain body text. Close, Restore purchases, Terms and
         Privacy Policy are all visible.
 12. [ ] **Settings and Delete my account.**
-        Pass: each section is a mint card with a coloured badge beside its
-        title: Account blue, Subscription yellow, Reminders coral, Your data
-        lavender, About mint. Switches are teal when on.
+        Pass: each section is a cream card with a badge beside its title:
+        Subscription yellow, Reminders coral, and Account, Your data and
+        About teal on mint. Switches are teal when on.
         **Delete my account** is a deep pink-red button, clearly different
         from the teal ones.
 13. [ ] **Error and empty states.** Look back at the offline screens in
@@ -563,8 +629,9 @@ in light mode.
         Pass: backgrounds are a deep teal-black, the accent is the icon's
         bright mint, and main buttons have dark text. The sun mark beside
         "Home" has a cream sun, and Scan my skin is mint with a dark mark and
-        dark text. The coloured cards turn deep and muted (navy, brown, plum)
-        with their colours bright on top. Every word is readable, and the
+        dark text. Cards are a deep teal-grey; the few coloured ones turn
+        deep and muted (brown for sun and coral, dark teal for mint) with
+        their colours bright on top. Every word is readable, and the
         routine drawings show clearly on their dark tiles.
 15. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
         11 and 12.
