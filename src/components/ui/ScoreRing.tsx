@@ -43,8 +43,8 @@ export interface ScoreRingProps {
    */
   progress?: SharedValue<number>;
   /**
-   * The empty part of the ring. On a tinted card, `background` keeps it
-   * visible against the card's colour.
+   * The empty part of the ring. On a tinted card, `surface` (white in light
+   * mode) keeps it visible against the card's colour.
    */
   trackColor?: ColorName;
 }

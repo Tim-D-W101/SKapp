@@ -1,5 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
+import { parseAppearancePreference, type AppearancePreference } from '@/lib/appearance';
+
 /**
  * Small on-device flags. They live in SecureStore only because it is the one
  * persistent key-value store the app already has; none of them is secret.
@@ -42,4 +44,19 @@ export async function isPremiumPreviewSaved(): Promise<boolean> {
 export async function savePremiumPreview(on: boolean): Promise<void> {
   if (on) await SecureStore.setItemAsync(PREMIUM_PREVIEW_KEY, 'true');
   else await SecureStore.deleteItemAsync(PREMIUM_PREVIEW_KEY);
+}
+
+const APPEARANCE_KEY = 'glowtrack.appearance';
+
+/**
+ * Light, dark, or following the phone (lib/appearance.ts). Kept on this
+ * phone only, and kept through signing out: it's how this phone looks, not
+ * part of an account. Null when nothing is saved, as on a new install.
+ */
+export async function readSavedAppearance(): Promise<AppearancePreference | null> {
+  return parseAppearancePreference(await SecureStore.getItemAsync(APPEARANCE_KEY));
+}
+
+export async function saveAppearance(preference: AppearancePreference): Promise<void> {
+  await SecureStore.setItemAsync(APPEARANCE_KEY, preference);
 }

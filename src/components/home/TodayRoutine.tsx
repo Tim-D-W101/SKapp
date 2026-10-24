@@ -71,7 +71,7 @@ export function TodayRoutine() {
                 <Text variant="bodySmall" color="textSecondary">
                   {progress}
                 </Text>
-                <View style={[styles.track, { backgroundColor: palette.background }]}>
+                <View style={[styles.track, { backgroundColor: palette.surface }]}>
                   <View
                     style={[
                       styles.fill,

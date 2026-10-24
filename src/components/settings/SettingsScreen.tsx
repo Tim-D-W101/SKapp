@@ -9,13 +9,15 @@ import { layout, spacing } from '@/theme/tokens';
 
 import { AboutSection } from './AboutSection';
 import { AccountSection } from './AccountSection';
+import { AppearanceSection } from './AppearanceSection';
 import { DataSection } from './DataSection';
 import { RemindersSection } from './RemindersSection';
 import { SubscriptionSection } from './SubscriptionSection';
 import { TestingSection } from './TestingSection';
 
 /**
- * Account, subscription, reminders, the person's data, and the legal pages.
+ * Account, appearance (light, dark or the phone's setting), subscription,
+ * reminders, the person's data, and the legal pages.
  * It opens from the profile button at the top of Home. Test builds that
  * offer the premium preview also get a Testing section; no other build
  * shows it.
@@ -31,6 +33,7 @@ export function SettingsScreen() {
           {copy.settings.title}
         </Text>
         <AccountSection />
+        <AppearanceSection />
         <SubscriptionSection />
         <RemindersSection />
         <DataSection />

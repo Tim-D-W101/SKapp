@@ -25,7 +25,7 @@ export function ProgressHero({ records }: ProgressHeroProps) {
     const next = nextScanDate(latest.createdAt);
     return (
       <Card style={styles.card} tint="peach">
-        <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
+        <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="surface" />
         <Text variant="h3" align="center" accessibilityRole="header">
           {copy.progress.oneScan.title}
         </Text>
@@ -43,7 +43,7 @@ export function ProgressHero({ records }: ProgressHeroProps) {
   const days = calendarDaysBetween(first.createdAt, latest.createdAt);
   return (
     <Card style={styles.card} tint="peach">
-      <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
+      <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="surface" />
       <Text variant="h3" align="center">
         {copy.progress.journey(latest.overall - first.overall, copy.progress.journeySpan(days))}
       </Text>

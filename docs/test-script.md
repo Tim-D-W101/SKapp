@@ -615,14 +615,16 @@ find no Testing section.
 ## Look and feel check (10 minutes)
 
 Run this once on any build that changes the app's look, such as the
-supporting colours (sun yellow, coral, peach and dusk blue) beside the
-launcher icon's teal, mint and cream. It needs an account with at least two scans and a
-routine, so run it after section 8 and before section 9 wipes the account.
-It sits apart from the numbered sections so their step numbers don't move.
+light and dark palettes, the Appearance setting, or the supporting colours
+(sun yellow, coral, apricot peach and dusk blue) beside the launcher icon's
+teal and mint. It needs an account with at least two scans and a routine,
+so run it after section 8 and before section 9 wipes the account. It sits
+apart from the numbered sections so their step numbers don't move.
 
 **Before you start:** on the phone, open Settings → Display, and note how
-to change **Font size** and **Dark theme**. Start on the default font size,
-in light mode.
+to change **Font size** and **Dark theme**. Start on the default font size.
+In GlowTrack, open Settings (the round button at the top of Home) →
+**Appearance** and choose **Light**, whatever the phone is set to.
 
 1. [ ] **Startup and onboarding** (fresh install, or after 9.8).
        Pass: the app's teal is the teal of the GlowTrack icon on the phone's
@@ -635,27 +637,29 @@ in light mode.
        Pass: the email field's outline turns teal while typing. A bad
        address shows its message in a deep pink-red, not teal.
 3. [ ] **Home, as it first opens.**
-       Pass: the screen is white, and the small sun mark sits beside
-       "Home". Without scrolling, several different colours show, each
-       meaning something:
+       Pass: the screen is a clean, barely-grey white with **white cards**
+       on it (no cream anywhere), and the small sun mark sits beside
+       "Home". Without scrolling, colour shows only where it means
+       something:
    - Scan my skin is a teal card with a **sun-yellow sun** rising over mint
-     arcs and a sun-yellow camera badge;
-   - under it, "Your latest scan" is one row on a **warm peach** card: the
-     teal score ring beside the date and "See these results ›"; tapping
-     anywhere on it opens that scan's results;
-   - Today's routine is a cream card with a **sun-yellow Morning** row and a
+     arcs and a **coral** camera badge;
+   - under it, "Your latest scan" is one row on a **bright apricot** card
+     (orange-peach, not skin-coloured), the only coloured card on Home: the
+     teal score ring on a white track beside the date and "See these
+     results ›"; tapping anywhere on it opens that scan's results;
+   - Today's routine is a white card with a **sun-yellow Morning** row and a
      **dusk-blue Evening** row (a calm twilight blue with a moon), each with
-     a matching badge and progress bar. On most phones both rows show
-     without scrolling.
+     a matching badge and a progress bar on a white track. On most phones
+     both rows show without scrolling.
 
-   Scrolling on: Reminders is a soft **coral** card and Your next scan a
-   pale **mint** one. No two cards next to each other share a colour.
-   Colour is flat: no purple, no gradients, no glass effects, nothing
-   glows. At the bottom, the open button (Home) is filled teal and
-   Progress is cream. Main buttons are teal pills with white text. Every
-   word is easy to read.
+   Scrolling on: Reminders and Your next scan are **white** cards, with a
+   **coral** bell badge and coral "Change ›" on Reminders and a mint
+   calendar badge on the next scan. Colour is flat: no purple, no
+   gradients, no glass effects, nothing glows. At the bottom, the open
+   button (Home) is filled teal and Progress is white with a thin outline.
+   Main buttons are teal pills with white text. Every word is easy to read.
    - **No scans yet** (a fresh account): under the scan card, "No scans
-     yet" sits on the same peach card.
+     yet" sits on the same apricot card.
 
 4. [ ] **Camera and tips.**
        Pass: the face oval turns mint at "Looking good". **Why?** opens a
@@ -668,18 +672,19 @@ in light mode.
        photos for now", if you reach it, looks the same, with Go back.
 6. [ ] **Results.**
        Pass: the ring and bars run from pale mint (low) to deep teal (high);
-       nothing looks red or alarming. The seven scores sit on a cream card,
+       nothing looks red or alarming. The seven scores sit on a white card,
        "Where to focus" on a sun-yellow panel, and "Since your last scan" on
-       a cream card. The full disclaimer, with its info icon, is
+       a white card. The full disclaimer, with its info icon, is
        visible without scrolling past anything collapsed.
 7. [ ] **Share.**
        Pass: the preview is a light mint card with the sun mark beside
        "GlowTrack". The shared image looks the same as the preview.
 8. [ ] **Progress and compare.**
-       Pass: the latest score sits on a peach card, as on Home, "Over time" (or the
-       locked "Your trend and comparisons") on a cream card with a teal
-       chart line and points, "Before and after" on a cream card with a
-       teal badge, and the weekly streak on a sun-yellow card. History thumbnails show
+       Pass: the latest score sits on the apricot card, as on Home, with
+       its ring on a white track, "Over time" (or the locked "Your trend and
+       comparisons") on a white card with a teal chart line and points,
+       "Before and after" on a white card with a teal badge, and the weekly
+       streak on a sun-yellow card. History thumbnails show
        (or show a mint placeholder). On the "Before and after" screen, there
        is no coloured strip down the left edge of the screen.
 9. [ ] **Routine pictures.** Open Morning, then Evening.
@@ -708,31 +713,50 @@ in light mode.
         button are plain body text. Close, Restore purchases, Terms and
         Privacy Policy are all visible.
 12. [ ] **Settings and Delete my account.**
-        Pass: each section is a cream card with a badge beside its title:
-        Subscription yellow, Reminders coral, and Account, Your data and
-        About teal on mint. Switches are teal when on.
+        Pass: each section is a white card with a badge beside its title:
+        Subscription yellow, Reminders coral, and Account, Appearance, Your
+        data and About teal on mint. **Appearance** is second, under
+        Account, with three choices in one row: System (a phone), Light (a
+        sun) and Dark (a moon), the chosen one filled teal, and a line under
+        them saying what it does. Switches are teal when on.
         **Delete my account** is a deep pink-red button, clearly different
         from the teal ones.
 13. [ ] **Error and empty states.** Look back at the offline screens in
         section 8, and at the Progress tab after 9.9.
         Pass: a full-screen error shows a quiet grey badge and an outlined
         Try again, never red. "No scans yet" shows the sun mark above it.
-14. [ ] **Dark theme.** Turn on Dark theme and repeat 3, 6, 9 and 11
-        quickly.
-        Pass: backgrounds are a deep teal-black, the accent is the icon's
-        bright mint, and main buttons have dark text. The sun mark beside
-        "Home" has a cream sun, and Scan my skin is mint with a dark mark and
-        dark text. Cards are a deep teal-grey; the coloured ones turn deep
-        and muted (olive-brown for sun, red-brown for coral, warm brown for
-        peach, navy for dusk, dark teal for mint) with their colours bright
-        on top, and are still told apart. Every word is readable, and the
-        routine drawings show clearly on their dark tiles.
-15. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
+14. [ ] **Dark look.** In GlowTrack's Settings → Appearance choose
+        **Dark**, and repeat 3, 6, 9 and 11 quickly.
+        Pass: the whole app turns dark at once, without restarting.
+        Backgrounds are a deep spruce ink and cards a clear step lighter.
+        Scan my skin stays the icon's **deep teal** (not mint) with white
+        text, a sun-yellow sun over mint arcs and a glowing coral camera.
+        The open bottom button and main buttons are bright mint with dark
+        text. The sun mark beside "Home" has a cream sun. Coloured cards and
+        rows turn rich and deep (terracotta for the apricot latest scan, gold
+        for sun, rosewood for coral, navy for dusk, deep teal for mint) with
+        their colours bright on top, and are still told apart; nothing
+        looks muddy brown. Every word is readable, and the routine drawings
+        show clearly on their dark tiles.
+15. [ ] **Appearance follows the choice, not the phone.**
+        Pass for each:
+    - with the phone in **Dark theme**, choose **Light** in GlowTrack:
+      GlowTrack is light everywhere (status bar icons dark) while other
+      apps stay dark. Close GlowTrack fully and reopen it: it opens light
+      straight away, with no dark flash first;
+    - with the phone in **light** mode, choose **Dark**: the same, the
+      other way round;
+    - choose **System**, then turn the phone's Dark theme on and off from
+      quick settings: GlowTrack follows the phone each time, and the line
+      under the choices says it matches your phone's setting;
+    - with TalkBack on, the three choices read as radio buttons, the first
+      as "System, matches your phone's setting".
+16. [ ] **Largest font.** Set Font size to the largest, and repeat 3, 6, 9,
         11 and 12.
         Pass: no text is cut off or overlaps. A long button label, such as
         "Delete all my scan photos", wraps onto two lines inside its button
         instead of ending in "…". Routine text wraps beside its drawing.
-16. [ ] **Smallest font.** Set Font size to the smallest and look at Home and
+17. [ ] **Smallest font.** Set Font size to the smallest and look at Home and
         Routine.
         Pass: text is small but every button and tick box is still a large,
         easy target. Set the font size back afterwards.

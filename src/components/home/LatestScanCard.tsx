@@ -12,10 +12,11 @@ export interface LatestScanCardProps {
 }
 
 /**
- * The latest overall score on Home, on a warm peach card beside the teal
- * ring: the ring on one side, when it was taken and the way to its results
- * on the other. Kept to one row, so the morning and evening routine show on
- * the first screen too. Tapping anywhere opens that scan's results.
+ * The latest overall score on Home, on a bright apricot card beside the teal
+ * ring: the only tinted card on Home. The ring on one side, when it was
+ * taken and the way to its results on the other. Kept to one row, so the
+ * morning and evening routine show on the first screen too. Tapping
+ * anywhere opens that scan's results.
  */
 export function LatestScanCard({ latest }: LatestScanCardProps) {
   const palette = useColors();
@@ -30,7 +31,7 @@ export function LatestScanCard({ latest }: LatestScanCardProps) {
       style={({ pressed }) => (pressed ? styles.pressed : null)}
     >
       <Card tint="peach" style={styles.card}>
-        <ScoreRing score={latest.overall} label={copy.results.overall} trackColor="background" />
+        <ScoreRing score={latest.overall} label={copy.results.overall} trackColor="surface" />
         <View style={styles.text}>
           <Text variant="label" tint="peach">
             {copy.home.latest.title}

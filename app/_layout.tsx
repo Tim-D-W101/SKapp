@@ -10,8 +10,9 @@ import { isOnboarded } from '@/lib/onboarding';
 import { useAnalyticsSync } from '@/lib/useAnalyticsSync';
 import { useReminderSync } from '@/lib/useReminderSync';
 import { useSubscriptionSync } from '@/lib/useSubscriptionSync';
+import { useAppearanceStore } from '@/stores/useAppearanceStore';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useColors } from '@/theme/tokens';
+import { useColors, useColorSchemeName } from '@/theme/tokens';
 
 // Before anything renders, so a crash during startup is reported too.
 initCrashReporting();
@@ -33,9 +34,15 @@ initCrashReporting();
  * over them are. When a guard flips, the router moves to the first reachable
  * group listed below. Reminders are managed from then on, whichever screen
  * is showing.
+ *
+ * Nothing draws until the Appearance choice made in Settings has been read
+ * from the phone, a moment at most, so the app never opens dark and then
+ * turns light. The status bar's icons follow the same choice.
  */
 export default function RootLayout() {
   const palette = useColors();
+  const scheme = useColorSchemeName();
+  const appearanceLoaded = useAppearanceStore((state) => state.loaded);
   const initialise = useAuthStore((state) => state.initialise);
   const isLoading = useAuthStore((state) => state.isLoading);
   const startupError = useAuthStore((state) => state.startupError);
@@ -51,6 +58,8 @@ export default function RootLayout() {
   useSubscriptionSync();
   useAnalyticsSync();
   useReminderSync(showsApp && onboarded);
+
+  if (!appearanceLoaded) return null;
 
   let content;
   if (startupError) {
@@ -85,7 +94,7 @@ export default function RootLayout() {
   return (
     // Gestures anywhere in the app (the comparison slider) need this at the root.
     <GestureHandlerRootView style={styles.root}>
-      <StatusBar style="auto" />
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       {content}
     </GestureHandlerRootView>
   );
