@@ -363,7 +363,7 @@ export const copy = {
       body: 'Subscribe to get the results for this photo and keep scanning. Your photo is saved, so you can carry on right here.',
       /** Test builds only, while Preview premium is on in Settings. */
       previewNote:
-        'Preview premium is on, but it only changes what this phone shows. The server still needs a real subscription to give results for a scan after your free one.',
+        "Preview premium is on, but the server didn't accept this test build's preview key, so it still needs a real subscription to give results for a scan after your free one. The key has to match on the server and in this build.",
       seePlans: 'See plans',
     },
   },
@@ -863,8 +863,12 @@ export const copy = {
       premiumPreview: 'Preview premium',
       premiumPreviewHint:
         'Unlocks the premium screens on this phone, such as your trend and before-and-after comparisons, so you can look around. It is not a subscription, and nothing is bought.',
+      /** This build has the preview scan key. */
       serverNote:
-        "Scans still follow the server's free-scan limit. After your free scan, the server only gives results for a new scan with a real subscription, even with this switch on.",
+        'With this switch on, this test build also asks the server for results on scans after your free one. That works once the server has the same preview key as this build. Your first scan is still your free one.',
+      /** This build has no preview scan key. */
+      serverNoteNoKey:
+        "This test build has no preview key, so scans still follow the server's free-scan limit. After your free scan, the server only gives results for a new scan with a real subscription, even with this switch on.",
       loadFailed: "The saved setting couldn't be read on this phone, so the preview is off.",
       saveFailed: "That didn't save on this phone. Try again.",
     },

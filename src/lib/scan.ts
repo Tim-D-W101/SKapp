@@ -3,6 +3,7 @@ import { randomUUID } from 'expo-crypto';
 import { ANALYZE_SCAN_FUNCTION, ATTRIBUTE_KEYS, SCANS_BUCKET } from '@/constants/scan';
 import { logInDevelopment, readFunctionErrorCode } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
+import { getPreviewScanHeaders } from '@/stores/usePremiumPreviewStore';
 import type { Json, Tables } from '@/types/database';
 import type { AttributeKey, CaptureQuality, ScanResult, ScanStatus } from '@/types/scan';
 
@@ -120,10 +121,17 @@ export async function submitScan(
   return { scanId, started: startAnalysis(scanId) };
 }
 
-/** Calls the Edge Function for a pending scan. Safe to repeat: a scan is only ever analysed once. */
+/**
+ * Calls the Edge Function for a pending scan. Safe to repeat: a scan is only
+ * ever analysed once. A preview build sends its preview scan key while
+ * Preview premium is on (usePremiumPreviewStore); no other build sends it.
+ */
 export async function startAnalysis(scanId: string): Promise<StartResult> {
   try {
-    const { error } = await supabase.functions.invoke(ANALYZE_SCAN_FUNCTION, { body: { scanId } });
+    const { error } = await supabase.functions.invoke(ANALYZE_SCAN_FUNCTION, {
+      body: { scanId },
+      headers: getPreviewScanHeaders(),
+    });
     if (!error) return { ok: true };
     return { ok: false, code: await readFunctionErrorCode(error), error };
   } catch (error: unknown) {
