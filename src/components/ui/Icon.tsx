@@ -30,7 +30,9 @@ export type IconName =
   | 'bell'
   | 'calendar'
   | 'camera'
-  | 'clock';
+  | 'clock'
+  | 'phone'
+  | 'contrast';
 
 export interface IconProps {
   name: IconName;
@@ -64,12 +66,13 @@ export function Icon({ name, size = sizes.icon.md, color = 'textSecondary', tint
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      {renderGlyph(name)}
+      {renderGlyph(name, stroke)}
     </Svg>
   );
 }
 
-function renderGlyph(name: IconName) {
+/** `ink` is the icon's colour, for the rare glyph with a filled part. */
+function renderGlyph(name: IconName, ink: string) {
   switch (name) {
     case 'info':
       return (
@@ -213,6 +216,21 @@ function renderGlyph(name: IconName) {
           <Path d="M12 15V4" />
           <Path d="M8 8l4-4 4 4" />
           <Path d="M5 12v7h14v-7" />
+        </>
+      );
+    case 'phone':
+      return (
+        <>
+          <Rect x={7} y={3} width={10} height={18} rx={2.5} />
+          <Path d="M11 17.5h2" />
+        </>
+      );
+    // Half light, half dark: the usual sign for light and dark appearance.
+    case 'contrast':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={8.5} />
+          <Path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill={ink} />
         </>
       );
   }

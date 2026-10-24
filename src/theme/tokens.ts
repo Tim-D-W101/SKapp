@@ -8,7 +8,16 @@
 import { Platform, useColorScheme } from 'react-native';
 import type { TextStyle, ViewStyle } from 'react-native';
 
-import { colors, scanSweepColor, shareCardColors, type ColorPalette } from './colors';
+import { resolveColorScheme } from '@/lib/appearance';
+import { useAppearanceStore } from '@/stores/useAppearanceStore';
+
+import {
+  colors,
+  scanSweepColor,
+  shareCardColors,
+  type ColorPalette,
+  type ColorSchemeName,
+} from './colors';
 
 // ---------------------------------------------------------------------------
 // Colours
@@ -35,10 +44,21 @@ export {
   type TintName,
 } from './colors';
 
-/** Returns the palette for the device's current light/dark setting. */
+/**
+ * Light or dark, as chosen under Appearance in Settings: always light,
+ * always dark, or the phone's own setting. Everything that picks colours by
+ * scheme goes through this, so a choice made in Settings applies everywhere
+ * at once, without a restart.
+ */
+export function useColorSchemeName(): ColorSchemeName {
+  const preference = useAppearanceStore((state) => state.preference);
+  const system = useColorScheme();
+  return resolveColorScheme(preference, system);
+}
+
+/** Returns the palette for the light or dark look in use (useColorSchemeName). */
 export function useColors(): ColorPalette {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? colors.dark : colors.light;
+  return colors[useColorSchemeName()];
 }
 
 // ---------------------------------------------------------------------------

@@ -771,6 +771,28 @@ export const copy = {
       manageHint: 'Opens your subscriptions in Google Play.',
       manageFailed: "Google Play didn't open. Try again later.",
     },
+    /** Light or dark colours, or the phone's own setting. Kept on this phone only. */
+    appearance: {
+      title: 'Appearance',
+      /** Screen reader name for the three choices. */
+      label: 'Appearance',
+      options: { system: 'System', light: 'Light', dark: 'Dark' },
+      /** Screen reader names, where the short label needs saying in full. */
+      optionLabels: {
+        system: "System, matches your phone's setting",
+        light: 'Light',
+        dark: 'Dark',
+      },
+      /** Under the choices: what the chosen one does. */
+      notes: {
+        system: "Matches your phone's light or dark setting.",
+        light: 'Always light, whatever your phone is set to.',
+        dark: 'Always dark, whatever your phone is set to.',
+      },
+      loadFailed:
+        "Your saved choice couldn't be read on this phone, so the app matches your phone's setting for now.",
+      saveFailed: "That didn't save on this phone. Try again.",
+    },
     reminders: {
       title: 'Reminders',
       oneADay: 'At most one reminder a day, whatever is switched on.',
