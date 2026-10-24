@@ -80,43 +80,154 @@ it's on, the phone's own checks count you as subscribed, so the trend, the
 before-and-after comparison and the camera after your free scan open
 instead of the plans.
 
-It's controlled by one variable:
+On its own, the switch only changes what the phone shows: the server (the
+analyze-scan Edge Function) checks the real subscription with RevenueCat, so
+a scan after your free one would still be turned down. To get real results
+for scans 2, 3 and on, the preview build also carries a **preview scan key**
+that the server knows. The app sends it with each scan while the switch is
+on, and the server counts a scan with the right key as subscribed.
 
-| Variable                             | Value  | Where                                  |
-| ------------------------------------ | ------ | -------------------------------------- |
-| `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` | `true` | The EAS **`preview`** environment only |
+It's controlled by two EAS variables and one Supabase secret:
 
-- **Set it once, in the `preview` environment only:**
+| Name                                 | Value                    | Where                                   |
+| ------------------------------------ | ------------------------ | --------------------------------------- |
+| `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` | `true`                   | The EAS **`preview`** environment only  |
+| `EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN`   | your key (same as below) | The EAS **`preview`** environment only  |
+| `PREVIEW_BYPASS_TOKEN`               | your key (same as above) | Supabase **Edge Function secrets** only |
+
+Without the key, the switch still works as before, and only the free scan
+gets results. The app sends the key only in a build that offers the switch
+(never one on the `production` channel), only while the switch is on, and
+only if the build was published with the key.
+
+### Set it up (once)
+
+1. **The switch.** In the `preview` environment only:
+
+   ```bash
+   npx eas-cli env:create --environment preview --name EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW --value true --visibility plaintext
+   ```
+
+2. **Make a key**: a long random string, at least 32 characters. Don't paste
+   it into a chat, a commit or a ticket.
+
+   ```bash
+   openssl rand -hex 32
+   ```
+
+3. **Give it to the server.** Add a line to `supabase/functions/.env` (it's
+   gitignored, and already holds the function's other secrets):
+
+   ```text
+   PREVIEW_BYPASS_TOKEN=<your key>
+   ```
+
+   Then upload the file, as in `supabase/functions/analyze-scan/README.md`:
+
+   ```bash
+   npx supabase secrets set --env-file supabase/functions/.env --project-ref yheevhjamvuxtnqudszk
+   ```
+
+   A value shorter than 32 characters is ignored (the function logs an
+   error), so the key never opens scans by being easy to guess.
+
+4. **Deploy the function** once, so the server knows to look for the key.
+   Later changes to the secret need no new deploy.
+
+   ```bash
+   npx supabase functions deploy analyze-scan --project-ref yheevhjamvuxtnqudszk
+   ```
+
+5. **Give it to the preview build.** Same key, in the `preview` environment
+   only. `read -rs` keeps it out of your screen and shell history; paste the
+   key and press Enter:
+
+   ```bash
+   read -rs PREVIEW_KEY
+   npx eas-cli env:create --environment preview --name EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN --value "$PREVIEW_KEY" --visibility sensitive
+   unset PREVIEW_KEY
+   ```
+
+   `sensitive` hides it on expo.dev and in logs while still letting
+   `eas update` use it.
+
+6. **Publish to the preview channel** as usual (`--environment preview`).
+   Both values are written into the update, so the installed preview APK
+   picks them up with no new build.
+
+Then, on the preview build: Settings → Testing shows the switch, with a note
+that this build also asks the server for scans after your free one. Turn
+Preview premium on, and scans after the free one get real scores. The
+first scan is still the free one, and is used up the same way.
+
+### Switch it off, or change the key
+
+- **Off, at once, for everyone:** remove the server's secret. Any key sent
+  after that is ignored; no deploy is needed.
 
   ```bash
-  npx eas-cli env:create --environment preview --name EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW --value true --visibility plaintext
+  npx supabase secrets unset PREVIEW_BYPASS_TOKEN --project-ref yheevhjamvuxtnqudszk
   ```
 
-  Then publish to the preview channel as usual (`--environment preview`). The
-  value is written into the update, so the installed preview APK gets the
-  Testing section with no new build. To take it away again, delete the
-  variable (`npx eas-cli env:delete`) and publish again.
+- **Take it out of the preview build:** delete the EAS variable
+  (`npx eas-cli env:delete`) and publish again. Do the same with
+  `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` to remove the Testing section.
+- **A new key** (for example, if a preview APK went somewhere it
+  shouldn't): make one, set it on the server (step 3) and in EAS (delete
+  and recreate, step 5), and publish again. The old key stops working as
+  soon as the server has the new one.
 
-- **Never set it for production.** Not in the EAS `production`
-  environment, not in `eas.json`, not in `app.json`. Check it's absent before
-  every production build or update:
+### Never for production
+
+- **Neither EAS variable may exist in the `production` environment,** nor
+  in `eas.json` or `app.json`. Check before every production build or
+  update:
 
   ```bash
   npx eas-cli env:list --environment production
   ```
 
-  `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` must not be in that list. As a second
-  guard, the app never shows the switch in a build on the `production`
-  channel, even if the variable were set by mistake. `npm test`
-  (`src/lib/premiumPreview.test.ts`) checks both rules, and that
-  `eas.json`, `app.json` and `.env.example` don't set it.
+  Neither `EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW` nor
+  `EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN` may be in that list.
 
-- **What it can't do.** It only changes what the phone shows. The server
-  (the analyze-scan Edge Function) still checks the real subscription with
-  RevenueCat, so after your free scan a new scan is still turned down with
-  "This scan needs a subscription". Purchases, restores and the
-  subscription shown in Settings are unchanged, and analytics keep reporting
-  the real subscription. The switch is saved on the phone only.
+- **A second guard in the app:** a build on the `production` channel never
+  shows the switch and never sends the key, even if a variable were set by
+  mistake. `npm test` (`src/lib/premiumPreview.test.ts`) checks the switch's
+  rules, and that `eas.json`, `app.json` and `.env.example` don't turn it on.
+- **The key isn't secret from testers.** Anything with an `EXPO_PUBLIC_`
+  name is written into the app, so anyone with the preview build could dig
+  the key out of it and get scans analysed without paying. Keep preview
+  builds to your testers, and change the key (or unset the secret) if one
+  leaks. It can never reach a Play Store build, which is built and updated
+  from the `production` environment.
+
+### What stays real
+
+- The free scan comes first, as for everyone, and is used up by the first
+  finished scan.
+- Purchases, restores and the subscription in Settings are unchanged, and
+  RevenueCat isn't asked about scans the key lets through.
+- **Analytics report reality:** a preview scan after the free one shows up
+  as a completed scan (`scan_completed`, `results_viewed`) by someone with
+  `is_premium` false, because that's what they are. Nothing records them as
+  subscribed. The switch is saved on the phone only.
+- The function logs each scan the key let through as
+  `outcome: "preview_bypass"`, so they can be told apart from real ones.
+
+### If scans after the free one are still turned down
+
+"This scan needs a subscription", with a note that the server didn't accept
+this build's preview key, means the key didn't match. The analyze-scan logs
+(see its README, "Logs") say why, never with the key itself:
+
+- `token_off`: the server has no `PREVIEW_BYPASS_TOKEN`, or it's shorter
+  than 32 characters (there's a `startup` error for that).
+- `token_rejected`: the two values differ. Set them again from the same
+  key, and publish again.
+- No `preview` line at all: the build didn't send a key. Check Preview
+  premium is on, and that the update was published with
+  `--environment preview` after the variable was created. The Testing note
+  says "This test build has no preview key" when the build has none.
 
 The steps to check it are in `docs/test-script.md`, "Premium preview check".
 

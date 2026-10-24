@@ -2,7 +2,11 @@ import * as Updates from 'expo-updates';
 import { create } from 'zustand';
 
 import { logInDevelopment } from '@/lib/errors';
-import { isPremiumPreviewAvailable } from '@/lib/premiumPreview';
+import {
+  isPremiumPreviewAvailable,
+  previewBypassToken,
+  previewScanHeaders,
+} from '@/lib/premiumPreview';
 import { isPremiumPreviewSaved, savePremiumPreview } from '@/lib/preferences';
 
 /**
@@ -14,6 +18,19 @@ export const PREMIUM_PREVIEW_AVAILABLE = isPremiumPreviewAvailable({
   flag: process.env.EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW,
   channel: Updates.channel,
 });
+
+/**
+ * The preview scan key, only in a build that offers the switch; null
+ * everywhere else, including any production build. Read in full, like the
+ * flag, so Expo writes it into the bundle. It only exists in the EAS
+ * `preview` environment (docs/ota-updates.md).
+ */
+const PREVIEW_BYPASS_TOKEN = PREMIUM_PREVIEW_AVAILABLE
+  ? previewBypassToken(process.env.EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN)
+  : null;
+
+/** Whether this build can ask the server to analyse scans after the free one while the switch is on. */
+export const PREVIEW_SCANS_AVAILABLE = PREVIEW_BYPASS_TOKEN !== null;
 
 interface PremiumPreviewState {
   /** The switch is on. Always false in a build that doesn't offer it. */
@@ -54,6 +71,18 @@ export const usePremiumPreviewStore = create<PremiumPreviewState>()((set, get) =
     }
   },
 }));
+
+/**
+ * Extra headers for the analyze-scan call: the preview scan key while the
+ * switch is on in a build that has one, otherwise none (previewScanHeaders).
+ */
+export function getPreviewScanHeaders(): Record<string, string> {
+  return previewScanHeaders({
+    available: PREMIUM_PREVIEW_AVAILABLE,
+    enabled: usePremiumPreviewStore.getState().enabled,
+    token: PREVIEW_BYPASS_TOKEN,
+  });
+}
 
 // Read once at startup, so the premium screens open straight away on a
 // test build where the switch was left on.

@@ -9,6 +9,8 @@
  *   429 FREE_ATTEMPTS_USED when the free scan is still unused but its free
  *   attempts for the current 24 hours are; the scan stays pending.
  *   The app follows the scan row through Realtime, not through this response.
+ *   Preview test builds only: an `x-preview-bypass-token` header matching the
+ *   optional PREVIEW_BYPASS_TOKEN secret counts as a subscription (preview.ts).
  *
  * The Anthropic API key, the service role key and the RevenueCat secret key exist
  * only here, as Edge Function secrets. See README.md for setup and deployment.
@@ -21,6 +23,7 @@ import { z } from 'zod';
 import { AnalysisError, analyseImage, type Attempt, type ScoredAnalysis } from './analysis.ts';
 import { hasActiveEntitlement } from './entitlement.ts';
 import { MODEL } from './model.ts';
+import { PREVIEW_BYPASS_SECRET, previewTokenStatus, readPreviewToken } from './preview.ts';
 import { PROMPT_VERSION } from './prompt.ts';
 
 type ErrorCode =
@@ -84,6 +87,12 @@ const REVENUECAT_SECRET_KEY = requireSecret('REVENUECAT_SECRET_KEY');
 // Provided automatically to every hosted Edge Function.
 const SUPABASE_URL = requireSecret('SUPABASE_URL');
 const SERVICE_ROLE_KEY = requireSecret('SUPABASE_SERVICE_ROLE_KEY');
+
+// Optional, for preview test builds only (preview.ts). While it's unset, as it
+// should be whenever no preview build is being tested, it lets no scan through.
+const previewSecret = readPreviewToken(Deno.env.get(PREVIEW_BYPASS_SECRET));
+if (previewSecret.problem) log('error', { stage: 'startup', message: previewSecret.problem });
+const PREVIEW_TOKEN = previewSecret.token;
 
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -191,10 +200,15 @@ async function downloadImage(path: string): Promise<{ base64: string; mimeType: 
  * attempts are used up, the subscription is checked with RevenueCat, not
  * taken from the app. If RevenueCat can't answer, the scan is refused for
  * now rather than analysed for free.
+ *
+ * `preview` is true only for a request carrying the preview key
+ * (preview.ts): it then counts as subscribed, in place of asking
+ * RevenueCat. The free scan still comes first, exactly as without it.
  */
 async function checkAccess(
   scanId: string,
   userId: string,
+  preview: boolean,
 ): Promise<
   | 'allowed'
   | 'SUBSCRIPTION_REQUIRED'
@@ -231,6 +245,12 @@ async function checkAccess(
     if (taken) return 'allowed';
     // The free attempts for these 24 hours are used up. A subscription still
     // covers the scan.
+  }
+
+  if (preview) {
+    // Logged, so the function's logs show which scans the preview key let through.
+    log('info', { scanId, stage: 'access', outcome: 'preview_bypass' });
+    return 'allowed';
   }
 
   try {
@@ -364,7 +384,12 @@ Deno.serve(async (request) => {
   //    anything costs money. A refusal leaves the scan pending, so the same
   //    photo can go ahead once the user subscribes, or once the free attempts
   //    reset.
-  const access = await checkAccess(scanId, userId);
+  const preview = previewTokenStatus(request, PREVIEW_TOKEN);
+  if (preview === 'rejected' || preview === 'off') {
+    // A preview build's key that isn't honoured: say why, never what it was.
+    log('info', { scanId, stage: 'preview', outcome: `token_${preview}` });
+  }
+  const access = await checkAccess(scanId, userId, preview === 'accepted');
   if (access !== 'allowed') return errorResponse(access);
 
   // 5. Claim it. The status filter makes this atomic: of two overlapping

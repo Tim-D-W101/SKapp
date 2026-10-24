@@ -125,7 +125,8 @@ describe('preview copy', () => {
 
   it('says scans still follow the server', () => {
     assert.match(copy.settings.testing.serverNote, /server/);
-    assert.match(copy.settings.testing.serverNote, /free-scan limit/);
+    assert.match(copy.settings.testing.serverNote, /preview key/);
+    assert.match(copy.settings.testing.serverNoteNoKey, /free-scan limit/);
     assert.match(copy.scan.subscriptionNeeded.previewNote, /real subscription/);
     assert.match(copy.settings.testing.premiumPreviewHint, /not a subscription/);
   });

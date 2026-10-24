@@ -46,20 +46,31 @@ Checked before anything costs money, never trusting the app:
    answer is `503 ENTITLEMENT_UNAVAILABLE`: the scan waits rather than running
    for free. That includes a free scan past its free attempts, so a subscriber
    is never told their free attempts are used up.
+7. **Preview test builds only:** if the optional `PREVIEW_BYPASS_TOKEN` secret
+   is set, a request whose `x-preview-bypass-token` header carries the same
+   value counts as subscribed in step 3, without asking RevenueCat. The free
+   scan still comes first (steps 1 and 2), and is used up the same way. Only
+   a preview build sends the header (see `preview.ts` and
+   docs/ota-updates.md, "Testing premium on the preview build"). With the
+   secret unset, nothing is let through this way. Each scan it lets through
+   is logged with `outcome: "preview_bypass"`; a key that isn't honoured is
+   logged as `token_rejected` (wrong key) or `token_off` (no secret set),
+   never with the key itself.
 
 ## Files
 
-| File             | What it holds                                                                  |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `index.ts`       | The HTTP handler: auth, ownership, status changes, saving the result.          |
-| `entitlement.ts` | The subscription check against RevenueCat, and its 5-minute memory.            |
-| `analysis.ts`    | The model call, Zod validation and the single retry. Shared with calibration.  |
-| `routine.ts`     | Puts the routine in order: sunscreen last in the morning, 3 to 5 steps a part. |
-| `prompt.ts`      | The system prompt, response schema and `PROMPT_VERSION`. Versioned.            |
-| `model.ts`       | The model name, endpoint, settings and prices. Swapping model is one line.     |
-| `scoring.ts`     | Clamping and the weighted `overall`.                                           |
-| `compliance.ts`  | Rejects replies that use the banned vocabulary listed in `prompt.ts`.          |
-| `deno.json`      | Dependency versions (Zod, supabase-js). Nothing here goes into the app bundle. |
+| File             | What it holds                                                                     |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `index.ts`       | The HTTP handler: auth, ownership, status changes, saving the result.             |
+| `entitlement.ts` | The subscription check against RevenueCat, and its 5-minute memory.               |
+| `preview.ts`     | The optional preview scan key for preview test builds, compared in constant time. |
+| `analysis.ts`    | The model call, Zod validation and the single retry. Shared with calibration.     |
+| `routine.ts`     | Puts the routine in order: sunscreen last in the morning, 3 to 5 steps a part.    |
+| `prompt.ts`      | The system prompt, response schema and `PROMPT_VERSION`. Versioned.               |
+| `model.ts`       | The model name, endpoint, settings and prices. Swapping model is one line.        |
+| `scoring.ts`     | Clamping and the weighted `overall`.                                              |
+| `compliance.ts`  | Rejects replies that use the banned vocabulary listed in `prompt.ts`.             |
+| `deno.json`      | Dependency versions (Zod, supabase-js). Nothing here goes into the app bundle.    |
 
 ## Secrets
 
@@ -92,6 +103,16 @@ Edge Function automatically. If `ANTHROPIC_API_KEY` or `REVENUECAT_SECRET_KEY`
 is missing, the function refuses to start, and the error shows in its logs. So
 **set `REVENUECAT_SECRET_KEY` before deploying the Phase 10 version**, or every
 scan fails, free ones included.
+
+**Optional, preview testing only: `PREVIEW_BYPASS_TOKEN`.** A random key, at
+least 32 characters (`openssl rand -hex 32`), that lets the preview build run
+real scans after the free one without a subscription (see "Who may scan",
+step 7). The same value goes in the EAS `preview` environment as
+`EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN`; the full steps are in
+docs/ota-updates.md, "Testing premium on the preview build". A shorter value
+is ignored, with an error in the logs. Leave it unset when no preview build
+is being tested; `npx supabase secrets unset PREVIEW_BYPASS_TOKEN` switches
+it off. It is not needed for the function to start.
 
 ## Deploy
 

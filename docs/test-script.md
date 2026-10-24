@@ -561,19 +561,24 @@ again, and Settings and Home's Reminders card can always set one later.
        with light text; nothing is cut off, and the screen scrolls if
        needed with the buttons reachable.
 
-## Premium preview check (test builds only, 5 minutes)
+## Premium preview check (test builds only, 8 minutes)
 
 Only on a **preview** build whose update was published with
-`EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW=true` in the EAS `preview` environment
-(docs/ota-updates.md, "Testing premium on the preview build"). It needs an
-account whose free scan is used, without a subscription. Never on a
-production or Play Store build: there, step 1 must find no Testing section.
+`EXPO_PUBLIC_ENABLE_PREMIUM_PREVIEW=true` and
+`EXPO_PUBLIC_PREVIEW_BYPASS_TOKEN` in the EAS `preview` environment, with the
+same key set as the analyze-scan function's `PREVIEW_BYPASS_TOKEN` secret
+and the function deployed (docs/ota-updates.md, "Testing premium on the
+preview build"). It needs an account whose free scan is used, without a
+subscription. Never on a production or Play Store build: there, step 1 must
+find no Testing section.
 
 1. [ ] **Open Settings and scroll down.**
        Pass: a **Testing** section with a teal gear badge, saying it's only
        in test builds, a **Preview premium** switch (off), and a note that
-       scans still follow the server's free-scan limit. On a production or
-       Play Store build there's no Testing section at all.
+       this test build also asks the server for results on scans after your
+       free one. (A build published without the key says "This test build
+       has no preview key" instead.) On a production or Play Store build
+       there's no Testing section at all.
 2. [ ] **With the switch off, check the locks.**
        Pass: Progress shows "Your trend and comparisons" with **See plans**,
        and Scan my skin opens the plans.
@@ -586,15 +591,26 @@ production or Play Store build: there, step 1 must find no Testing section.
        saved on this phone only.
 5. [ ] **Tap Scan my skin and take a photo.**
        Pass: the camera opens instead of the plans. After Use this, the
-       server turns the scan down: "This scan needs a subscription" with a
-       note that Preview premium only changes what this phone shows, and the
-       plans open. That's expected: the server still needs a real
-       subscription.
-6. [ ] **Settings → Subscription.**
+       usual waiting screen runs and "Your results" appears with real scores,
+       as for any scan. The new scan is in Progress → Scan history.
+6. [ ] **Take one more scan the same way.**
+       Pass: it gets results too: scans 2, 3 and on all work while the switch
+       is on. In the analyze-scan logs, each shows
+       `outcome: "preview_bypass"`.
+7. [ ] **Settings → Subscription.**
        Pass: still "No active subscription": the preview isn't a
        subscription.
-7. [ ] **Turn Preview premium off.**
-       Pass: Progress is locked again and Scan my skin opens the plans.
+8. [ ] **Turn Preview premium off, then tap Scan my skin.**
+       Pass: Progress is locked again and Scan my skin opens the plans. With
+       the switch off, the app sends no key, so the server would turn a scan
+       down as before.
+9. [ ] **Optional, the server's off switch.** Unset the secret, as in
+       ota-updates.md, "Switch it off, or change the key", then turn Preview
+       premium on and take a scan.
+       Pass: "This scan needs a subscription", with a note that the server
+       didn't accept this test build's preview key, and the plans open. The
+       logs show `token_off`. Set the secret again afterwards (ota-updates.md,
+       step 3).
 
 ## Look and feel check (10 minutes)
 

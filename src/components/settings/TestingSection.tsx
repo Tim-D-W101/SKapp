@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { Card, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { usePremiumPreviewStore } from '@/stores/usePremiumPreviewStore';
+import { PREVIEW_SCANS_AVAILABLE, usePremiumPreviewStore } from '@/stores/usePremiumPreviewStore';
 import { spacing } from '@/theme/tokens';
 
 import { SwitchRow } from './SwitchRow';
@@ -10,7 +10,9 @@ import { SwitchRow } from './SwitchRow';
 /**
  * Tools for testing a preview build: for now, the "Preview premium" switch
  * (lib/premiumPreview.ts). Settings only shows it in a build that offers it
- * (PREMIUM_PREVIEW_AVAILABLE), never in a production build.
+ * (PREMIUM_PREVIEW_AVAILABLE), never in a production build. The note under
+ * it says whether this build can also get scans after the free one analysed
+ * (it has the preview scan key) or not.
  */
 export function TestingSection() {
   const enabled = usePremiumPreviewStore((state) => state.enabled);
@@ -28,7 +30,9 @@ export function TestingSection() {
         onChange={(value) => void setEnabled(value)}
       />
       <Text variant="bodySmall" color="textSecondary">
-        {copy.settings.testing.serverNote}
+        {PREVIEW_SCANS_AVAILABLE
+          ? copy.settings.testing.serverNote
+          : copy.settings.testing.serverNoteNoKey}
       </Text>
       {error ? (
         <Text variant="bodySmall" color="danger" accessibilityLiveRegion="polite">
