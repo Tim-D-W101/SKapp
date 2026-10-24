@@ -47,13 +47,11 @@ export interface RemindersCardInputs {
   plan: readonly PlannedReminder[] | null;
   /** The last attempt to make the plan failed. */
   planFailed: boolean;
-  /** When the morning and evening routine reminders arrive, in local hours. */
-  routineHours: Readonly<Record<'morning' | 'evening', number>>;
 }
 
 /** The card's state, from the reminder store. Permission comes first, then the master switch. */
 export function remindersCardState(inputs: RemindersCardInputs): RemindersCardState {
-  const { now, loaded, permission, enabled, plan, planFailed, routineHours } = inputs;
+  const { now, loaded, permission, enabled, plan, planFailed } = inputs;
   if (!loaded) return { kind: 'loading' };
   if (permission === 'undetermined') return { kind: 'needsPermission' };
   if (permission === 'denied') return { kind: 'blocked' };
@@ -62,16 +60,15 @@ export function remindersCardState(inputs: RemindersCardInputs): RemindersCardSt
   if (!plan) return { kind: planFailed ? 'failed' : 'loading' };
   const next = plan.find((reminder) => reminder.date.getTime() > now.getTime());
   if (!next) return { kind: 'none' };
-  return { kind: 'next', name: reminderName(next, routineHours), date: next.date };
+  return { kind: 'next', name: reminderName(next), date: next.date };
 }
 
-/** What to call a planned reminder. The plan only says "routine", so the hour tells morning from evening. */
-export function reminderName(
-  reminder: Pick<PlannedReminder, 'kind' | 'date'>,
-  routineHours: Readonly<Record<'morning' | 'evening', number>>,
-): ReminderName {
-  if (reminder.kind !== 'routine') return reminder.kind;
-  return reminder.date.getHours() === routineHours.morning ? 'morning' : 'evening';
+/**
+ * What to call a planned reminder. A routine reminder is named for the
+ * routine it's for, not its hour: either can be set to any time of day.
+ */
+export function reminderName(reminder: PlannedReminder): ReminderName {
+  return reminder.kind === 'routine' ? reminder.slot : reminder.kind;
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;

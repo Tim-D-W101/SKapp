@@ -22,7 +22,7 @@ export interface RoutineSectionProps {
 
 /**
  * Morning or evening: a header that opens and closes the section, and its
- * steps to tick off. Each section is in its own colour (sun or lavender),
+ * steps to tick off. Each section is in its own colour (sun or mint),
  * and so are its ticks; each step's drawing is in the colour of its kind.
  */
 export function RoutineSection({

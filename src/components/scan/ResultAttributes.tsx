@@ -15,10 +15,10 @@ export interface ResultAttributesProps {
   clock: SharedValue<number>;
 }
 
-/** The seven attribute scores as bars, arriving one after another, on a sky-blue score card. */
+/** The seven attribute scores as bars, arriving one after another, on a score card. */
 export function ResultAttributes({ scores, clock }: ResultAttributesProps) {
   return (
-    <Card style={styles.card} tint="sky">
+    <Card style={styles.card}>
       {ATTRIBUTE_KEYS.map((key, index) => (
         <AttributeBar
           key={key}

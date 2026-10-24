@@ -59,6 +59,14 @@ const WEEKDAYS = [
   { value: 0, short: 'Sun', name: 'Sunday' },
 ] as const;
 
+/** The two halves of a 12-hour clock. */
+const DAY_PERIODS = { am: 'AM', pm: 'PM' } as const;
+
+/** 0-23 on a 12-hour clock face: midnight and noon are both 12. */
+function clockHour(hour: number): string {
+  return String(hour % 12 === 0 ? 12 : hour % 12);
+}
+
 /** What each reminder is called on Home's reminders card. */
 const REMINDER_NAMES: Record<ReminderName, string> = {
   weekly: 'Weekly scan',
@@ -96,6 +104,20 @@ export const copy = {
     save: 'Save',
     learnMore: 'Learn more',
     stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
+  },
+
+  /** Times of day, written the same way on every screen. */
+  time: {
+    am: DAY_PERIODS.am,
+    pm: DAY_PERIODS.pm,
+    /** "8:00 AM" on a 12-hour clock, "20:00" on a 24-hour one. */
+    hour: (hour: number, twentyFourHour: boolean) => {
+      if (twentyFourHour) return `${String(hour).padStart(2, '0')}:00`;
+      const period = hour < 12 ? DAY_PERIODS.am : DAY_PERIODS.pm;
+      return `${clockHour(hour)}:00 ${period}`;
+    },
+    /** An hour as it reads on a 12-hour clock face, for the time picker: 0 and 12 are "12". */
+    clockHour: (hour: number) => clockHour(hour),
   },
 
   onboarding: {
@@ -729,8 +751,22 @@ export const copy = {
       weeklyHint: 'A week after your last scan, on the day and time you choose.',
       day: 'Day',
       time: 'Time',
-      earlier: 'Earlier',
-      later: 'Later',
+      /** The tappable time under a reminder, which opens the time picker. */
+      change: 'Change',
+      changeTimeHint: 'Opens a time picker',
+      /** Screen reader name for the time: "Time, 8:00 AM". */
+      timeLabel: (label: string, time: string) => `${label}, ${time}`,
+      /** The time picker's title, for each reminder whose time can be set. */
+      weeklyTimeTitle: 'Weekly scan reminder',
+      routineTimeTitle: {
+        morning: 'Morning routine reminder',
+        evening: 'Evening routine reminder',
+      },
+      timePicker: {
+        /** Screen reader names for the AM / PM switch and the hours. */
+        period: 'Morning or afternoon',
+        hours: 'Hour',
+      },
       /** Monday first. Short labels for the day picker, then the full name for screen readers. */
       weekdays: WEEKDAYS,
       routine: 'Daily routine reminder',

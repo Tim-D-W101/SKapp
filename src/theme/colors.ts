@@ -5,14 +5,15 @@
  *
  * The brand is the colour of its icon. The palette is built around the three
  * colours of the launcher icon (`iconColors`): its teal is the accent, its
- * mint is the soft tint behind cards and highlights, and its cream is the
- * sun in the brand mark. Screens stay clean white; text is a deep teal ink.
+ * mint is the soft tint behind highlights and selections, and its cream is
+ * the warm, paper-like surface of cards. Screens stay clean white; text is a
+ * deep teal ink.
  *
- * Alongside the brand, four friendly supporting colours (`tints`: sun, coral,
- * lavender and sky) give each kind of card its own colour, so screens aren't
- * all one teal. They are used by meaning, the same way on every screen (see
- * `TintName`). The brand teal keeps the primary buttons, the tab bar and the
- * sun mark.
+ * Alongside the brand, two warm supporting colours (`tints`: sun and coral)
+ * add a little friendliness in a few chosen places, so screens are neither
+ * all one teal nor a rainbow. They are used by meaning, the same way on
+ * every screen (see `TintName`); most cards stay cream with a teal badge.
+ * The brand teal keeps the primary buttons, the tab bar and the sun mark.
  *
  * Contrast (WCAG AA) is checked by colors.test.ts for every text colour on
  * every background below, tinted ones included, and for white text on the
@@ -31,7 +32,7 @@ export const iconColors = {
   teal: '#1D655D',
   /** The two arcs under the sun. */
   mint: '#96DAD0',
-  /** The sun. */
+  /** The sun, and the cards' surface in light mode. */
   cream: '#F8F5F1',
 } as const;
 
@@ -50,17 +51,15 @@ export type ScoreScale = readonly [string, string, string, string, string];
 
 /**
  * The supporting colours, each used for one kind of thing on every screen:
- * - mint: the brand's own tint, for anything without a colour of its own
- * - sun: the morning routine, the camera on Home's scan card, where to focus, the
- *   weekly streak, the subscription
- * - coral: the next scan, comparisons, reminders
- * - lavender: the evening routine, the trend over time, changes since the
- *   last scan
- * - sky: scores, and the account
+ * - mint: the brand's own tint, for scores, the evening routine, the trend
+ *   and anything else without a colour of its own
+ * - sun: the morning routine, the camera on Home's scan card, where to focus,
+ *   the weekly streak, the subscription
+ * - coral: reminders
  */
-export type TintName = 'mint' | 'sun' | 'coral' | 'lavender' | 'sky';
+export type TintName = 'mint' | 'sun' | 'coral';
 
-export const TINT_NAMES: readonly TintName[] = ['mint', 'sun', 'coral', 'lavender', 'sky'];
+export const TINT_NAMES: readonly TintName[] = ['mint', 'sun', 'coral'];
 
 /** One supporting colour, in the four strengths it's used at. */
 export interface Tint {
@@ -81,7 +80,7 @@ export interface Tint {
 export interface ColorPalette {
   /** Screen background — white in light mode, deep teal ink in dark mode. */
   background: string;
-  /** Cards and grouped content sitting on the background: a light mint tint. */
+  /** Cards and grouped content sitting on the background: the icon's warm cream in light mode. */
   surface: string;
   /** Sheets, inputs, the tab bar and anything floating above a surface. */
   surfaceElevated: string;
@@ -116,10 +115,11 @@ export type ColorSchemeName = 'light' | 'dark';
 
 const lightColors: ColorPalette = {
   background: '#FFFFFF',
-  surface: '#F0F9F7',
+  // Warm and paper-like rather than another shade of mint, so teal stands out on it.
+  surface: iconColors.cream,
   surfaceElevated: '#FFFFFF',
-  border: '#C9E5DF',
-  borderSubtle: '#DFF0EC',
+  border: '#E3DDD3',
+  borderSubtle: '#EDE8E0',
   borderStrong: '#5B8A83',
   textPrimary: '#112E2A',
   textSecondary: '#3A5752',
@@ -140,8 +140,6 @@ const lightColors: ColorPalette = {
     // A warm sun yellow. Its text variant is a deep golden brown.
     sun: { soft: '#FFF4D6', fill: '#FFC83D', text: '#7A5300', onFill: '#4A3300' },
     coral: { soft: '#FFE9E4', fill: '#FF8F7A', text: '#A63A2A', onFill: '#5C1A10' },
-    lavender: { soft: '#F0EBFF', fill: '#B9A6F5', text: '#5B45A8', onFill: '#2E1F66' },
-    sky: { soft: '#E3F2FF', fill: '#7CC3F7', text: '#1F5F96', onFill: '#0D3357' },
   },
 };
 
@@ -170,8 +168,6 @@ const darkColors: ColorPalette = {
     mint: { soft: '#173A35', fill: iconColors.mint, text: '#A3E1D8', onFill: '#0C1615' },
     sun: { soft: '#2B2412', fill: '#FFD466', text: '#FFDA80', onFill: '#0C1615' },
     coral: { soft: '#2E1C19', fill: '#FF9E8C', text: '#FFB3A6', onFill: '#0C1615' },
-    lavender: { soft: '#231F35', fill: '#C3B3FA', text: '#CFC3FF', onFill: '#0C1615' },
-    sky: { soft: '#142838', fill: '#8DCDF9', text: '#A6D8FB', onFill: '#0C1615' },
   },
 };
 
@@ -290,23 +286,5 @@ export const illustrationColors: Record<TintName, IllustrationInk> = {
     secondaryDeep: '#FF9A87',
     secondary: '#FFB8A9',
     secondaryLight: '#FFDAD2',
-  },
-  lavender: {
-    ...illustrationBase,
-    outline: '#3E2E80',
-    primary: '#8E74E0',
-    primaryDeep: '#6B52C4',
-    secondaryDeep: '#A895F0',
-    secondary: '#C9BBFA',
-    secondaryLight: '#E6DFFF',
-  },
-  sky: {
-    ...illustrationBase,
-    outline: '#134A78',
-    primary: '#3D9BE0',
-    primaryDeep: '#2275B8',
-    secondaryDeep: '#79BEF2',
-    secondary: '#A5D4F7',
-    secondaryLight: '#D3EAFB',
   },
 };

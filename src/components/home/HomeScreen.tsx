@@ -93,7 +93,7 @@ export function HomeScreen() {
 
       <ScanCard />
 
-      <Card style={styles.latest} elevation="md" tint="sky">
+      <Card style={styles.latest}>
         <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
         <Text variant="bodySmall" color="textSecondary" align="center">
           {copy.home.latestDate(formatShortDate(latest.createdAt))}
@@ -110,8 +110,8 @@ export function HomeScreen() {
 
       <RemindersCard />
 
-      <Card style={styles.card} tint="coral">
-        <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="coral" />
+      <Card style={styles.card}>
+        <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="mint" />
         <Text color="textSecondary">
           {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
         </Text>

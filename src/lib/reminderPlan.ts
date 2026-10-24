@@ -2,12 +2,12 @@ import { copy } from '@/constants/copy';
 import { SUGGESTED_SCAN_INTERVAL_DAYS } from '@/constants/progress';
 import {
   REMINDER_HORIZON_DAYS,
-  ROUTINE_REMINDER_HOURS,
   STREAK_REMINDER_HOUR,
   STREAK_REMINDER_MIN_WEEKS,
 } from '@/constants/reminders';
 import { localDayKey } from '@/lib/dates';
 import { startOfWeek, weeklyStreak } from '@/lib/streak';
+import type { RoutineSlot } from '@/types/routine';
 
 export type RoutineReminderSlot = 'off' | 'morning' | 'evening';
 export type ReminderKind = 'weekly' | 'streak' | 'routine';
@@ -25,18 +25,24 @@ export interface ReminderInputs {
   };
   streakEnabled: boolean;
   routine: RoutineReminderSlot;
+  /** When the morning and the evening routine reminder arrive, in local hours (0-23). */
+  routineHours: Readonly<Record<RoutineSlot, number>>;
   /** When each completed scan was taken, oldest first. */
   scanDates: string[];
   /** Local days (YYYY-MM-DD) that have already had a reminder. */
   usedDays: string[];
 }
 
-export interface PlannedReminder {
-  kind: ReminderKind;
+interface PlannedReminderBase {
   date: Date;
   title: string;
   body: string;
 }
+
+/** A routine reminder also says which routine it's for, whatever hour it was set to. */
+export type PlannedReminder =
+  | (PlannedReminderBase & { kind: Exclude<ReminderKind, 'routine'> })
+  | (PlannedReminderBase & { kind: 'routine'; slot: RoutineSlot });
 
 /** Higher wins when two reminders fall on the same day. */
 const PRIORITY: Record<ReminderKind, number> = { weekly: 3, streak: 2, routine: 1 };
@@ -100,14 +106,16 @@ function streakCandidates(inputs: ReminderInputs): PlannedReminder[] {
 }
 
 function routineCandidates(inputs: ReminderInputs): PlannedReminder[] {
-  const { now, routine } = inputs;
+  const { now, routine, routineHours } = inputs;
   if (routine === 'off') return [];
   const message =
     routine === 'morning' ? copy.notifications.routineMorning : copy.notifications.routineEvening;
   const planned: PlannedReminder[] = [];
   for (let offset = 0; offset < REMINDER_HORIZON_DAYS; offset += 1) {
-    const date = atLocal(now, offset, ROUTINE_REMINDER_HOURS[routine]);
-    if (date.getTime() > now.getTime()) planned.push({ kind: 'routine', date, ...message });
+    const date = atLocal(now, offset, routineHours[routine]);
+    if (date.getTime() > now.getTime()) {
+      planned.push({ kind: 'routine', slot: routine, date, ...message });
+    }
   }
   return planned;
 }

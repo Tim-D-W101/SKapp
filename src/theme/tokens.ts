@@ -104,6 +104,18 @@ export const sizes = {
   sheetHandle: { width: 40, height: 4 },
   /** The most of the screen a tall bottom sheet covers; its content scrolls beyond that. */
   sheetMaxHeight: '85%',
+  /**
+   * A dialog over the screen, such as the time picker: its widest and its
+   * tallest (its content scrolls beyond that), and the basis of an hour in
+   * its grid, which fits four to a row.
+   */
+  dialog: {
+    maxWidth: 400,
+    maxHeight: '90%',
+    hourCellBasis: '22%',
+  },
+  /** The tappable time under a reminder: at least this tall, as it holds two lines. */
+  timeRow: 64,
   /** Scan photo thumbnails, in the photos' 3:4 shape. */
   thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,
@@ -114,11 +126,14 @@ export const sizes = {
   /**
    * The tab bar's two big buttons: their least height (they grow with large
    * text), and the smallest their label shrinks to, as a fraction, before it
-   * would be cut off at the largest text sizes.
+   * would be cut off at the largest text sizes. Their icons are a size up
+   * from the small icons elsewhere, on a sturdier line.
    */
   tabBar: {
     button: 56,
     minLabelScale: 0.8,
+    icon: 26,
+    iconStroke: 2,
   },
   /**
    * The "Scan my skin" card at the top of Home: the width of its sun mark,
@@ -329,7 +344,7 @@ export type ShadowStyle = Pick<
   'shadowColor' | 'shadowOffset' | 'shadowOpacity' | 'shadowRadius' | 'elevation'
 >;
 
-/** A deep teal rather than black, so shadows under mint cards stay soft. */
+/** A deep teal rather than black, so shadows under cards stay soft. */
 const SHADOW_COLOR = '#0E3A35';
 
 /** Android reads `elevation`; iOS reads the shadow* properties. Each level sets both. */

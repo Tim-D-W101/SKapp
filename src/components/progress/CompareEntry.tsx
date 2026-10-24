@@ -12,8 +12,8 @@ export interface CompareEntryProps {
 /** The way into the before-and-after comparison. Needs two scans, and says so until then. */
 export function CompareEntry({ scanCount }: CompareEntryProps) {
   return (
-    <Card style={styles.card} tint="coral">
-      <SectionTitle title={copy.progress.compare.title} icon="drag" tint="coral" />
+    <Card style={styles.card}>
+      <SectionTitle title={copy.progress.compare.title} icon="drag" tint="mint" />
       {scanCount < 2 ? (
         <Text color="textSecondary">{copy.progress.compare.needTwo}</Text>
       ) : (

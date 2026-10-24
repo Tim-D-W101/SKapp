@@ -10,6 +10,11 @@ export { LoadingState, type LoadingStateProps } from './LoadingState';
 export { ScoreRing, type ScoreRingProps } from './ScoreRing';
 export { Screen, type ScreenProps } from './Screen';
 export { SectionTitle, type SectionTitleProps } from './SectionTitle';
+export {
+  SegmentedControl,
+  type SegmentedControlProps,
+  type SegmentedOption,
+} from './SegmentedControl';
 export { SunMark, type SunMarkProps } from './SunMark';
 export { Text, type TextProps } from './Text';
 export { TextField, type TextFieldProps } from './TextField';

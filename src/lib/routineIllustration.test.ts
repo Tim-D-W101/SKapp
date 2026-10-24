@@ -96,9 +96,11 @@ describe('drawing colours', () => {
     assert.deepEqual([...used].sort(), [...TINT_NAMES].sort());
   });
 
-  it('shows a usual morning in four different colours', () => {
+  it('never shows two steps of a usual morning side by side in one colour', () => {
     const morning = ['cleanse', 'serum', 'moisturise', 'sunscreen'];
     const tints = morning.map((key) => tintForIllustration(illustrationForStep(step(key))));
-    assert.equal(new Set(tints).size, morning.length, tints.join(', '));
+    for (let index = 1; index < tints.length; index += 1) {
+      assert.notEqual(tints[index], tints[index - 1], tints.join(', '));
+    }
   });
 });
