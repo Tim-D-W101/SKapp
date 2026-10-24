@@ -668,6 +668,13 @@ export const copy = {
     },
     latestDate: (date: string) => `From your scan on ${date}`,
     seeResults: 'See these results',
+    /** The latest score's card, under the scan card. Tapping it opens that scan's results. */
+    latest: {
+      title: 'Your latest scan',
+      /** Screen reader name for the card: "Your latest scan. Overall 72. From your scan on 21 Oct 2026". */
+      label: (score: number, date: string) => `Your latest scan. Overall ${score}. ${date}`,
+      hint: 'Opens the results of this scan',
+    },
     nextScan: {
       title: 'Your next scan',
       on: (date: string) => `Suggested for ${date}, a week after your last one.`,

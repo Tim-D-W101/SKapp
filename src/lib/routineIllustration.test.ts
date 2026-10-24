@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import { BANNED_TERMS, ROUTINE_STEP_KEYS } from '../../supabase/functions/analyze-scan/prompt.ts';
 import { copy } from '../constants/copy.ts';
-import { TINT_NAMES } from '../theme/colors.ts';
+import { ILLUSTRATION_TINTS } from '../theme/colors.ts';
 import type { RoutineStep } from '../types/routine.ts';
 
 import {
@@ -85,15 +85,15 @@ describe('drawing labels', () => {
 });
 
 describe('drawing colours', () => {
-  it('draws every product in one of the supporting colours', () => {
+  it('draws every product in one of the drawing colours', () => {
     for (const kind of PRODUCT_ILLUSTRATIONS) {
-      assert.ok(TINT_NAMES.includes(tintForIllustration(kind)), kind);
+      assert.ok(ILLUSTRATION_TINTS.includes(tintForIllustration(kind)), kind);
     }
   });
 
-  it('uses every supporting colour', () => {
+  it('uses every drawing colour', () => {
     const used = new Set(PRODUCT_ILLUSTRATIONS.map(tintForIllustration));
-    assert.deepEqual([...used].sort(), [...TINT_NAMES].sort());
+    assert.deepEqual([...used].sort(), [...ILLUSTRATION_TINTS].sort());
   });
 
   it('never shows two steps of a usual morning side by side in one colour', () => {
