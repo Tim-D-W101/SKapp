@@ -16,25 +16,27 @@ type ExitTarget = '/' | '/routine' | '/progress';
  * The results of the scan that has just finished, revealed in stages. Every
  * way out ends the scan flow. "Build my routine" (first scan) goes to the
  * routine tab and "See my progress" (repeat scans) to the progress tab.
- * The first time someone leaves a successful scan, the reminders explanation
- * comes first: after a scan, never on launch.
+ * On the way out, a reminders question can come first (see reminderOffer.ts):
+ * "Do you want daily reminders?" while none is set, until it's answered.
+ * After a scan, never on launch.
  */
 export function ScanResultScreen() {
   // The result as it was on arrival, so leaving doesn't change the screen mid-transition.
   const [analysis] = useState(() => useScanStore.getState().analysis);
   const endScanFlow = useScanStore((state) => state.endScanFlow);
-  const shouldOfferIntro = useReminderStore((state) => state.shouldOfferIntro);
+  const afterScanOffer = useReminderStore((state) => state.afterScanOffer);
 
   const exitTo = useCallback(
     (target: ExitTarget) => {
       endScanFlow();
-      if (shouldOfferIntro()) {
-        router.replace({ pathname: '/scan/reminders', params: { next: target } });
+      const offer = afterScanOffer();
+      if (offer) {
+        router.replace({ pathname: '/scan/reminders', params: { next: target, offer } });
       } else {
         router.dismissTo(target);
       }
     },
-    [endScanFlow, shouldOfferIntro],
+    [endScanFlow, afterScanOffer],
   );
 
   const leave = useCallback(() => exitTo('/'), [exitTo]);

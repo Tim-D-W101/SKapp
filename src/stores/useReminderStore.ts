@@ -12,6 +12,7 @@ import {
   type PermissionState,
 } from '@/lib/notifications';
 import { fetchScanDates } from '@/lib/progress';
+import { afterScanOffer as chooseAfterScanOffer, type AfterScanOffer } from '@/lib/reminderOffer';
 import { planReminders, type PlannedReminder } from '@/lib/reminderPlan';
 import {
   clearReminderSettings,
@@ -44,13 +45,18 @@ interface ReminderState {
 
   /** Reads the settings and the permission. Never asks for permission. */
   load: () => Promise<void>;
-  /** True once, after a first scan, until the explanation has been shown. */
-  shouldOfferIntro: () => boolean;
+  /** Which reminders question, if any, follows a scan's results (see reminderOffer.ts). */
+  afterScanOffer: () => AfterScanOffer | null;
   /** Shows the system prompt (only after the in-app explanation) and schedules if allowed. */
   askPermission: () => Promise<PermissionState>;
   dismissIntro: () => void;
+  /**
+   * Not now to the daily reminders question after a scan: it isn't asked
+   * again, nor is the routine tab's offer of the same reminder.
+   */
+  dismissAfterScanOffer: () => void;
   update: (
-    changes: Partial<Pick<ReminderSettings, 'enabled' | 'streak' | 'routine' | 'routineHours'>>,
+    changes: Partial<Pick<ReminderSettings, 'enabled' | 'streak' | 'routine' | 'routineTimes'>>,
   ) => void;
   /** The weekly reminder's switch, day and hour live on the profile. */
   updateWeekly: (changes: WeeklyReminderChanges) => Promise<ActionResult>;
@@ -107,7 +113,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       },
       streakEnabled: settings.streak,
       routine: settings.routine,
-      routineHours: settings.routineHours,
+      routineTimes: settings.routineTimes,
       scanDates,
       usedDays: deliveredToday.length > 0 ? [today] : [],
     });
@@ -148,9 +154,9 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       }
     },
 
-    shouldOfferIntro: () => {
+    afterScanOffer: () => {
       const { loaded, permission, settings } = get();
-      return loaded && permission === 'undetermined' && !settings.introSeen;
+      return chooseAfterScanOffer({ loaded, permission, settings });
     },
 
     askPermission: async () => {
@@ -170,6 +176,10 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
     },
 
     dismissIntro: () => saveSettings({ introSeen: true }),
+
+    // It explained reminders too, so the weekly explanation needn't follow.
+    dismissAfterScanOffer: () =>
+      saveSettings({ afterScanOfferDismissed: true, routineOfferDismissed: true, introSeen: true }),
 
     update: (changes) => {
       saveSettings(changes);

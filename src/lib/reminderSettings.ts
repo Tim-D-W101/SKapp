@@ -1,8 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 
-import { ROUTINE_REMINDER_HOURS } from '@/constants/reminders';
+import { ROUTINE_REMINDER_START_TIMES } from '@/constants/reminders';
 import { logInDevelopment } from '@/lib/errors';
-import type { RoutineReminderSlot } from '@/lib/reminderPlan';
+import type { ReminderTime, RoutineReminderSlot } from '@/lib/reminderPlan';
 import type { RoutineSlot } from '@/types/routine';
 
 /**
@@ -17,15 +17,19 @@ export interface ReminderSettings {
   streak: boolean;
   routine: RoutineReminderSlot;
   /**
-   * When the morning and the evening routine reminder arrive, in local hours
-   * (0-23). Each keeps its own time, so switching between them never loses one.
+   * When the morning and the evening routine reminder arrive: any local time
+   * the person picks. Each keeps its own time, so switching between them
+   * never loses one. Until one is set, the picker starts from a suggestion.
    */
-  routineHours: Record<RoutineSlot, number>;
+  routineTimes: Record<RoutineSlot, ReminderTime>;
   /** The explanation before the system permission prompt has been shown. */
   introSeen: boolean;
-  /** Visits to the routine tab. A routine reminder is only offered after a couple. */
+  /** Visits to the routine tab. A routine reminder is only offered there after a couple. */
   routineVisits: number;
+  /** The routine tab's daily reminder offer was turned down (or the one after a scan was). */
   routineOfferDismissed: boolean;
+  /** The "Do you want daily reminders?" question after a scan was answered Not now. */
+  afterScanOfferDismissed: boolean;
   /** When each reminder in the current plan is due (ms), so a day that already had one gets no other. */
   scheduled: number[];
 }
@@ -34,10 +38,14 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: true,
   streak: true,
   routine: 'off',
-  routineHours: { ...ROUTINE_REMINDER_HOURS },
+  routineTimes: {
+    morning: { ...ROUTINE_REMINDER_START_TIMES.morning },
+    evening: { ...ROUTINE_REMINDER_START_TIMES.evening },
+  },
   introSeen: false,
   routineVisits: 0,
   routineOfferDismissed: false,
+  afterScanOfferDismissed: false,
   scheduled: [],
 };
 
@@ -48,19 +56,39 @@ function isSlot(value: unknown): value is RoutineReminderSlot {
 }
 
 const HOURS_IN_DAY = 24;
+const MINUTES_IN_HOUR = 60;
 
-function isHour(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < HOURS_IN_DAY;
+function isWhole(value: unknown, below: number): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < below;
 }
 
-/** Stored hours, each falling back to its default if missing or not a whole hour of the day. */
-function readRoutineHours(value: unknown): Record<RoutineSlot, number> {
-  const stored: Partial<Record<RoutineSlot, unknown>> =
-    typeof value === 'object' && value !== null ? value : {};
-  return {
-    morning: isHour(stored.morning) ? stored.morning : ROUTINE_REMINDER_HOURS.morning,
-    evening: isHour(stored.evening) ? stored.evening : ROUTINE_REMINDER_HOURS.evening,
+function asRecord(value: unknown): Partial<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null ? value : {};
+}
+
+function readTime(value: unknown): ReminderTime | null {
+  const stored = asRecord(value);
+  return isWhole(stored.hour, HOURS_IN_DAY) && isWhole(stored.minute, MINUTES_IN_HOUR)
+    ? { hour: stored.hour, minute: stored.minute }
+    : null;
+}
+
+/**
+ * Stored times, each falling back to its starting suggestion if missing or
+ * not a real time of day. Builds before minutes could be picked stored a
+ * whole hour per routine (`routineHours`); that hour is kept, on the hour.
+ */
+function readRoutineTimes(times: unknown, legacyHours: unknown): Record<RoutineSlot, ReminderTime> {
+  const stored = asRecord(times);
+  const hours = asRecord(legacyHours);
+  const read = (slot: RoutineSlot): ReminderTime => {
+    const time = readTime(stored[slot]);
+    if (time) return time;
+    const hour = hours[slot];
+    if (isWhole(hour, HOURS_IN_DAY)) return { hour, minute: 0 };
+    return { ...ROUTINE_REMINDER_START_TIMES[slot] };
   };
+  return { morning: read('morning'), evening: read('evening') };
 }
 
 export async function readReminderSettings(): Promise<ReminderSettings> {
@@ -69,17 +97,18 @@ export async function readReminderSettings(): Promise<ReminderSettings> {
     if (!raw) return DEFAULT_REMINDER_SETTINGS;
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return DEFAULT_REMINDER_SETTINGS;
-    const stored: Partial<Record<keyof ReminderSettings, unknown>> = parsed;
+    const stored: Partial<Record<keyof ReminderSettings | 'routineHours', unknown>> = parsed;
     const flag = (value: unknown, fallback: boolean) =>
       typeof value === 'boolean' ? value : fallback;
     return {
       enabled: flag(stored.enabled, DEFAULT_REMINDER_SETTINGS.enabled),
       streak: flag(stored.streak, DEFAULT_REMINDER_SETTINGS.streak),
       routine: isSlot(stored.routine) ? stored.routine : DEFAULT_REMINDER_SETTINGS.routine,
-      routineHours: readRoutineHours(stored.routineHours),
+      routineTimes: readRoutineTimes(stored.routineTimes, stored.routineHours),
       introSeen: flag(stored.introSeen, false),
       routineVisits: typeof stored.routineVisits === 'number' ? stored.routineVisits : 0,
       routineOfferDismissed: flag(stored.routineOfferDismissed, false),
+      afterScanOfferDismissed: flag(stored.afterScanOfferDismissed, false),
       scheduled: Array.isArray(stored.scheduled)
         ? stored.scheduled.filter((time): time is number => typeof time === 'number')
         : [],

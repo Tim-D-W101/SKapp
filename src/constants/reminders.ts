@@ -1,8 +1,15 @@
 /** How far ahead reminders are scheduled. The plan is rebuilt on every app open and after each scan. */
 export const REMINDER_HORIZON_DAYS = 14;
 
-/** When the morning and evening routine reminders arrive until another time is chosen, in local hours. */
-export const ROUTINE_REMINDER_HOURS = { morning: 8, evening: 20 } as const;
+/**
+ * Where the time picker starts for a morning or evening routine reminder
+ * that has never been set. Only a starting point: the reminder itself always
+ * comes at the time the person picks and saves.
+ */
+export const ROUTINE_REMINDER_START_TIMES = {
+  morning: { hour: 8, minute: 0 },
+  evening: { hour: 20, minute: 0 },
+} as const;
 
 /** When a streak-at-risk reminder arrives, on the last day of the week. */
 export const STREAK_REMINDER_HOUR = 18;

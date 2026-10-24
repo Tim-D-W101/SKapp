@@ -109,12 +109,13 @@ export const sizes = {
   /**
    * A dialog over the screen, such as the time picker: its widest and its
    * tallest (its content scrolls beyond that), and the basis of an hour in
-   * its grid, which fits four to a row.
+   * its grid, which fits four to a row, and of a minute, six to a row.
    */
   dialog: {
     maxWidth: 400,
     maxHeight: '90%',
     hourCellBasis: '22%',
+    minuteCellBasis: '14%',
   },
   /** The tappable time under a reminder: at least this tall, as it holds two lines. */
   timeRow: 64,

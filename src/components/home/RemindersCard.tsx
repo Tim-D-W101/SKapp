@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Card, Icon, LoadingState, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { formatHour, formatShortDate } from '@/lib/dates';
+import { formatShortDate, formatTime } from '@/lib/dates';
 import { relativeDay, remindersCardState, type RemindersCardState } from '@/lib/nextReminder';
 import { useReminderStore } from '@/stores/useReminderStore';
 import { opacity, sizes, spacing, useColors } from '@/theme/tokens';
@@ -21,7 +21,7 @@ function statusLine(state: RemindersCardState, now: Date): string {
       return copy.home.reminders.next(
         state.name,
         relativeDay(state.date, now),
-        formatHour(state.date.getHours()),
+        formatTime(state.date.getHours(), state.date.getMinutes()),
         formatShortDate(state.date.toISOString()),
       );
     case 'none':

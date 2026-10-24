@@ -110,14 +110,17 @@ export const copy = {
   time: {
     am: DAY_PERIODS.am,
     pm: DAY_PERIODS.pm,
-    /** "8:00 AM" on a 12-hour clock, "20:00" on a 24-hour one. */
-    hour: (hour: number, twentyFourHour: boolean) => {
-      if (twentyFourHour) return `${String(hour).padStart(2, '0')}:00`;
+    /** "8:45 AM" on a 12-hour clock, "20:45" on a 24-hour one. */
+    clock: (hour: number, minute: number, twentyFourHour: boolean) => {
+      const minutes = String(minute).padStart(2, '0');
+      if (twentyFourHour) return `${String(hour).padStart(2, '0')}:${minutes}`;
       const period = hour < 12 ? DAY_PERIODS.am : DAY_PERIODS.pm;
-      return `${clockHour(hour)}:00 ${period}`;
+      return `${clockHour(hour)}:${minutes} ${period}`;
     },
     /** An hour as it reads on a 12-hour clock face, for the time picker: 0 and 12 are "12". */
     clockHour: (hour: number) => clockHour(hour),
+    /** Minutes past the hour, for the time picker: ":05". */
+    minute: (minute: number) => `:${String(minute).padStart(2, '0')}`,
   },
 
   onboarding: {
@@ -531,7 +534,7 @@ export const copy = {
     loadFailed: "Your routine didn't load. Check your connection and try again.",
     reminderOffer: {
       title: 'Want a daily nudge?',
-      body: 'We can remind you once a day to do your routine. You can change it or turn it off any time in Settings.',
+      body: 'We can remind you once a day to do your routine, at a time you pick. You can change it or turn it off any time in Settings.',
       morning: 'Mornings',
       evening: 'Evenings',
       notNow: 'Not now',
@@ -573,6 +576,26 @@ export const copy = {
       body: 'Your morning steps are ready when you are.',
     },
     routineEvening: { title: 'Evening routine', body: 'A few minutes of care before bed.' },
+    /**
+     * After a scan's results, while no daily routine reminder is set: the
+     * question, then the time, picked right there. Answered once; Settings
+     * and Home's reminders card can always change it later.
+     */
+    dailyOffer: {
+      title: 'Do you want daily reminders?',
+      body: 'A friendly nudge once a day to do your morning or evening routine, at a time you pick. You can change it or turn it off any time.',
+      note: 'At most one notification a day. On a day a scan reminder arrives, it takes this one’s place.',
+      yes: 'Yes, set my time',
+      notNow: 'Not now',
+      timeTitle: 'When suits you?',
+      timeBody: 'Choose your morning or evening routine, then any time that works for you.',
+      /** Screen reader name for the morning / evening choice. */
+      routine: 'Which routine',
+      save: 'Save my reminder',
+      /** Notifications were refused at the system prompt: the time is kept for when they're allowed. */
+      deniedTitle: 'Your time is saved',
+      continue: 'Continue',
+    },
     streakAtRisk: {
       title: 'Keep your streak going',
       body: (weeks: number) => `You're on a ${weeks}-week streak. One scan today keeps it going.`,
@@ -770,15 +793,20 @@ export const copy = {
         evening: 'Evening routine reminder',
       },
       timePicker: {
-        /** Screen reader names for the AM / PM switch and the hours. */
+        /** Screen reader name for the AM / PM switch. */
         period: 'Morning or afternoon',
+        /** Above the hours and the minutes, and their screen reader names. */
         hours: 'Hour',
+        minutes: 'Minutes',
+        /** The round buttons either side of the time, for the minutes between the ones listed. */
+        earlier: 'One minute earlier',
+        later: 'One minute later',
       },
       /** Monday first. Short labels for the day picker, then the full name for screen readers. */
       weekdays: WEEKDAYS,
       routine: 'Daily routine reminder',
       routineHint: "On the day a scan reminder arrives, it takes this one's place.",
-      routineLocked: 'Available once you have used your routine a couple of times.',
+      routineLocked: 'Available once your first scan has made your routine.',
       routineOptions: { off: 'Off', morning: 'Morning', evening: 'Evening' },
       streak: 'Streak reminder',
       streakHint: 'Only when a streak of 2 weeks or more is about to end.',
