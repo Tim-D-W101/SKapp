@@ -104,6 +104,18 @@ export const sizes = {
   sheetHandle: { width: 40, height: 4 },
   /** The most of the screen a tall bottom sheet covers; its content scrolls beyond that. */
   sheetMaxHeight: '85%',
+  /**
+   * A dialog over the screen, such as the time picker: its widest and its
+   * tallest (its content scrolls beyond that), and the basis of an hour in
+   * its grid, which fits four to a row.
+   */
+  dialog: {
+    maxWidth: 400,
+    maxHeight: '90%',
+    hourCellBasis: '22%',
+  },
+  /** The tappable time under a reminder: at least this tall, as it holds two lines. */
+  timeRow: 64,
   /** Scan photo thumbnails, in the photos' 3:4 shape. */
   thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,

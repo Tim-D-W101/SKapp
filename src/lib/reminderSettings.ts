@@ -1,7 +1,9 @@
 import * as SecureStore from 'expo-secure-store';
 
+import { ROUTINE_REMINDER_HOURS } from '@/constants/reminders';
 import { logInDevelopment } from '@/lib/errors';
 import type { RoutineReminderSlot } from '@/lib/reminderPlan';
+import type { RoutineSlot } from '@/types/routine';
 
 /**
  * Reminder settings that belong to this phone rather than the account: the
@@ -14,6 +16,11 @@ export interface ReminderSettings {
   enabled: boolean;
   streak: boolean;
   routine: RoutineReminderSlot;
+  /**
+   * When the morning and the evening routine reminder arrive, in local hours
+   * (0-23). Each keeps its own time, so switching between them never loses one.
+   */
+  routineHours: Record<RoutineSlot, number>;
   /** The explanation before the system permission prompt has been shown. */
   introSeen: boolean;
   /** Visits to the routine tab. A routine reminder is only offered after a couple. */
@@ -27,6 +34,7 @@ export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: true,
   streak: true,
   routine: 'off',
+  routineHours: { ...ROUTINE_REMINDER_HOURS },
   introSeen: false,
   routineVisits: 0,
   routineOfferDismissed: false,
@@ -37,6 +45,22 @@ const KEY = 'glowtrack.reminders';
 
 function isSlot(value: unknown): value is RoutineReminderSlot {
   return value === 'off' || value === 'morning' || value === 'evening';
+}
+
+const HOURS_IN_DAY = 24;
+
+function isHour(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < HOURS_IN_DAY;
+}
+
+/** Stored hours, each falling back to its default if missing or not a whole hour of the day. */
+function readRoutineHours(value: unknown): Record<RoutineSlot, number> {
+  const stored: Partial<Record<RoutineSlot, unknown>> =
+    typeof value === 'object' && value !== null ? value : {};
+  return {
+    morning: isHour(stored.morning) ? stored.morning : ROUTINE_REMINDER_HOURS.morning,
+    evening: isHour(stored.evening) ? stored.evening : ROUTINE_REMINDER_HOURS.evening,
+  };
 }
 
 export async function readReminderSettings(): Promise<ReminderSettings> {
@@ -52,6 +76,7 @@ export async function readReminderSettings(): Promise<ReminderSettings> {
       enabled: flag(stored.enabled, DEFAULT_REMINDER_SETTINGS.enabled),
       streak: flag(stored.streak, DEFAULT_REMINDER_SETTINGS.streak),
       routine: isSlot(stored.routine) ? stored.routine : DEFAULT_REMINDER_SETTINGS.routine,
+      routineHours: readRoutineHours(stored.routineHours),
       introSeen: flag(stored.introSeen, false),
       routineVisits: typeof stored.routineVisits === 'number' ? stored.routineVisits : 0,
       routineOfferDismissed: flag(stored.routineOfferDismissed, false),

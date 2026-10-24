@@ -1,3 +1,5 @@
+import { copy } from '@/constants/copy';
+
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function startOfLocalDay(date: Date): number {
@@ -41,10 +43,26 @@ export function formatShortDate(iso: string): string {
   });
 }
 
-/** An hour of the day the way the phone writes times, such as "7:00 pm" or "19:00". */
+let twentyFourHour: boolean | null = null;
+
+/**
+ * Whether the phone's language tells time on a 24-hour clock ("19:00")
+ * rather than a 12-hour one ("7:00 PM"). Worked out once: only the clock
+ * style is taken from the phone, never its wording.
+ */
+export function usesTwentyFourHourClock(): boolean {
+  if (twentyFourHour === null) {
+    const onePm = new Date(2000, 0, 1, 13).toLocaleTimeString(undefined, { hour: 'numeric' });
+    twentyFourHour = onePm.includes('13');
+  }
+  return twentyFourHour;
+}
+
+/**
+ * An hour of the day, written the same clean way everywhere: "7:00 PM", or
+ * "19:00" on a phone that uses a 24-hour clock. Never seconds, odd spacing
+ * or a lower-case "pm", whatever the phone's own formatter would add.
+ */
 export function formatHour(hour: number): string {
-  return new Date(2000, 0, 1, hour).toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  return copy.time.hour(hour, usesTwentyFourHourClock());
 }

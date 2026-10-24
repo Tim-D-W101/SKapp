@@ -49,7 +49,9 @@ interface ReminderState {
   /** Shows the system prompt (only after the in-app explanation) and schedules if allowed. */
   askPermission: () => Promise<PermissionState>;
   dismissIntro: () => void;
-  update: (changes: Partial<Pick<ReminderSettings, 'enabled' | 'streak' | 'routine'>>) => void;
+  update: (
+    changes: Partial<Pick<ReminderSettings, 'enabled' | 'streak' | 'routine' | 'routineHours'>>,
+  ) => void;
   /** The weekly reminder's switch, day and hour live on the profile. */
   updateWeekly: (changes: WeeklyReminderChanges) => Promise<ActionResult>;
   recordRoutineVisit: () => void;
@@ -105,6 +107,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       },
       streakEnabled: settings.streak,
       routine: settings.routine,
+      routineHours: settings.routineHours,
       scanDates,
       usedDays: deliveredToday.length > 0 ? [today] : [],
     });

@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Card, Icon, LoadingState, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { ROUTINE_REMINDER_HOURS } from '@/constants/reminders';
 import { formatHour, formatShortDate } from '@/lib/dates';
 import { relativeDay, remindersCardState, type RemindersCardState } from '@/lib/nextReminder';
 import { useReminderStore } from '@/stores/useReminderStore';
@@ -66,7 +65,6 @@ export function RemindersCard() {
     enabled,
     plan,
     planFailed,
-    routineHours: ROUTINE_REMINDER_HOURS,
   });
   const tint = palette.tints.coral;
   const title = <SectionTitle title={copy.home.reminders.title} icon="bell" tint="coral" />;

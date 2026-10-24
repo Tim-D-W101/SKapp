@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import { BANNED_TERMS } from '../../supabase/functions/analyze-scan/prompt.ts';
 import { copy } from '../constants/copy.ts';
+import type { RoutineSlot } from '../types/routine.ts';
 import type { PlannedReminder } from './reminderPlan.ts';
 
 import {
@@ -17,14 +18,15 @@ import {
 // calendar-day checks give the same answers on every machine.
 process.env.TZ = 'Europe/London';
 
-/** As in constants/reminders.ts. */
-const ROUTINE_HOURS = { morning: 8, evening: 20 } as const;
-
 /** Friday 23 October 2026, 10:30 local time. */
 const NOW = new Date(2026, 9, 23, 10, 30);
 
-function reminder(kind: PlannedReminder['kind'], date: Date): PlannedReminder {
+function reminder(kind: 'weekly' | 'streak', date: Date): PlannedReminder {
   return { kind, date, title: 'Title', body: 'Body' };
+}
+
+function routine(slot: RoutineSlot, date: Date): PlannedReminder {
+  return { kind: 'routine', slot, date, title: 'Title', body: 'Body' };
 }
 
 /** Allowed, switched on, and a plan already made: the usual state once the app is open. */
@@ -36,14 +38,13 @@ function inputs(changes: Partial<RemindersCardInputs> = {}): RemindersCardInputs
     enabled: true,
     plan: [],
     planFailed: false,
-    routineHours: ROUTINE_HOURS,
     ...changes,
   };
 }
 
 describe('remindersCardState', () => {
   const plan = [
-    reminder('routine', new Date(2026, 9, 23, 20)),
+    routine('evening', new Date(2026, 9, 23, 20)),
     reminder('weekly', new Date(2026, 9, 25, 19)),
   ];
 
@@ -90,7 +91,7 @@ describe('remindersCardState', () => {
   });
 
   it('shows the soonest reminder still to come', () => {
-    const passed = reminder('routine', new Date(2026, 9, 23, 8));
+    const passed = routine('morning', new Date(2026, 9, 23, 8));
     assert.deepEqual(remindersCardState(inputs({ plan: [passed, ...plan] })), {
       kind: 'next',
       name: 'evening',
@@ -100,22 +101,23 @@ describe('remindersCardState', () => {
 
   it('has nothing to show when nothing in the plan is still to come', () => {
     assert.deepEqual(remindersCardState(inputs({ plan: [] })), { kind: 'none' });
-    const passed = [reminder('routine', new Date(2026, 9, 23, 8)), reminder('weekly', NOW)];
+    const passed = [routine('morning', new Date(2026, 9, 23, 8)), reminder('weekly', NOW)];
     assert.deepEqual(remindersCardState(inputs({ plan: passed })), { kind: 'none' });
   });
 });
 
 describe('reminderName', () => {
   it('names the weekly and streak reminders by their kind', () => {
-    assert.equal(reminderName(reminder('weekly', NOW), ROUTINE_HOURS), 'weekly');
-    assert.equal(reminderName(reminder('streak', NOW), ROUTINE_HOURS), 'streak');
+    assert.equal(reminderName(reminder('weekly', NOW)), 'weekly');
+    assert.equal(reminderName(reminder('streak', NOW)), 'streak');
   });
 
-  it('tells a morning routine reminder from an evening one by its hour', () => {
-    const morning = reminder('routine', new Date(2026, 9, 24, ROUTINE_HOURS.morning));
-    const evening = reminder('routine', new Date(2026, 9, 24, ROUTINE_HOURS.evening));
-    assert.equal(reminderName(morning, ROUTINE_HOURS), 'morning');
-    assert.equal(reminderName(evening, ROUTINE_HOURS), 'evening');
+  it('names a routine reminder for its routine, whatever hour it was set to', () => {
+    assert.equal(reminderName(routine('morning', new Date(2026, 9, 24, 8))), 'morning');
+    assert.equal(reminderName(routine('evening', new Date(2026, 9, 24, 20))), 'evening');
+    // Both moved to the same hour: still told apart.
+    assert.equal(reminderName(routine('morning', new Date(2026, 9, 24, 21))), 'morning');
+    assert.equal(reminderName(routine('evening', new Date(2026, 9, 24, 21))), 'evening');
   });
 });
 

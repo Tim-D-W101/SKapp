@@ -29,7 +29,8 @@ export type IconName =
   | 'moon'
   | 'bell'
   | 'calendar'
-  | 'camera';
+  | 'camera'
+  | 'clock';
 
 export interface IconProps {
   name: IconName;
@@ -183,6 +184,13 @@ function renderGlyph(name: IconName) {
           <Rect x={4} y={5.5} width={16} height={14.5} rx={3} />
           <Path d="M4 10h16" />
           <Path d="M8.5 3.5v4M15.5 3.5v4" />
+        </>
+      );
+    case 'clock':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={8.5} />
+          <Path d="M12 7.5V12l3 2" />
         </>
       );
     case 'drag':
