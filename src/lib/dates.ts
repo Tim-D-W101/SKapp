@@ -59,10 +59,10 @@ export function usesTwentyFourHourClock(): boolean {
 }
 
 /**
- * An hour of the day, written the same clean way everywhere: "7:00 PM", or
- * "19:00" on a phone that uses a 24-hour clock. Never seconds, odd spacing
+ * A time of day, written the same clean way everywhere: "7:45 PM", or
+ * "19:45" on a phone that uses a 24-hour clock. Never seconds, odd spacing
  * or a lower-case "pm", whatever the phone's own formatter would add.
  */
-export function formatHour(hour: number): string {
-  return copy.time.hour(hour, usesTwentyFourHourClock());
+export function formatTime(hour: number, minute = 0): string {
+  return copy.time.clock(hour, minute, usesTwentyFourHourClock());
 }

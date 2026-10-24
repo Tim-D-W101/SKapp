@@ -13,8 +13,9 @@ export interface ProgressHeroProps {
 }
 
 /**
- * The latest overall score and the journey since the first scan. With one
- * scan, an encouraging note that the second is where change shows up.
+ * The latest overall score and the journey since the first scan, on the
+ * latest scan's peach, as on Home. With one scan, an encouraging note that
+ * the second is where change shows up.
  */
 export function ProgressHero({ records }: ProgressHeroProps) {
   const first = records[0].result;
@@ -23,7 +24,7 @@ export function ProgressHero({ records }: ProgressHeroProps) {
   if (records.length === 1) {
     const next = nextScanDate(latest.createdAt);
     return (
-      <Card style={styles.card}>
+      <Card style={styles.card} tint="peach">
         <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
         <Text variant="h3" align="center" accessibilityRole="header">
           {copy.progress.oneScan.title}
@@ -41,7 +42,7 @@ export function ProgressHero({ records }: ProgressHeroProps) {
 
   const days = calendarDaysBetween(first.createdAt, latest.createdAt);
   return (
-    <Card style={styles.card}>
+    <Card style={styles.card} tint="peach">
       <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
       <Text variant="h3" align="center">
         {copy.progress.journey(latest.overall - first.overall, copy.progress.journeySpan(days))}

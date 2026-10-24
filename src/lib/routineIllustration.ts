@@ -1,4 +1,4 @@
-import type { TintName } from '@/theme/colors';
+import type { IllustrationTint } from '@/theme/colors';
 import type { RoutineStep } from '@/types/routine';
 
 /**
@@ -57,7 +57,7 @@ export function illustrationForStep(step: Pick<RoutineStep, 'key'>): ProductIllu
  * moisturiser) and anything else. A usual morning (cleanser, serum,
  * moisturiser, sunscreen) never puts two of one colour side by side.
  */
-const TINTS: Record<ProductIllustration, TintName> = {
+const TINTS: Record<ProductIllustration, IllustrationTint> = {
   makeupRemover: 'coral',
   cleanser: 'mint',
   toner: 'mint',
@@ -71,6 +71,6 @@ const TINTS: Record<ProductIllustration, TintName> = {
 };
 
 /** The colour a product drawing is drawn in, and its tile's colour. */
-export function tintForIllustration(kind: ProductIllustration): TintName {
+export function tintForIllustration(kind: ProductIllustration): IllustrationTint {
   return TINTS[kind];
 }

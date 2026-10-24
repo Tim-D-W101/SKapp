@@ -1,4 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -10,18 +10,17 @@ import {
   ErrorState,
   LoadingState,
   Screen,
-  ScoreRing,
   SectionTitle,
   Text,
 } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { formatShortDate } from '@/lib/dates';
 import { nextScanDate } from '@/lib/progress';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 
 import { HomeHeader } from './HomeHeader';
+import { LatestScanCard } from './LatestScanCard';
 import { RemindersCard } from './RemindersCard';
 import { ScanCard } from './ScanCard';
 import { TodayRoutine } from './TodayRoutine';
@@ -37,6 +36,10 @@ const LOADING_LINES = 4;
  * every state, so scanning and Settings are always one tap away. It reads
  * the same stores as the Progress tab and the routine and refreshes them on
  * each visit, so all three always agree.
+ *
+ * Each card has its own colour, by what it shows (see TintName): the latest
+ * scan peach, morning sun and evening dusk, reminders coral and the next
+ * scan mint, so the first screen is never one cream-and-teal wash.
  */
 export function HomeScreen() {
   const status = useProgressStore((state) => state.status);
@@ -65,8 +68,11 @@ export function HomeScreen() {
           {status === 'error' ? (
             <ErrorState message={copy.home.loadFailed} onRetry={retry} />
           ) : status === 'ready' ? (
-            // The scan card above is the way to the first scan.
-            <EmptyState title={copy.progress.noScans.title} body={copy.progress.noScans.body} />
+            // The scan card above is the way to the first scan. Peach, as the
+            // latest scan's card will be once there is one.
+            <Card tint="peach">
+              <EmptyState title={copy.progress.noScans.title} body={copy.progress.noScans.body} />
+            </Card>
           ) : (
             <LoadingState lines={LOADING_LINES} />
           )}
@@ -93,24 +99,13 @@ export function HomeScreen() {
 
       <ScanCard />
 
-      <Card style={styles.latest}>
-        <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="background" />
-        <Text variant="bodySmall" color="textSecondary" align="center">
-          {copy.home.latestDate(formatShortDate(latest.createdAt))}
-        </Text>
-        <Button
-          label={copy.home.seeResults}
-          onPress={() => router.push(`/progress/${latest.scanId}`)}
-          variant="secondary"
-          fullWidth
-        />
-      </Card>
+      <LatestScanCard latest={latest} />
 
       <TodayRoutine />
 
       <RemindersCard />
 
-      <Card style={styles.card}>
+      <Card style={styles.card} tint="mint">
         <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="mint" />
         <Text color="textSecondary">
           {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
@@ -140,10 +135,6 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     flex: 1,
-  },
-  latest: {
-    alignItems: 'center',
-    gap: spacing.md,
   },
   card: {
     gap: spacing.sm,

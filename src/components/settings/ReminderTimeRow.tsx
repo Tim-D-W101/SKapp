@@ -3,7 +3,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, IconBadge, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { formatHour } from '@/lib/dates';
+import { formatTime } from '@/lib/dates';
+import type { ReminderTime } from '@/lib/reminderPlan';
 import { radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { TimePickerDialog } from './TimePickerDialog';
@@ -13,9 +14,11 @@ export interface ReminderTimeRowProps {
   label: string;
   /** The time picker's title: which reminder this is. */
   pickerTitle: string;
-  /** The reminder's local hour (0-23). */
-  hour: number;
-  onChange: (hour: number) => void;
+  /** The reminder's local time. */
+  time: ReminderTime;
+  /** Whether the picker offers minutes too. Off for a reminder that is only ever on the hour. */
+  withMinutes?: boolean;
+  onChange: (time: ReminderTime) => void;
 }
 
 /**
@@ -23,17 +26,23 @@ export interface ReminderTimeRowProps {
  * plain that it can be changed. Tapping anywhere on it opens the time picker;
  * the new time is passed on only when it's saved there.
  */
-export function ReminderTimeRow({ label, pickerTitle, hour, onChange }: ReminderTimeRowProps) {
+export function ReminderTimeRow({
+  label,
+  pickerTitle,
+  time,
+  withMinutes = true,
+  onChange,
+}: ReminderTimeRowProps) {
   const palette = useColors();
   const [picking, setPicking] = useState(false);
-  const time = formatHour(hour);
+  const shown = formatTime(time.hour, time.minute);
 
   return (
     <>
       <Pressable
         onPress={() => setPicking(true)}
         accessibilityRole="button"
-        accessibilityLabel={copy.settings.reminders.timeLabel(label, time)}
+        accessibilityLabel={copy.settings.reminders.timeLabel(label, shown)}
         accessibilityHint={copy.settings.reminders.changeTimeHint}
         style={({ pressed }) => [
           styles.row,
@@ -48,7 +57,7 @@ export function ReminderTimeRow({ label, pickerTitle, hour, onChange }: Reminder
           <Text variant="caption" color="textSecondary">
             {label}
           </Text>
-          <Text variant="h3">{time}</Text>
+          <Text variant="h3">{shown}</Text>
         </View>
         <Text variant="label" color="accentText">
           {copy.settings.reminders.change}
@@ -59,11 +68,12 @@ export function ReminderTimeRow({ label, pickerTitle, hour, onChange }: Reminder
       {picking ? (
         <TimePickerDialog
           title={pickerTitle}
-          hour={hour}
+          time={time}
+          withMinutes={withMinutes}
           onCancel={() => setPicking(false)}
           onSave={(next) => {
             setPicking(false);
-            if (next !== hour) onChange(next);
+            if (next.hour !== time.hour || next.minute !== time.minute) onChange(next);
           }}
         />
       ) : null}

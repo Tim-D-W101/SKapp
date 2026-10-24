@@ -5,13 +5,16 @@ import { Button, SegmentedControl, Text, type SegmentedOption } from '@/componen
 import { copy } from '@/constants/copy';
 import { ROUTINE_VISITS_BEFORE_OFFER } from '@/constants/reminders';
 import { logInDevelopment } from '@/lib/errors';
-import type { RoutineReminderSlot } from '@/lib/reminderPlan';
+import type { ReminderTime, RoutineReminderSlot } from '@/lib/reminderPlan';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useReminderStore, type WeeklyReminderChanges } from '@/stores/useReminderStore';
+import { useRoutineStore } from '@/stores/useRoutineStore';
 import { sizes, spacing, useColors } from '@/theme/tokens';
+import type { RoutineSlot } from '@/types/routine';
 
 import { ReminderTimeRow } from './ReminderTimeRow';
 import { SwitchRow } from './SwitchRow';
+import { TimePickerDialog } from './TimePickerDialog';
 
 /** Monday first, in one even row: the short name shows, the full one is read out. */
 const WEEKDAY_OPTIONS: readonly SegmentedOption<number>[] = copy.settings.reminders.weekdays.map(
@@ -29,9 +32,11 @@ const ROUTINE_OPTIONS: readonly SegmentedOption<RoutineReminderSlot>[] = [
  * separated by hairlines: the weekly reminder's day and time, the daily
  * routine reminder's morning or evening and its time, and the streak
  * reminder. Each time reads large and opens a time picker when tapped.
- * Changes reschedule at once. If notifications were refused, it points to
- * the phone's settings instead of asking again. Settings shows it in its
- * Reminders section, and Home in the sheet its reminders card opens;
+ * Choosing Morning or Evening opens the picker straight away, so the
+ * reminder always comes at a time the person set; nothing changes until
+ * Save. Changes reschedule at once. If notifications were refused, it
+ * points to the phone's settings instead of asking again. Settings shows it
+ * in its Reminders section, and Home in the sheet its reminders card opens;
  * whoever shows it gives it a title.
  */
 export function ReminderControls() {
@@ -42,8 +47,11 @@ export function ReminderControls() {
   const updateWeekly = useReminderStore((state) => state.updateWeekly);
   const askPermission = useReminderStore((state) => state.askPermission);
   const profile = useAuthStore((state) => state.profile);
+  const hasRoutine = useRoutineStore((state) => state.routine !== null);
   const [error, setError] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
+  /** Morning or Evening, just chosen: its time picker is open, and nothing is saved until Save. */
+  const [choosing, setChoosing] = useState<RoutineSlot | null>(null);
 
   const saveWeekly = async (changes: WeeklyReminderChanges) => {
     setError(null);
@@ -94,9 +102,22 @@ export function ReminderControls() {
   const weeklyOn = profile?.reminder_enabled ?? false;
   const weekday = profile?.reminder_weekday ?? 0;
   const hour = profile?.reminder_hour ?? 0;
-  const routineUnlocked = settings.routineVisits >= ROUTINE_VISITS_BEFORE_OFFER;
+  // Once there's a routine to be reminded of, or one is already set.
+  const routineUnlocked =
+    hasRoutine ||
+    settings.routine !== 'off' ||
+    settings.routineVisits >= ROUTINE_VISITS_BEFORE_OFFER;
   const routineSlot = settings.routine === 'off' ? null : settings.routine;
   const divider = <View style={[styles.divider, { backgroundColor: palette.borderSubtle }]} />;
+
+  const chooseRoutine = (routine: RoutineReminderSlot) => {
+    if (routine === settings.routine) return;
+    if (routine === 'off') update({ routine });
+    else setChoosing(routine);
+  };
+
+  const setRoutineTime = (slot: RoutineSlot, time: ReminderTime, routine = settings.routine) =>
+    update({ routine, routineTimes: { ...settings.routineTimes, [slot]: time } });
 
   return (
     <View style={styles.controls}>
@@ -130,8 +151,9 @@ export function ReminderControls() {
                 <ReminderTimeRow
                   label={copy.settings.reminders.time}
                   pickerTitle={copy.settings.reminders.weeklyTimeTitle}
-                  hour={hour}
-                  onChange={(next) => void saveWeekly({ reminder_hour: next })}
+                  time={{ hour, minute: 0 }}
+                  withMinutes={false}
+                  onChange={(next) => void saveWeekly({ reminder_hour: next.hour })}
                 />
               </>
             ) : null}
@@ -145,17 +167,26 @@ export function ReminderControls() {
                 <SegmentedControl
                   options={ROUTINE_OPTIONS}
                   value={settings.routine}
-                  onChange={(routine) => update({ routine })}
+                  onChange={chooseRoutine}
                   accessibilityLabel={copy.settings.reminders.routine}
                 />
                 {routineSlot ? (
                   <ReminderTimeRow
                     label={copy.settings.reminders.time}
                     pickerTitle={copy.settings.reminders.routineTimeTitle[routineSlot]}
-                    hour={settings.routineHours[routineSlot]}
-                    onChange={(next) =>
-                      update({ routineHours: { ...settings.routineHours, [routineSlot]: next } })
-                    }
+                    time={settings.routineTimes[routineSlot]}
+                    onChange={(next) => setRoutineTime(routineSlot, next)}
+                  />
+                ) : null}
+                {choosing ? (
+                  <TimePickerDialog
+                    title={copy.settings.reminders.routineTimeTitle[choosing]}
+                    time={settings.routineTimes[choosing]}
+                    onCancel={() => setChoosing(null)}
+                    onSave={(next) => {
+                      setChoosing(null);
+                      setRoutineTime(choosing, next, choosing);
+                    }}
                   />
                 ) : null}
                 <Text variant="caption" color="textSecondary">

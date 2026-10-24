@@ -12,6 +12,12 @@ import type { RoutineSlot } from '@/types/routine';
 export type RoutineReminderSlot = 'off' | 'morning' | 'evening';
 export type ReminderKind = 'weekly' | 'streak' | 'routine';
 
+/** A time of day the person picked, in local time: any hour (0-23) and minute (0-59). */
+export interface ReminderTime {
+  hour: number;
+  minute: number;
+}
+
 export interface ReminderInputs {
   now: Date;
   /** The master switch. Off means nothing is scheduled. */
@@ -25,8 +31,8 @@ export interface ReminderInputs {
   };
   streakEnabled: boolean;
   routine: RoutineReminderSlot;
-  /** When the morning and the evening routine reminder arrive, in local hours (0-23). */
-  routineHours: Readonly<Record<RoutineSlot, number>>;
+  /** When the morning and the evening routine reminder arrive, each at the time the person set. */
+  routineTimes: Readonly<Record<RoutineSlot, ReminderTime>>;
   /** When each completed scan was taken, oldest first. */
   scanDates: string[];
   /** Local days (YYYY-MM-DD) that have already had a reminder. */
@@ -39,7 +45,7 @@ interface PlannedReminderBase {
   body: string;
 }
 
-/** A routine reminder also says which routine it's for, whatever hour it was set to. */
+/** A routine reminder also says which routine it's for, whatever time it was set to. */
 export type PlannedReminder =
   | (PlannedReminderBase & { kind: Exclude<ReminderKind, 'routine'> })
   | (PlannedReminderBase & { kind: 'routine'; slot: RoutineSlot });
@@ -49,9 +55,9 @@ const PRIORITY: Record<ReminderKind, number> = { weekly: 3, streak: 2, routine: 
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** The day `offset` days after `date`'s day, at `hour`:00 local time. */
-function atLocal(date: Date, offset: number, hour: number): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + offset, hour);
+/** The day `offset` days after `date`'s day, at `hour`:`minute` local time. */
+function atLocal(date: Date, offset: number, hour: number, minute = 0): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + offset, hour, minute);
 }
 
 /** The first moment at or after `from` that falls on `weekday` at `hour`:00. */
@@ -106,13 +112,14 @@ function streakCandidates(inputs: ReminderInputs): PlannedReminder[] {
 }
 
 function routineCandidates(inputs: ReminderInputs): PlannedReminder[] {
-  const { now, routine, routineHours } = inputs;
+  const { now, routine, routineTimes } = inputs;
   if (routine === 'off') return [];
   const message =
     routine === 'morning' ? copy.notifications.routineMorning : copy.notifications.routineEvening;
+  const { hour, minute } = routineTimes[routine];
   const planned: PlannedReminder[] = [];
   for (let offset = 0; offset < REMINDER_HORIZON_DAYS; offset += 1) {
-    const date = atLocal(now, offset, routineHours[routine]);
+    const date = atLocal(now, offset, hour, minute);
     if (date.getTime() > now.getTime()) {
       planned.push({ kind: 'routine', slot: routine, date, ...message });
     }

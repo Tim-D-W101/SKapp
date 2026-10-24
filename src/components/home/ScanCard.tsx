@@ -8,9 +8,9 @@ import { layout, motion, radius, shadows, sizes, spacing, useColors } from '@/th
 
 /**
  * The big "Scan my skin" card at the top of Home: the app's mark on the
- * brand teal, with a sun-yellow camera badge. It starts a scan the same way
- * every other scan button does, so once the free scan is used it opens the
- * plans instead.
+ * brand teal, its sun rising in sun yellow, with a sun-yellow camera badge.
+ * It starts a scan the same way every other scan button does, so once the
+ * free scan is used it opens the plans instead.
  */
 export function ScanCard() {
   const palette = useColors();

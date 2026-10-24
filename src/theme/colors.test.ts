@@ -6,6 +6,7 @@ import {
   colors,
   getScoreColor,
   iconColors,
+  ILLUSTRATION_TINTS,
   illustrationColors,
   shareCardColors,
   sunMarkColors,
@@ -167,7 +168,7 @@ describe('supporting colours', () => {
     });
   }
 
-  for (const name of TINT_NAMES) {
+  for (const name of ILLUSTRATION_TINTS) {
     const ink = illustrationColors[name];
 
     it(`${name} drawings: the outline shows on the light tile (${GRAPHIC}:1)`, () => {
