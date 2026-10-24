@@ -39,8 +39,8 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
 
   if (records.length < 2) {
     return (
-      <Card style={styles.card} tint="lavender">
-        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="lavender" />
+      <Card style={styles.card}>
+        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
         <Text color="textSecondary">{copy.progress.chart.needTwo}</Text>
       </Card>
     );
@@ -54,9 +54,9 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
   const selectedValue = valueOf(selected, metric);
 
   return (
-    <Card style={styles.card} tint="lavender">
+    <Card style={styles.card}>
       <View style={styles.header}>
-        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="lavender" />
+        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
         <Text variant="bodySmall" color="textSecondary">
           {metricLabel}
         </Text>
@@ -100,7 +100,7 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
           time: new Date(record.result.createdAt).getTime(),
           value: valueOf(record.result, metric),
         }))}
-        tint="lavender"
+        tint="mint"
         selectedIndex={selectedIndex}
         onSelect={(index) => setSelectedId(records[index].result.scanId)}
         firstLabel={formatShortDate(records[0].result.createdAt)}

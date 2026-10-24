@@ -50,18 +50,19 @@ export function illustrationForStep(step: Pick<RoutineStep, 'key'>): ProductIllu
 }
 
 /**
- * Each drawing's colour, so the kinds of step are told apart at a glance: a
- * sunny sunscreen and face oil, coral serum and lip balm, lavender for the
- * eyes and makeup removal, sky-blue cleanser and toner, and the brand mint
- * for moisturiser and anything else. A usual morning (cleanser, serum,
- * moisturiser, sunscreen) shows four different colours.
+ * Each drawing's colour, from the brand's three, so neighbouring steps are
+ * told apart at a glance without the list turning into a rainbow: a sunny
+ * sunscreen and face oil, coral for the extras (serum, eye cream, lip balm,
+ * makeup remover), and the brand mint for the basics (cleanser, toner,
+ * moisturiser) and anything else. A usual morning (cleanser, serum,
+ * moisturiser, sunscreen) never puts two of one colour side by side.
  */
 const TINTS: Record<ProductIllustration, TintName> = {
-  makeupRemover: 'lavender',
-  cleanser: 'sky',
-  toner: 'sky',
+  makeupRemover: 'coral',
+  cleanser: 'mint',
+  toner: 'mint',
   serum: 'coral',
-  eyeCream: 'lavender',
+  eyeCream: 'coral',
   moisturiser: 'mint',
   faceOil: 'sun',
   lipBalm: 'coral',

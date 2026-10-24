@@ -76,7 +76,7 @@ export function DataSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.data.title} icon="list" tint="lavender" />
+      <SectionTitle title={copy.settings.data.title} icon="list" tint="mint" />
 
       <View style={styles.item}>
         <Text color="textSecondary">{copy.settings.data.downloadBody}</Text>

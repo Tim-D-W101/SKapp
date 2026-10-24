@@ -14,10 +14,10 @@ export const MIDNIGHT_GRACE_MS = 1000;
 /** In the order Home and the routine list them. */
 export const ROUTINE_SLOTS = ['morning', 'evening'] as const satisfies readonly RoutineSlot[];
 
-/** Each section's colour, on Home and on the routine: a sunny morning, a lavender evening. */
+/** Each section's colour, on Home and on the routine: a warm, sunny morning and a calm teal evening. */
 export const ROUTINE_SLOT_TINTS = {
   morning: 'sun',
-  evening: 'lavender',
+  evening: 'mint',
 } as const satisfies Record<RoutineSlot, TintName>;
 
 /** Each section's icon, beside its name. */

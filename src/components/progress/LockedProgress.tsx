@@ -8,8 +8,8 @@ import { spacing } from '@/theme/tokens';
 /** In place of the trend and comparisons, for someone who has never subscribed. */
 export function LockedProgress() {
   return (
-    <Card style={styles.card} tint="lavender">
-      <SectionTitle title={copy.progress.locked.title} icon="chart" tint="lavender" />
+    <Card style={styles.card}>
+      <SectionTitle title={copy.progress.locked.title} icon="chart" tint="mint" />
       <Text color="textSecondary">{copy.progress.locked.body}</Text>
       <Button label={copy.progress.locked.cta} onPress={() => openPaywall('progress')} fullWidth />
     </Card>

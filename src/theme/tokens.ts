@@ -344,7 +344,7 @@ export type ShadowStyle = Pick<
   'shadowColor' | 'shadowOffset' | 'shadowOpacity' | 'shadowRadius' | 'elevation'
 >;
 
-/** A deep teal rather than black, so shadows under mint cards stay soft. */
+/** A deep teal rather than black, so shadows under cards stay soft. */
 const SHADOW_COLOR = '#0E3A35';
 
 /** Android reads `elevation`; iOS reads the shadow* properties. Each level sets both. */

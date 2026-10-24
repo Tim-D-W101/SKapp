@@ -29,7 +29,7 @@ export function AccountSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.account.title} icon="user" tint="sky" />
+      <SectionTitle title={copy.settings.account.title} icon="user" tint="mint" />
       {isAnonymous ? (
         <>
           <Text color="textSecondary">{copy.settings.account.anonymous}</Text>

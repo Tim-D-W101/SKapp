@@ -43,7 +43,7 @@ export function ResultChange({ result, previous }: ResultChangeProps) {
   ];
 
   return (
-    <Card style={styles.card} tint="lavender">
+    <Card style={styles.card}>
       <View style={styles.header}>
         <Text variant="h3" accessibilityRole="header">
           {copy.results.changeTitle}

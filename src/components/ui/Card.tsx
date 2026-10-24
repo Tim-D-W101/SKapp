@@ -21,13 +21,13 @@ export interface CardProps {
   elevation?: ShadowLevel | 'none';
   /**
    * Gives the card one of the supporting colours' soft backgrounds, by what
-   * it shows (see TintName). Without one, it's the soft mint surface.
+   * it shows (see TintName). Without one, it's the warm cream surface.
    */
   tint?: TintName;
   style?: StyleProp<ViewStyle>;
 }
 
-/** A soft surface with rounded corners: mint, or the soft background of its tint. */
+/** A soft surface with rounded corners: warm cream, or the soft background of its tint. */
 export function Card({
   children,
   padding,
