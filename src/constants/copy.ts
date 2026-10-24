@@ -17,7 +17,12 @@
  * Never hyped, never alarming.
  *
  * Reviewing this one file proves the whole app's wording.
+ *
+ * Its only import is a type, which disappears when it's compiled, so the
+ * tests can still load it directly in plain Node.
  */
+
+import type { RelativeDay, ReminderName } from '@/lib/nextReminder';
 
 /** Lengths of time, for free trials. */
 type PeriodUnit = 'day' | 'week' | 'month' | 'year';
@@ -41,6 +46,41 @@ const BILLING_PERIODS: Record<BillingPlan, string> = {
 /** "1 day", "3 days". */
 function periodCount(count: number, unit: PeriodUnit): string {
   return `${count} ${PERIOD_NAMES[unit][count === 1 ? 0 : 1]}`;
+}
+
+/** Monday first. Short labels for the day picker, then the full name for screen readers. */
+const WEEKDAYS = [
+  { value: 1, short: 'Mon', name: 'Monday' },
+  { value: 2, short: 'Tue', name: 'Tuesday' },
+  { value: 3, short: 'Wed', name: 'Wednesday' },
+  { value: 4, short: 'Thu', name: 'Thursday' },
+  { value: 5, short: 'Fri', name: 'Friday' },
+  { value: 6, short: 'Sat', name: 'Saturday' },
+  { value: 0, short: 'Sun', name: 'Sunday' },
+] as const;
+
+/** What each reminder is called on Home's reminders card. */
+const REMINDER_NAMES: Record<ReminderName, string> = {
+  weekly: 'Weekly scan',
+  streak: 'Weekly streak',
+  morning: 'Morning routine',
+  evening: 'Evening routine',
+};
+
+/** "today at 8:00 am", "Sunday at 7:00 pm", "3 Nov 2026 at 7:00 pm". */
+function reminderWhen(day: RelativeDay, time: string, date: string): string {
+  switch (day.kind) {
+    case 'today':
+      return `today at ${time}`;
+    case 'tomorrow':
+      return `tomorrow at ${time}`;
+    case 'weekday': {
+      const weekday = WEEKDAYS.find((entry) => entry.value === day.weekday);
+      return `${weekday ? weekday.name : date} at ${time}`;
+    }
+    case 'later':
+      return `${date} at ${time}`;
+  }
 }
 
 export const copy = {
@@ -619,6 +659,30 @@ export const copy = {
       slotLabel: (slot: string, progress: string) => `${slot} routine, ${progress}`,
       openHint: 'Opens your full routine',
     },
+    /**
+     * The reminders card, under today's routine: the next reminder, or why
+     * there isn't one. Tapping it opens the reminder settings in a sheet.
+     */
+    reminders: {
+      title: 'Reminders',
+      /**
+       * "Next reminder: Morning routine, tomorrow at 8:00 am". `time` and
+       * `date` are the reminder's, written the way the phone writes them.
+       */
+      next: (name: ReminderName, day: RelativeDay, time: string, date: string) =>
+        `Next reminder: ${REMINDER_NAMES[name]}, ${reminderWhen(day, time, date)}`,
+      off: 'Reminders are off',
+      none: 'No reminders coming up',
+      noneBody: 'Choose a weekly scan reminder, or one for your routine.',
+      loadFailed: "Your next reminder didn't load. Check your connection and try again.",
+      /** The action at the top right of the card. */
+      turnOn: 'Turn on',
+      change: 'Change',
+      /** Screen reader name for the card: its title, then what it says. */
+      cardLabel: (line: string) => `Reminders. ${line}`,
+      changeHint: 'Opens your reminder settings',
+      turnOnHint: 'Turns reminders on and opens your reminder settings',
+    },
     /** The round button at the top right of Home that opens Settings. */
     profile: {
       label: 'Settings and account',
@@ -668,15 +732,7 @@ export const copy = {
       earlier: 'Earlier',
       later: 'Later',
       /** Monday first. Short labels for the day picker, then the full name for screen readers. */
-      weekdays: [
-        { value: 1, short: 'Mon', name: 'Monday' },
-        { value: 2, short: 'Tue', name: 'Tuesday' },
-        { value: 3, short: 'Wed', name: 'Wednesday' },
-        { value: 4, short: 'Thu', name: 'Thursday' },
-        { value: 5, short: 'Fri', name: 'Friday' },
-        { value: 6, short: 'Sat', name: 'Saturday' },
-        { value: 0, short: 'Sun', name: 'Sunday' },
-      ],
+      weekdays: WEEKDAYS,
       routine: 'Daily routine reminder',
       routineHint: "On the day a scan reminder arrives, it takes this one's place.",
       routineLocked: 'Available once you have used your routine a couple of times.',

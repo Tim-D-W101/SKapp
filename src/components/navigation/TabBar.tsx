@@ -1,30 +1,17 @@
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
-import { hapticSelection } from '@/lib/haptics';
-import {
-  fontFamilies,
-  layout,
-  opacity,
-  radius,
-  sizes,
-  spacing,
-  typography,
-  useColors,
-} from '@/theme/tokens';
-
-const { tabBar } = sizes;
-
-/** Space above a tab's icon pill and below its label, inside the bar. */
-const ITEM_PADDING =
-  (tabBar.height - tabBar.indicator.height - spacing.xs - typography.caption.lineHeight) / 2;
+import { hapticImpact } from '@/lib/haptics';
+import { useReduceMotion } from '@/lib/useReduceMotion';
+import { layout, motion, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 /**
- * The tab bar: a plain bar along the bottom of the screen with one tab per
- * route, each an icon over a label. The open tab's icon sits on a pill and
- * its label turns teal and bolder. Scanning starts from Home, not from here.
+ * The tab bar: two big rounded buttons side by side, one per route, each an
+ * icon beside a label. The open tab's button is filled in the brand teal;
+ * the other is a soft mint button with a hairline outline. Scanning starts
+ * from Home, not from here.
  *
  * It sits in the layout below the screens, not over them, so nothing scrolls
  * behind it, and it pads itself clear of the phone's navigation bar or
@@ -39,11 +26,11 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
       style={[
         styles.bar,
         {
-          backgroundColor: palette.surfaceElevated,
+          backgroundColor: palette.background,
           borderTopColor: palette.borderSubtle,
           paddingLeft: layout.gutter + insets.left,
           paddingRight: layout.gutter + insets.right,
-          paddingBottom: insets.bottom,
+          paddingBottom: spacing.sm + insets.bottom,
         },
       ]}
     >
@@ -53,26 +40,26 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
         const label = typeof options.tabBarLabel === 'string' ? options.tabBarLabel : options.title;
 
         const onPress = () => {
+          hapticImpact();
           const event = navigation.emit({
             type: 'tabPress',
             target: route.key,
             canPreventDefault: true,
           });
           if (!focused && !event.defaultPrevented) {
-            hapticSelection();
             navigation.navigate(route.name, route.params);
           }
         };
 
         return (
-          <TabItem
+          <TabButton
             key={route.key}
             label={label ?? route.name}
             accessibilityLabel={options.tabBarAccessibilityLabel}
             focused={focused}
             icon={options.tabBarIcon?.({
               focused,
-              color: focused ? palette.accentText : palette.textSecondary,
+              color: focused ? palette.textInverse : palette.accentText,
               size: sizes.icon.lg,
             })}
             onPress={onPress}
@@ -84,7 +71,7 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
   );
 }
 
-interface TabItemProps {
+interface TabButtonProps {
   label: string;
   accessibilityLabel?: string;
   focused: boolean;
@@ -93,63 +80,95 @@ interface TabItemProps {
   onLongPress: () => void;
 }
 
-/** One tab: its icon on a pill that fills in when the tab is open, and its label. */
-function TabItem({ label, accessibilityLabel, focused, icon, onPress, onLongPress }: TabItemProps) {
+/**
+ * One tab, as a big button: filled teal when its tab is open, soft mint
+ * otherwise. While pressed it darkens a step and dips slightly on a quick
+ * spring, unless the phone asks for less motion.
+ */
+function TabButton({
+  label,
+  accessibilityLabel,
+  focused,
+  icon,
+  onPress,
+  onLongPress,
+}: TabButtonProps) {
   const palette = useColors();
+  const reduceMotion = useReduceMotion();
+  const [scale] = useState(() => new Animated.Value(1));
+
+  const springTo = (toValue: number) => {
+    if (reduceMotion) return;
+    Animated.spring(scale, {
+      toValue,
+      ...motion.pressSpring,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
-    <Pressable
-      onPress={onPress}
-      onLongPress={onLongPress}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: focused }}
-      accessibilityLabel={accessibilityLabel ?? label}
-      style={({ pressed }) => [styles.item, pressed && !focused ? styles.pressed : null]}
-    >
-      <View
-        style={[
-          styles.indicator,
-          { backgroundColor: focused ? palette.accentSubtle : 'transparent' },
-        ]}
+    <Animated.View style={[styles.slot, { transform: [{ scale }] }]}>
+      <Pressable
+        onPress={onPress}
+        onLongPress={onLongPress}
+        onPressIn={() => springTo(motion.pressScale)}
+        onPressOut={() => springTo(1)}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: focused }}
+        accessibilityLabel={accessibilityLabel ?? label}
+        style={({ pressed }) => {
+          const fill = focused
+            ? pressed
+              ? palette.accentPressed
+              : palette.accent
+            : pressed
+              ? palette.accentSubtle
+              : palette.surface;
+          return [
+            styles.button,
+            { backgroundColor: fill, borderColor: focused ? fill : palette.border },
+          ];
+        }}
       >
         {icon}
-      </View>
-      <Text
-        variant="caption"
-        color={focused ? 'accentText' : 'textSecondary'}
-        numberOfLines={1}
-        style={focused ? styles.activeLabel : null}
-      >
-        {label}
-      </Text>
-    </Pressable>
+        <Text
+          variant="labelLarge"
+          color={focused ? 'textInverse' : 'accentText'}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={sizes.tabBar.minLabelScale}
+          style={styles.label}
+        >
+          {label}
+        </Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
     borderTopWidth: sizes.borderWidth,
   },
-  item: {
+  slot: {
     flex: 1,
-    alignItems: 'center',
-    gap: spacing.xs,
-    minHeight: tabBar.height,
-    paddingVertical: ITEM_PADDING,
   },
-  pressed: {
-    opacity: opacity.pressed,
-  },
-  indicator: {
-    width: tabBar.indicator.width,
-    height: tabBar.indicator.height,
-    borderRadius: radius.full,
+  button: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.sm,
+    minHeight: sizes.tabBar.button,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
+    // Both buttons have the same border, so they stay the same size whichever is open.
+    borderWidth: sizes.borderWidth,
   },
-  activeLabel: {
-    fontFamily: fontFamilies.semibold,
-    fontWeight: typography.label.fontWeight,
+  label: {
+    flexShrink: 1,
   },
 });

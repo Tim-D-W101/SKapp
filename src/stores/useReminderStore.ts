@@ -12,7 +12,7 @@ import {
   type PermissionState,
 } from '@/lib/notifications';
 import { fetchScanDates } from '@/lib/progress';
-import { planReminders } from '@/lib/reminderPlan';
+import { planReminders, type PlannedReminder } from '@/lib/reminderPlan';
 import {
   clearReminderSettings,
   DEFAULT_REMINDER_SETTINGS,
@@ -33,6 +33,14 @@ interface ReminderState {
   loaded: boolean;
   permission: PermissionState;
   settings: ReminderSettings;
+  /**
+   * The plan last scheduled, soonest first, for the reminders card on Home.
+   * Null until one has been made. Kept in memory only: it's rebuilt on every
+   * app open.
+   */
+  plan: PlannedReminder[] | null;
+  /** The last attempt to make the plan failed, most likely offline. */
+  planFailed: boolean;
 
   /** Reads the settings and the permission. Never asks for permission. */
   load: () => Promise<void>;
@@ -68,6 +76,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
     const { permission, settings } = get();
     const profile = useAuthStore.getState().profile;
     if (permission !== 'granted' || !profile) return;
+    if (get().planFailed) set({ planFailed: false });
 
     let scanDates: string[];
     try {
@@ -75,6 +84,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
     } catch (error: unknown) {
       // Offline: the schedule made last time stays as it is.
       logInDevelopment('Could not read scan dates for reminders', error);
+      if (started === generation) set({ planFailed: true });
       return;
     }
     if (started !== generation) return;
@@ -105,8 +115,11 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       saveSettings({
         scheduled: [...deliveredToday, ...plan.map((reminder) => reminder.date.getTime())],
       });
+      set({ plan });
     } catch (error: unknown) {
       logInDevelopment('Could not schedule reminders', error);
+      // Some of the old plan may have been cancelled already, so it can't be shown.
+      if (started === generation) set({ plan: null, planFailed: true });
     }
   };
 
@@ -114,6 +127,8 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
     loaded: false,
     permission: 'undetermined',
     settings: DEFAULT_REMINDER_SETTINGS,
+    plan: null,
+    planFailed: false,
 
     load: async () => {
       const started = generation;
@@ -195,7 +210,13 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
       generation += 1;
       rescheduling = null;
       rescheduleAgain = false;
-      set({ loaded: false, permission: 'undetermined', settings: DEFAULT_REMINDER_SETTINGS });
+      set({
+        loaded: false,
+        permission: 'undetermined',
+        settings: DEFAULT_REMINDER_SETTINGS,
+        plan: null,
+        planFailed: false,
+      });
       void clearReminderSettings();
       cancelReminders().catch((error: unknown) => {
         logInDevelopment('Could not cancel reminders', error);
