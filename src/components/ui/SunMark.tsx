@@ -7,12 +7,12 @@ export interface SunMarkProps {
   width?: number;
   /**
    * What it's drawn on. `light` gives the teal sun, `dark` the icon's cream
-   * sun, and `accent` colours that suit the accent fill in either mode.
-   * Defaults to the app's light or dark look (Appearance in Settings); set
-   * it on a surface that doesn't follow the theme, such as the share card,
-   * and to `accent` on the accent fill, such as Home's "Scan my skin" card.
+   * sun, and `brand` a sun-yellow sun over mint arcs, for the brand teal
+   * fill. Defaults to the app's light or dark look (Appearance in
+   * Settings); set it on a surface that doesn't follow the theme, such as
+   * the share card, and to `brand` on Home's "Scan my skin" card.
    */
-  on?: 'light' | 'dark' | 'accent';
+  on?: 'light' | 'dark' | 'brand';
 }
 
 /**
@@ -23,7 +23,7 @@ export interface SunMarkProps {
  */
 export function SunMark({ width = sizes.sunMark.lg, on }: SunMarkProps) {
   const scheme = useColorSchemeName();
-  const ink = on === 'accent' ? sunMarkColors.onAccent[scheme] : sunMarkColors[on ?? scheme];
+  const ink = on === 'brand' ? sunMarkColors.onBrand[scheme] : sunMarkColors[on ?? scheme];
 
   return (
     <Svg

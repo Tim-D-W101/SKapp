@@ -3,19 +3,26 @@
  * of the design tokens live in tokens.ts, which re-exports all of this, so
  * components keep importing from '@/theme/tokens'.
  *
- * The brand is the colour of its icon. The palette is built around the three
- * colours of the launcher icon (`iconColors`): its teal is the accent, its
- * mint is the soft tint behind highlights and selections, and its cream is
- * the warm, paper-like surface of cards. Screens stay clean white; text is a
- * deep teal ink.
+ * The brand is the colour of its icon (`iconColors`): its teal fills the
+ * primary buttons, the open tab and Home's "Scan my skin" card, and its mint
+ * is the soft tint behind highlights and selections. Text is a deep teal ink
+ * in light mode and a pale mint white in dark mode.
+ *
+ * There are two looks, chosen under Appearance in Settings (or following the
+ * phone), each designed in its own right:
+ * - Light is fresh and bright: clean white cards on a barely-there cool
+ *   white screen, crisp hairlines, and colour where it means something.
+ * - Dark is deep spruce ink with raised cards a clear step lighter, the
+ *   scan card in the icon's own teal, mint for the primary buttons and the
+ *   open tab, and the supporting colours as rich jewel tones, not mud.
  *
  * Alongside the brand, four friendly supporting colours (`tints`: sun,
- * coral, peach and dusk) give the things that matter their own colour, so
- * Home and the first screens never read as one cream-and-teal wash. Each is
- * used by meaning, the same way on every screen (see `TintName`), and only
- * there: flat colour, never a gradient, glow or glass effect, and nothing
- * purple. The brand teal keeps the primary buttons, the tab bar, the scan
- * card and the sun mark.
+ * coral, peach and dusk) give the things that matter their own colour. Each
+ * is used by meaning, the same way on every screen (see `TintName`), and
+ * sparingly: most cards are plain, and colour comes from badges, rows, bars
+ * and one or two tinted cards per screen, never a different tint on every
+ * card. Flat colour only: never a gradient, glow or glass effect, and
+ * nothing purple.
  *
  * Contrast (WCAG AA) is checked by colors.test.ts for every text colour on
  * every background below, tinted ones included, and for white text on the
@@ -34,7 +41,7 @@ export const iconColors = {
   teal: '#1D655D',
   /** The two arcs under the sun. */
   mint: '#96DAD0',
-  /** The sun, and the cards' surface in light mode. */
+  /** The sun on the icon, and the sun mark's sun in dark mode. */
   cream: '#F8F5F1',
 } as const;
 
@@ -55,12 +62,17 @@ export type ScoreScale = readonly [string, string, string, string, string];
  * The supporting colours, each used for one kind of thing on every screen:
  * - mint: the brand's own tint, for scores, the trend, the next scan and
  *   anything else without a colour of its own
- * - sun: the morning routine, the sun and camera on Home's scan card, where
- *   to focus, the weekly streak, the subscription
- * - coral: reminders
- * - peach: your latest scan, warm against the teal ring on it (Home's
- *   latest score, Progress' latest score, and "No scans yet")
+ * - sun: the morning routine, the sun on Home's scan card, where to focus,
+ *   the weekly streak, the subscription
+ * - coral: the warm nudges to come back: reminders, and the camera on
+ *   Home's scan card
+ * - peach: your latest scan, a bright apricot against the teal ring on it
+ *   (Home's latest score, Progress' latest score, and "No scans yet")
  * - dusk: the evening routine, a calm twilight blue beside the morning's sun
+ *
+ * On Home only the latest scan's card is filled with one (peach), with the
+ * morning and evening rows inside the routine card; reminders and the next
+ * scan are plain cards that carry their colour on their badge and action.
  */
 export type TintName = 'mint' | 'sun' | 'coral' | 'peach' | 'dusk';
 
@@ -91,9 +103,12 @@ export interface Tint {
 }
 
 export interface ColorPalette {
-  /** Screen background — white in light mode, deep teal ink in dark mode. */
+  /** Screen background: a barely-there cool white in light mode, deep spruce ink in dark mode. */
   background: string;
-  /** Cards and grouped content sitting on the background: the icon's warm cream in light mode. */
+  /**
+   * Cards and grouped content sitting on the background: clean white in
+   * light mode, a clear step lighter than the screen in dark mode.
+   */
   surface: string;
   /** Sheets, inputs, the tab bar and anything floating above a surface. */
   surfaceElevated: string;
@@ -107,7 +122,16 @@ export interface ColorPalette {
   textTertiary: string;
   /** Text on accent or danger fills. */
   textInverse: string;
-  /** The brand fill: primary buttons, Home's scan card, the routine's ring and highlights. */
+  /**
+   * Home's "Scan my skin" card: the icon's teal in both looks, so the app's
+   * biggest block of colour is always its own. In dark mode it stays a deep
+   * teal rather than turning mint, so it glows without glaring.
+   */
+  brand: string;
+  brandPressed: string;
+  /** Text and icons on `brand`. */
+  onBrand: string;
+  /** The primary fill: primary buttons, the open tab, the routine's ring and highlights. */
   accent: string;
   /** Pale mint behind selected and highlighted things, such as the active tab. */
   accentSubtle: string;
@@ -127,67 +151,76 @@ export type ColorName = Exclude<keyof ColorPalette, 'score' | 'tints'>;
 export type ColorSchemeName = 'light' | 'dark';
 
 const lightColors: ColorPalette = {
-  background: '#FFFFFF',
-  // Warm and paper-like rather than another shade of mint, so teal stands out on it.
-  surface: iconColors.cream,
+  // A barely-there cool white, so the clean white cards on it read at a glance.
+  background: '#F4F7F6',
+  surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  border: '#E3DDD3',
-  borderSubtle: '#EDE8E0',
-  borderStrong: '#5B8A83',
+  border: '#DCE4E2',
+  borderSubtle: '#E7EDEB',
+  borderStrong: '#4F7C75',
   textPrimary: '#112E2A',
   textSecondary: '#3A5752',
-  textTertiary: '#4D6B66',
+  textTertiary: '#46625D',
   textInverse: '#FFFFFF',
+  brand: iconColors.teal,
+  brandPressed: '#154C46',
+  onBrand: '#FFFFFF',
   // The icon's teal, unchanged: white text on it is 6.8:1, so it needs no darker variant.
   accent: iconColors.teal,
-  accentSubtle: '#DDF3EF',
+  accentSubtle: '#D9F3EE',
   accentPressed: '#154C46',
   accentText: iconColors.teal,
-  success: '#26703F',
-  warning: '#935400',
+  success: '#246B3C',
+  warning: '#8F5100',
   // Raspberry: warm against the cool teal, so it never reads as the accent.
   danger: '#B0203F',
   score: [iconColors.mint, '#6BC3B6', '#40A395', '#2A8478', iconColors.teal],
   tints: {
-    mint: { soft: '#DDF3EF', fill: iconColors.mint, text: iconColors.teal, onFill: '#112E2A' },
-    // A warm sun yellow. Its text variant is a deep golden brown. The soft
-    // backgrounds are strong enough to tell apart from the cream cards at a glance.
-    sun: { soft: '#FFF0C7', fill: '#FFC83D', text: '#7A5300', onFill: '#4A3300' },
-    coral: { soft: '#FFE3DC', fill: '#FF8F7A', text: '#A63A2A', onFill: '#5C1A10' },
-    // An apricot, more orange than coral, so the two never read as one.
-    peach: { soft: '#FFE6D0', fill: '#FFAE70', text: '#8A4512', onFill: '#4A2409' },
+    mint: { soft: '#D9F3EE', fill: iconColors.mint, text: iconColors.teal, onFill: '#112E2A' },
+    // A warm sun yellow. Its text variant is a deep golden brown.
+    sun: { soft: '#FFF0BF', fill: '#FFC93D', text: '#7A5300', onFill: '#4A3300' },
+    // A lively coral, pinker than the peach, so the two never read as one.
+    coral: { soft: '#FFDFD8', fill: '#FF7F6B', text: '#A8382A', onFill: '#4F150C' },
+    // A bright apricot, more orange than coral and clear of skin tones.
+    peach: { soft: '#FFD6B0', fill: '#FFA866', text: '#86400E', onFill: '#4A2409' },
     // A muted twilight blue, well away from purple.
-    dusk: { soft: '#E4EBF9', fill: '#8FABE6', text: '#2C4B84', onFill: '#12244A' },
+    dusk: { soft: '#E1EAFB', fill: '#8FABE6', text: '#2C4B84', onFill: '#12244A' },
   },
 };
 
 const darkColors: ColorPalette = {
-  background: '#0C1615',
-  surface: '#13221F',
-  surfaceElevated: '#1A2D2A',
-  border: '#2D4844',
-  borderSubtle: '#203532',
+  // Deep spruce ink; cards sit a clear step lighter, since shadows don't show on dark.
+  background: '#0A1211',
+  surface: '#172625',
+  surfaceElevated: '#1E2E2C',
+  border: '#2E4440',
+  borderSubtle: '#243532',
   borderStrong: '#6C958F',
-  textPrimary: '#EAF6F3',
-  textSecondary: '#BDD4CF',
+  textPrimary: '#EEF7F5',
+  textSecondary: '#BCD2CD',
   textTertiary: '#9DB8B2',
-  textInverse: '#0C1615',
+  textInverse: '#0A1211',
+  // The icon's teal, a touch brighter so it stands off the dark screen (3:1).
+  brand: '#1F6E64',
+  brandPressed: '#185A52',
+  onBrand: '#FFFFFF',
   // The icon's mint, which glows on dark backgrounds; buttons carry dark text on it.
   accent: iconColors.mint,
-  accentSubtle: '#173A35',
+  accentSubtle: '#11433C',
   accentPressed: '#7DCCC0',
   accentText: '#A3E1D8',
   success: '#86D7A0',
   warning: '#F2B661',
   danger: '#FF91B4',
   score: ['#285B54', '#317468', '#43998C', '#69C2B5', '#A8E3DA'],
-  // Deep, quiet tinted surfaces, with each colour bright and pale on top.
+  // Rich jewel tones for tinted cards and rows (terracotta, rosewood, gold,
+  // navy, deep teal), each colour bright and pale on top.
   tints: {
-    mint: { soft: '#173A35', fill: iconColors.mint, text: '#A3E1D8', onFill: '#0C1615' },
-    sun: { soft: '#33290F', fill: '#FFD466', text: '#FFDA80', onFill: '#0C1615' },
-    coral: { soft: '#3A201C', fill: '#FF9E8C', text: '#FFB3A6', onFill: '#0C1615' },
-    peach: { soft: '#38251A', fill: '#FFBE8F', text: '#FFC9A3', onFill: '#0C1615' },
-    dusk: { soft: '#18243D', fill: '#A3BAEC', text: '#B9CBF3', onFill: '#0C1615' },
+    mint: { soft: '#11433C', fill: iconColors.mint, text: '#A3E1D8', onFill: '#0A1211' },
+    sun: { soft: '#3D3510', fill: '#FFD466', text: '#FFDC7A', onFill: '#0A1211' },
+    coral: { soft: '#5A2A26', fill: '#FF9A87', text: '#FFBCB0', onFill: '#0A1211' },
+    peach: { soft: '#55301F', fill: '#FFB98A', text: '#FFCFAD', onFill: '#0A1211' },
+    dusk: { soft: '#1C2C52', fill: '#A3BAEC', text: '#BCCCF5', onFill: '#0A1211' },
   },
 };
 
@@ -246,14 +279,13 @@ export const sunMarkColors = {
   light: { sun: iconColors.teal, arcs: iconColors.mint },
   dark: { sun: iconColors.cream, arcs: iconColors.mint },
   /**
-   * On the accent fill, such as Home's "Scan my skin" card. In light mode
-   * that fill is the icon's teal, and the sun rises in sun yellow over the
-   * icon's mint arcs: the first warm colour on Home. In dark mode the fill
-   * is mint, so the mark turns dark ink and teal.
+   * On the brand fill, Home's "Scan my skin" card, which is the icon's teal
+   * in both looks: the sun rises in sun yellow over the icon's mint arcs,
+   * the first warm colour on Home.
    */
-  onAccent: {
+  onBrand: {
     light: { sun: lightColors.tints.sun.fill, arcs: iconColors.mint },
-    dark: { sun: darkColors.textInverse, arcs: iconColors.teal },
+    dark: { sun: darkColors.tints.sun.fill, arcs: iconColors.mint },
   },
 } as const;
 

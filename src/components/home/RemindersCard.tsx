@@ -38,6 +38,8 @@ function statusLine(state: RemindersCardState, now: Date): string {
  * off, the tap turns reminders back on as it opens them. It reads the plan
  * the reminder store last scheduled and never makes one of its own; if
  * making it failed, it asks the store to try again each time Home is shown.
+ * It's a plain card that carries its coral on the bell badge and the action,
+ * so the latest scan stays the one tinted card on Home.
  */
 export function RemindersCard() {
   const palette = useColors();
@@ -76,7 +78,7 @@ export function RemindersCard() {
   if (state.kind === 'loading' || state.kind === 'failed') {
     return (
       <>
-        <Card style={styles.card} tint="coral">
+        <Card style={styles.card}>
           {title}
           {state.kind === 'failed' ? (
             <View style={styles.notice} accessibilityLiveRegion="polite">
@@ -121,7 +123,7 @@ export function RemindersCard() {
         }
         style={({ pressed }) => (pressed ? styles.pressed : null)}
       >
-        <Card style={styles.card} tint="coral">
+        <Card style={styles.card}>
           <View style={styles.header}>
             <View style={styles.title}>{title}</View>
             <View style={styles.action}>

@@ -68,13 +68,26 @@ describe('palette contrast', () => {
       }
     }
 
-    // Buttons, and the "Scan my skin" card's title and line (accent, and accentPressed while pressed).
+    // Buttons (accent, and accentPressed while pressed).
     for (const fill of ['accent', 'accentPressed', 'danger'] as const) {
       it(`${scheme}: button text on ${fill} meets ${TEXT}:1`, () => {
         const ratio = contrast(palette.textInverse, palette[fill]);
         assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
       });
     }
+
+    // The "Scan my skin" card's title and line (brand, and brandPressed while pressed).
+    for (const fill of ['brand', 'brandPressed'] as const) {
+      it(`${scheme}: scan card text on ${fill} meets ${TEXT}:1`, () => {
+        const ratio = contrast(palette.onBrand, palette[fill]);
+        assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+      });
+    }
+
+    it(`${scheme}: the scan card stands off the screen (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(palette.brand, palette.background);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
 
     for (const graphic of ['accent', 'borderStrong'] as const) {
       for (const background of BACKGROUNDS) {
@@ -148,8 +161,9 @@ describe('supporting colours', () => {
         });
       }
 
+      // The track is the plain surface, white in light mode (TodayRoutine).
       it(`${scheme}: a ${name} progress bar shows on its track (${GRAPHIC}:1)`, () => {
-        const ratio = contrast(tint.text, palette.background);
+        const ratio = contrast(tint.text, palette.surface);
         assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
       });
     }
@@ -182,9 +196,16 @@ describe('supporting colours', () => {
     });
   }
 
-  it('light screens stay pure white', () => {
-    assert.equal(luminance(colors.light.background), 1);
+  it('light cards stay pure white, on a near-white screen', () => {
+    assert.equal(luminance(colors.light.surface), 1);
     assert.equal(luminance(colors.light.surfaceElevated), 1);
+    // Barely off white: enough for white cards to read on it, never grey or cream.
+    assert.ok(luminance(colors.light.background) > 0.9);
+  });
+
+  it('dark cards sit a visible step above the screen', () => {
+    const ratio = contrast(colors.dark.surface, colors.dark.background);
+    assert.ok(ratio >= 1.2, `${ratio.toFixed(2)}:1`);
   });
 
   it('the score scale stays mint to teal, with no supporting colour in it', () => {
@@ -228,10 +249,14 @@ describe('palette and app icon', () => {
     assert.equal(background.toUpperCase(), iconColors.teal);
   });
 
+  it("uses the icon's teal for the light scan card, unchanged", () => {
+    assert.equal(colors.light.brand, iconColors.teal);
+  });
+
   for (const scheme of SCHEMES) {
     it(`${scheme}: the sun mark on Home's scan card meets ${GRAPHIC}:1`, () => {
-      for (const color of Object.values(sunMarkColors.onAccent[scheme])) {
-        const ratio = contrast(color, colors[scheme].accent);
+      for (const color of Object.values(sunMarkColors.onBrand[scheme])) {
+        const ratio = contrast(color, colors[scheme].brand);
         assert.ok(ratio >= GRAPHIC, `${color}: ${ratio.toFixed(2)}:1`);
       }
     });

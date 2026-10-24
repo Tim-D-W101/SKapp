@@ -8,13 +8,14 @@ import { layout, motion, radius, shadows, sizes, spacing, useColors } from '@/th
 
 /**
  * The big "Scan my skin" card at the top of Home: the app's mark on the
- * brand teal, its sun rising in sun yellow, with a sun-yellow camera badge.
+ * icon's teal (in dark mode too, where it glows without glaring), its sun
+ * rising in sun yellow, with a coral camera badge.
  * It starts a scan the same way every other scan button does, so once the
  * free scan is used it opens the plans instead.
  */
 export function ScanCard() {
   const palette = useColors();
-  const camera = palette.tints.sun;
+  const camera = palette.tints.coral;
 
   const scan = () => {
     hapticImpact();
@@ -30,18 +31,18 @@ export function ScanCard() {
       style={({ pressed }) => [
         styles.card,
         {
-          backgroundColor: pressed ? palette.accentPressed : palette.accent,
+          backgroundColor: pressed ? palette.brandPressed : palette.brand,
           transform: [{ scale: pressed ? motion.pressScale : 1 }],
         },
         shadows.md,
       ]}
     >
-      <SunMark width={sizes.scanCard.mark} on="accent" />
+      <SunMark width={sizes.scanCard.mark} on="brand" />
       <View style={styles.text}>
-        <Text variant="h2" color="textInverse">
+        <Text variant="h2" color="onBrand">
           {copy.home.scan.title}
         </Text>
-        <Text variant="bodySmall" color="textInverse">
+        <Text variant="bodySmall" color="onBrand">
           {copy.home.scan.body}
         </Text>
       </View>

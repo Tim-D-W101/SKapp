@@ -37,9 +37,12 @@ const LOADING_LINES = 4;
  * the same stores as the Progress tab and the routine and refreshes them on
  * each visit, so all three always agree.
  *
- * Each card has its own colour, by what it shows (see TintName): the latest
- * scan peach, morning sun and evening dusk, reminders coral and the next
- * scan mint, so the first screen is never one cream-and-teal wash.
+ * Colour is by meaning, and sparing (see TintName): the brand teal scan
+ * card, then the latest scan's card in apricot peach as the one tinted card.
+ * The other cards are clean white, with their colour on a badge, a row or
+ * an action: morning sun and evening dusk rows in the routine, a coral bell
+ * on reminders and a mint calendar on the next scan. Never a different tint
+ * on every card.
  */
 export function HomeScreen() {
   const status = useProgressStore((state) => state.status);
@@ -105,7 +108,7 @@ export function HomeScreen() {
 
       <RemindersCard />
 
-      <Card style={styles.card} tint="mint">
+      <Card style={styles.card}>
         <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="mint" />
         <Text color="textSecondary">
           {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
