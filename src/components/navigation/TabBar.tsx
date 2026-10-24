@@ -9,9 +9,9 @@ import { layout, motion, radius, sizes, spacing, useColors } from '@/theme/token
 
 /**
  * The tab bar: two big rounded buttons side by side, one per route, each an
- * icon beside a label. The open tab's button is filled in the brand teal;
- * the other is a soft mint button with a hairline outline. Scanning starts
- * from Home, not from here.
+ * icon beside a label. The open tab's button is filled in the brand teal,
+ * with a solid icon; the other is a quiet button with a hairline outline and
+ * an outlined icon. Scanning starts from Home, not from here.
  *
  * It sits in the layout below the screens, not over them, so nothing scrolls
  * behind it, and it pads itself clear of the phone's navigation bar or
@@ -60,7 +60,7 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
             icon={options.tabBarIcon?.({
               focused,
               color: focused ? palette.textInverse : palette.accentText,
-              size: sizes.icon.lg,
+              size: sizes.tabBar.icon,
             })}
             onPress={onPress}
             onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
@@ -81,7 +81,7 @@ interface TabButtonProps {
 }
 
 /**
- * One tab, as a big button: filled teal when its tab is open, soft mint
+ * One tab, as a big button: filled teal when its tab is open, quiet
  * otherwise. While pressed it darkens a step and dips slightly on a quick
  * spring, unless the phone asks for less motion.
  */

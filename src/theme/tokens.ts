@@ -126,11 +126,14 @@ export const sizes = {
   /**
    * The tab bar's two big buttons: their least height (they grow with large
    * text), and the smallest their label shrinks to, as a fraction, before it
-   * would be cut off at the largest text sizes.
+   * would be cut off at the largest text sizes. Their icons are a size up
+   * from the small icons elsewhere, on a sturdier line.
    */
   tabBar: {
     button: 56,
     minLabelScale: 0.8,
+    icon: 26,
+    iconStroke: 2,
   },
   /**
    * The "Scan my skin" card at the top of Home: the width of its sun mark,

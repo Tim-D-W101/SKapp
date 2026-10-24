@@ -1,14 +1,18 @@
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 
 import { TabBar } from '@/components/navigation/TabBar';
-import { Icon, type IconName } from '@/components/ui';
+import { TabIcon, type TabIconName } from '@/components/navigation/TabIcon';
 import { copy } from '@/constants/copy';
 import { useColors } from '@/theme/tokens';
 
-/** A tab's icon: white (dark ink in dark mode) on the open tab's teal button, teal on the other. */
-function tabIcon(name: IconName) {
-  return function TabIcon({ focused, size }: { focused: boolean; size: number }) {
-    return <Icon name={name} size={size} color={focused ? 'textInverse' : 'accentText'} />;
+/**
+ * A tab's icon, in the colour TabBar gives it: solid white (dark ink in dark
+ * mode) on the open tab's teal button, outlined teal on the other.
+ */
+function tabIcon(name: TabIconName) {
+  return function TabBarIcon(props: { focused: boolean; color: ColorValue; size: number }) {
+    return <TabIcon name={name} {...props} />;
   };
 }
 
@@ -32,7 +36,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: copy.tabs.home, tabBarIcon: tabIcon('home') }} />
       <Tabs.Screen
         name="progress"
-        options={{ title: copy.tabs.progress, tabBarIcon: tabIcon('chart') }}
+        options={{ title: copy.tabs.progress, tabBarIcon: tabIcon('progress') }}
       />
     </Tabs>
   );
