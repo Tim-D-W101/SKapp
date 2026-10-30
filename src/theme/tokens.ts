@@ -137,8 +137,6 @@ export const sizes = {
     hourCellBasis: '22%',
     minuteCellBasis: '14%',
   },
-  /** The tappable time under a reminder: at least this tall, as it holds two lines. */
-  timeRow: 64,
   /** The round marker before each point in a list, such as what stands out in a scan. */
   listMarker: 10,
   /** Scan photo thumbnails, in the photos' 3:4 shape. */

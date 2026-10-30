@@ -91,13 +91,13 @@ export function TimePickerDialog({
     setDraft((current) => (current + by + MINUTES_IN_DAY) % MINUTES_IN_DAY);
   };
 
+  // Soft cells in the screen's colour, no outlines, so a grid of 24 stays calm; the chosen one is filled.
   const cellColors = (selected: boolean, pressed: boolean) => ({
     backgroundColor: selected
       ? palette.accent
       : pressed
         ? palette.accentSubtle
-        : palette.surfaceElevated,
-    borderColor: selected ? palette.accent : palette.border,
+        : palette.background,
   });
 
   const nudgeButton = (by: number) => (
@@ -289,7 +289,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
   },
   grid: {
     flexDirection: 'row',
@@ -302,7 +301,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
   },
   /** Four to a row: each a little under a quarter, growing to fill it beside the gaps. */
   hourCell: {

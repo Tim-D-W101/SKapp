@@ -9,7 +9,7 @@ import type { ReminderTime, RoutineReminderSlot } from '@/lib/reminderPlan';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useReminderStore, type WeeklyReminderChanges } from '@/stores/useReminderStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
-import { sizes, spacing, useColors } from '@/theme/tokens';
+import { radius, spacing, useColors } from '@/theme/tokens';
 import type { RoutineSlot } from '@/types/routine';
 
 import { ReminderTimeRow } from './ReminderTimeRow';
@@ -28,16 +28,16 @@ const ROUTINE_OPTIONS: readonly SegmentedOption<RoutineReminderSlot>[] = [
 ];
 
 /**
- * Every reminder control: a master switch, then each kind on its own,
- * separated by hairlines: the weekly reminder's day and time, the daily
- * routine reminder's morning or evening and its time, and the streak
- * reminder. Each time reads large and opens a time picker when tapped.
- * Choosing Morning or Evening opens the picker straight away, so the
- * reminder always comes at a time the person set; nothing changes until
- * Save. Changes reschedule at once. If notifications were refused, it
- * points to the phone's settings instead of asking again. Settings shows it
- * in its Reminders section, and Home in the sheet its reminders card opens;
- * whoever shows it gives it a title.
+ * Every reminder control: a master switch, then each kind in its own soft
+ * group, so its switch, its options and its time read as one thing: the
+ * weekly reminder's day and time, the daily routine reminder's morning or
+ * evening and its time, and the streak reminder. Each time sits on a coral
+ * pill and opens a time picker when tapped. Choosing Morning or Evening
+ * opens the picker straight away, so the reminder always comes at a time the
+ * person set; nothing changes until Save. Changes reschedule at once. If
+ * notifications were refused, it points to the phone's settings instead of
+ * asking again. Settings shows it in its Reminders section, and Home in the
+ * sheet its reminders card opens; whoever shows it gives it a title.
  */
 export function ReminderControls() {
   const palette = useColors();
@@ -108,7 +108,8 @@ export function ReminderControls() {
     settings.routine !== 'off' ||
     settings.routineVisits >= ROUTINE_VISITS_BEFORE_OFFER;
   const routineSlot = settings.routine === 'off' ? null : settings.routine;
-  const divider = <View style={[styles.divider, { backgroundColor: palette.borderSubtle }]} />;
+  // The screen's colour: a quiet panel on the card or the sheet, for each reminder.
+  const group = [styles.group, { backgroundColor: palette.background }];
 
   const chooseRoutine = (routine: RoutineReminderSlot) => {
     if (routine === settings.routine) return;
@@ -123,14 +124,14 @@ export function ReminderControls() {
     <View style={styles.controls}>
       <SwitchRow
         label={copy.settings.reminders.master}
+        hint={copy.settings.reminders.oneADay}
         value={settings.enabled}
         onChange={(enabled) => update({ enabled })}
       />
 
       {settings.enabled ? (
         <>
-          {divider}
-          <View style={styles.group}>
+          <View style={group}>
             <SwitchRow
               label={copy.settings.reminders.weekly}
               hint={copy.settings.reminders.weeklyHint}
@@ -159,9 +160,8 @@ export function ReminderControls() {
             ) : null}
           </View>
 
-          {divider}
-          <View style={styles.group}>
-            <Text>{copy.settings.reminders.routine}</Text>
+          <View style={group}>
+            <Text style={styles.groupTitle}>{copy.settings.reminders.routine}</Text>
             {routineUnlocked ? (
               <>
                 <SegmentedControl
@@ -200,20 +200,17 @@ export function ReminderControls() {
             )}
           </View>
 
-          {divider}
-          <SwitchRow
-            label={copy.settings.reminders.streak}
-            hint={copy.settings.reminders.streakHint}
-            value={settings.streak}
-            onChange={(streak) => update({ streak })}
-          />
-          {divider}
+          <View style={group}>
+            <SwitchRow
+              label={copy.settings.reminders.streak}
+              hint={copy.settings.reminders.streakHint}
+              value={settings.streak}
+              onChange={(streak) => update({ streak })}
+            />
+          </View>
         </>
       ) : null}
 
-      <Text variant="caption" color="textSecondary">
-        {copy.settings.reminders.oneADay}
-      </Text>
       {error ? (
         <Text variant="bodySmall" color="danger" accessibilityLiveRegion="polite">
           {error}
@@ -227,10 +224,15 @@ const styles = StyleSheet.create({
   controls: {
     gap: spacing.md,
   },
+  /** Slim at the sides, so the seven days still fit in one row inside Settings' card. */
   group: {
     gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
   },
-  divider: {
-    height: sizes.borderWidth,
+  /** Lines up with the switches' labels in the other groups, which sit in a touch-height row. */
+  groupTitle: {
+    paddingTop: spacing.xs,
   },
 });

@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Icon, IconBadge, Text } from '@/components/ui';
+import { Icon, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatTime } from '@/lib/dates';
 import type { ReminderTime } from '@/lib/reminderPlan';
-import { radius, sizes, spacing, useColors } from '@/theme/tokens';
+import { opacity, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { TimePickerDialog } from './TimePickerDialog';
 
 export interface ReminderTimeRowProps {
-  /** The row's small label, such as "Time". */
+  /** The row's label, such as "Time". */
   label: string;
   /** The time picker's title: which reminder this is. */
   pickerTitle: string;
@@ -22,8 +22,9 @@ export interface ReminderTimeRowProps {
 }
 
 /**
- * A reminder's time, large and easy to read, with "Change" beside it so it's
- * plain that it can be changed. Tapping anywhere on it opens the time picker;
+ * A reminder's time: its label, and the time itself large on a coral pill
+ * (the reminders' colour) between a coral clock and chevron, so it's plain
+ * that it can be changed. Tapping anywhere on the row opens the time picker;
  * the new time is passed on only when it's saved there.
  */
 export function ReminderTimeRow({
@@ -34,6 +35,7 @@ export function ReminderTimeRow({
   onChange,
 }: ReminderTimeRowProps) {
   const palette = useColors();
+  const tint = palette.tints.coral;
   const [picking, setPicking] = useState(false);
   const shown = formatTime(time.hour, time.minute);
 
@@ -44,25 +46,20 @@ export function ReminderTimeRow({
         accessibilityRole="button"
         accessibilityLabel={copy.settings.reminders.timeLabel(label, shown)}
         accessibilityHint={copy.settings.reminders.changeTimeHint}
-        style={({ pressed }) => [
-          styles.row,
-          {
-            backgroundColor: pressed ? palette.accentSubtle : palette.surfaceElevated,
-            borderColor: palette.border,
-          },
-        ]}
+        style={styles.row}
       >
-        <IconBadge name="clock" size="md" />
-        <View style={styles.text}>
-          <Text variant="caption" color="textSecondary">
-            {label}
-          </Text>
-          <Text variant="h3">{shown}</Text>
-        </View>
-        <Text variant="label" color="accentText">
-          {copy.settings.reminders.change}
-        </Text>
-        <Icon name="chevronRight" size={sizes.icon.md} color="accentText" />
+        {({ pressed }) => (
+          <>
+            <Text style={styles.label}>{label}</Text>
+            <View
+              style={[styles.pill, { backgroundColor: tint.soft }, pressed ? styles.pressed : null]}
+            >
+              <Icon name="clock" size={sizes.icon.md} tint={tint.text} />
+              <Text variant="h3">{shown}</Text>
+              <Icon name="chevronRight" size={sizes.icon.sm} tint={tint.text} />
+            </View>
+          </>
+        )}
       </Pressable>
 
       {picking ? (
@@ -86,13 +83,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    minHeight: sizes.timeRow,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
+    minHeight: sizes.minTouchTarget,
   },
-  text: {
+  label: {
     flex: 1,
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: sizes.minTouchTarget,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.sm,
+    borderRadius: radius.full,
+  },
+  pressed: {
+    opacity: opacity.pressed,
   },
 });

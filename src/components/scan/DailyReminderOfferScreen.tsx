@@ -121,7 +121,7 @@ export function DailyReminderOfferScreen({ next }: DailyReminderOfferScreenProps
           </Text>
         ) : null}
         {stage === 'time' ? (
-          <Card tint="coral" style={styles.choice}>
+          <Card style={styles.choice}>
             <SegmentedControl
               options={SLOT_OPTIONS}
               value={slot}
