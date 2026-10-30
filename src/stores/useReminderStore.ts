@@ -56,9 +56,11 @@ interface ReminderState {
    */
   dismissAfterScanOffer: () => void;
   update: (
-    changes: Partial<Pick<ReminderSettings, 'enabled' | 'streak' | 'routine' | 'routineTimes'>>,
+    changes: Partial<
+      Pick<ReminderSettings, 'enabled' | 'weeklyMinute' | 'streak' | 'routine' | 'routineTimes'>
+    >,
   ) => void;
-  /** The weekly reminder's switch, day and hour live on the profile. */
+  /** The weekly reminder's switch, day and hour live on the profile; its minute is in the settings. */
   updateWeekly: (changes: WeeklyReminderChanges) => Promise<ActionResult>;
   recordRoutineVisit: () => void;
   dismissRoutineOffer: () => void;
@@ -110,6 +112,7 @@ export const useReminderStore = create<ReminderState>()((set, get) => {
         enabled: profile.reminder_enabled,
         weekday: profile.reminder_weekday,
         hour: profile.reminder_hour,
+        minute: settings.weeklyMinute,
       },
       streakEnabled: settings.streak,
       routine: settings.routine,

@@ -14,6 +14,13 @@ import type { RoutineSlot } from '@/types/routine';
 export interface ReminderSettings {
   /** The master switch. */
   enabled: boolean;
+  /**
+   * The minutes past the weekly scan reminder's hour, so it can come at any
+   * time the person picks. The hour stays on the profile, which has no column
+   * for minutes; on a new phone the reminder comes on the hour until a time
+   * is picked again.
+   */
+  weeklyMinute: number;
   streak: boolean;
   routine: RoutineReminderSlot;
   /**
@@ -36,6 +43,7 @@ export interface ReminderSettings {
 
 export const DEFAULT_REMINDER_SETTINGS: ReminderSettings = {
   enabled: true,
+  weeklyMinute: 0,
   streak: true,
   routine: 'off',
   routineTimes: {
@@ -102,6 +110,9 @@ export async function readReminderSettings(): Promise<ReminderSettings> {
       typeof value === 'boolean' ? value : fallback;
     return {
       enabled: flag(stored.enabled, DEFAULT_REMINDER_SETTINGS.enabled),
+      weeklyMinute: isWhole(stored.weeklyMinute, MINUTES_IN_HOUR)
+        ? stored.weeklyMinute
+        : DEFAULT_REMINDER_SETTINGS.weeklyMinute,
       streak: flag(stored.streak, DEFAULT_REMINDER_SETTINGS.streak),
       routine: isSlot(stored.routine) ? stored.routine : DEFAULT_REMINDER_SETTINGS.routine,
       routineTimes: readRoutineTimes(stored.routineTimes, stored.routineHours),

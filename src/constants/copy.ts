@@ -119,8 +119,12 @@ export const copy = {
     },
     /** An hour as it reads on a 12-hour clock face, for the time picker: 0 and 12 are "12". */
     clockHour: (hour: number) => clockHour(hour),
-    /** Minutes past the hour, for the time picker: ":05". */
-    minute: (minute: number) => `:${String(minute).padStart(2, '0')}`,
+    /** An hour on a 24-hour clock, for the time picker: "07". */
+    clockHour24: (hour: number) => String(hour).padStart(2, '0'),
+    /** The minutes alone, for the time picker's minute box: "05". */
+    minutes: (minute: number) => String(minute).padStart(2, '0'),
+    /** Between the time picker's hour and minute boxes. */
+    separator: ':',
   },
 
   onboarding: {
@@ -820,7 +824,13 @@ export const copy = {
         /** Above the hours and the minutes, and their screen reader names. */
         hours: 'Hour',
         minutes: 'Minutes',
-        /** The round buttons either side of the time, for the minutes between the ones listed. */
+        /** Screen reader names for the hour and minute boxes, with the whole time: "Hour, 7:30 AM". */
+        hourBox: (value: string) => `Hour, ${value}`,
+        minuteBox: (value: string) => `Minutes, ${value}`,
+        hourBoxHint: 'Shows the hours to choose from',
+        minuteBoxHint: 'Shows the minutes to choose from',
+        /** The buttons under the minutes, for the ones between those listed: "1 min" beside a minus or a plus. */
+        oneMinute: '1 min',
         earlier: 'One minute earlier',
         later: 'One minute later',
       },

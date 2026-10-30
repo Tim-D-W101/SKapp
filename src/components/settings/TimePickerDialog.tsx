@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button, Icon, SegmentedControl, Text, type SegmentedOption } from '@/components/ui';
+import { Button, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatTime, usesTwentyFourHourClock } from '@/lib/dates';
 import { hapticSelection } from '@/lib/haptics';
@@ -14,58 +14,49 @@ export interface TimePickerDialogProps {
   title: string;
   /** The current time, in local time. */
   time: ReminderTime;
-  /**
-   * Whether minutes can be picked as well as the hour. Off for a reminder
-   * that is only ever on the hour, such as the weekly scan reminder.
-   */
-  withMinutes?: boolean;
   onCancel: () => void;
   onSave: (time: ReminderTime) => void;
 }
 
 type Period = 'am' | 'pm';
+type Field = 'hour' | 'minute';
 
 const HOURS_IN_HALF_DAY = 12;
 const MINUTES_IN_HOUR = 60;
-const MINUTES_IN_DAY = HOURS_IN_HALF_DAY * 2 * MINUTES_IN_HOUR;
+const MINUTES_IN_HALF_DAY = HOURS_IN_HALF_DAY * MINUTES_IN_HOUR;
+const MINUTES_IN_DAY = MINUTES_IN_HALF_DAY * 2;
 const HALF_DAY_HOURS = Array.from({ length: HOURS_IN_HALF_DAY }, (_, index) => index);
 const WHOLE_DAY_HOURS = Array.from({ length: HOURS_IN_HALF_DAY * 2 }, (_, index) => index);
-/** The minutes listed to tap; the buttons beside the time reach the ones between. */
+/** The minutes listed to tap; the buttons under them reach the ones between. */
 const MINUTE_STEP = 5;
 const MINUTES = Array.from(
   { length: MINUTES_IN_HOUR / MINUTE_STEP },
   (_, index) => index * MINUTE_STEP,
 );
+const PERIODS: readonly Period[] = ['am', 'pm'];
 /**
- * The least the large time and a minute's label shrink to, as a fraction,
- * to fit their space at the largest text sizes rather than be cut off.
+ * The least the hour and minute shrink to, as a fraction, to fit their boxes
+ * at the largest text sizes rather than be cut off.
  */
 const MIN_LABEL_SCALE = 0.5;
 
-const PERIODS: readonly SegmentedOption<Period>[] = [
-  { value: 'am', label: copy.time.am },
-  { value: 'pm', label: copy.time.pm },
-];
-
 /**
- * Picks the time a reminder arrives at: any time of day. The chosen time
- * shows large at the top, between buttons that move it a minute earlier or
- * later. Under it are the hours to tap (an AM / PM switch and twelve hours
- * on a phone that uses a 12-hour clock, or all twenty-four on one that
- * doesn't), then the minutes in fives. Nothing changes until Save. Mount it
- * while it's open: each opening starts from the reminder's current time.
+ * Picks the time a reminder arrives at: any time of day, one step at a time.
+ * The time shows large at the top as an hour box and a minute box (with AM /
+ * PM beside them on a phone that uses a 12-hour clock); the box being chosen
+ * is highlighted, and only its choices show below, so there's one clear
+ * thing to do at each step. It opens on the hours; picking one moves on to
+ * the minutes, in fives, with a minute either way under them for the ones
+ * between. Either box can be tapped to go back to it. Nothing changes until
+ * Save. Mount it while it's open: each opening starts from the reminder's
+ * current time.
  */
-export function TimePickerDialog({
-  title,
-  time,
-  withMinutes = true,
-  onCancel,
-  onSave,
-}: TimePickerDialogProps) {
+export function TimePickerDialog({ title, time, onCancel, onSave }: TimePickerDialogProps) {
   const palette = useColors();
   const reduceMotion = useReduceMotion();
   // Minutes since midnight, so a minute either way can roll over into the next hour.
-  const [draft, setDraft] = useState(time.hour * MINUTES_IN_HOUR + (withMinutes ? time.minute : 0));
+  const [draft, setDraft] = useState(time.hour * MINUTES_IN_HOUR + time.minute);
+  const [field, setField] = useState<Field>('hour');
   const hour = Math.floor(draft / MINUTES_IN_HOUR);
   const minute = draft % MINUTES_IN_HOUR;
   const twentyFourHour = usesTwentyFourHourClock();
@@ -73,21 +64,30 @@ export function TimePickerDialog({
   const hours = twentyFourHour
     ? WHOLE_DAY_HOURS
     : HALF_DAY_HOURS.map((offset) => offset + (period === 'pm' ? HOURS_IN_HALF_DAY : 0));
+  const hourLabel = (value: number) =>
+    twentyFourHour ? copy.time.clockHour24(value) : copy.time.clockHour(value);
+  const picker = copy.settings.reminders.timePicker;
 
-  const choose = (nextHour: number, nextMinute: number) => {
+  const chooseHour = (next: number) => {
     hapticSelection();
-    setDraft(nextHour * MINUTES_IN_HOUR + nextMinute);
+    setDraft(next * MINUTES_IN_HOUR + minute);
+    setField('minute');
   };
 
-  const choosePeriod = (next: Period) =>
+  const chooseMinute = (next: number) => {
+    hapticSelection();
+    setDraft(hour * MINUTES_IN_HOUR + next);
+  };
+
+  const choosePeriod = (next: Period) => {
+    if (next === period) return;
+    hapticSelection();
     setDraft(
-      (current) =>
-        (current % (HOURS_IN_HALF_DAY * MINUTES_IN_HOUR)) +
-        (next === 'pm' ? HOURS_IN_HALF_DAY * MINUTES_IN_HOUR : 0),
+      (current) => (current % MINUTES_IN_HALF_DAY) + (next === 'pm' ? MINUTES_IN_HALF_DAY : 0),
     );
+  };
 
   const nudge = (by: number) => {
-    hapticSelection();
     setDraft((current) => (current + by + MINUTES_IN_DAY) % MINUTES_IN_DAY);
   };
 
@@ -96,23 +96,80 @@ export function TimePickerDialog({
       ? palette.accent
       : pressed
         ? palette.accentSubtle
-        : palette.surfaceElevated,
-    borderColor: selected ? palette.accent : palette.border,
+        : palette.surfaceMuted,
   });
 
-  const nudgeButton = (by: number) => (
-    <Pressable
-      onPress={() => nudge(by)}
-      accessibilityRole="button"
-      accessibilityLabel={
-        by < 0
-          ? copy.settings.reminders.timePicker.earlier
-          : copy.settings.reminders.timePicker.later
-      }
-      style={({ pressed }) => [styles.nudge, cellColors(false, pressed)]}
+  const fieldBox = (which: Field, text: string, label: string, hint: string) => {
+    const active = field === which;
+    return (
+      <Pressable
+        onPress={() => setField(which)}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        accessibilityHint={hint}
+        accessibilityState={{ selected: active }}
+        style={({ pressed }) => [
+          styles.field,
+          {
+            backgroundColor: active || pressed ? palette.accentSubtle : palette.surfaceMuted,
+            borderColor: active ? palette.accent : 'transparent',
+          },
+        ]}
+      >
+        <Text
+          variant="display"
+          color={active ? 'accentText' : 'textPrimary'}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={MIN_LABEL_SCALE}
+        >
+          {text}
+        </Text>
+      </Pressable>
+    );
+  };
+
+  const grid = (
+    options: readonly number[],
+    selected: number,
+    choose: (value: number) => void,
+    label: (value: number) => string,
+    spoken: (value: number) => string,
+    across: 'four' | 'six',
+  ) => (
+    <View
+      style={styles.grid}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={field === 'hour' ? picker.hours : picker.minutes}
     >
-      <Icon name={by < 0 ? 'minus' : 'plus'} size={sizes.icon.lg} color="accentText" />
-    </Pressable>
+      {options.map((value) => {
+        const isSelected = value === selected;
+        return (
+          <Pressable
+            key={value}
+            onPress={() => choose(value)}
+            accessibilityRole="radio"
+            accessibilityLabel={spoken(value)}
+            accessibilityState={{ checked: isSelected }}
+            style={({ pressed }) => [
+              styles.cell,
+              { flexBasis: sizes.dialog.cellBasis[across] },
+              cellColors(isSelected, pressed),
+            ]}
+          >
+            <Text
+              variant="label"
+              color={isSelected ? 'textInverse' : 'textPrimary'}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={MIN_LABEL_SCALE}
+            >
+              {label(value)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 
   return (
@@ -139,102 +196,91 @@ export function TimePickerDialog({
             <Text variant="h3" accessibilityRole="header">
               {title}
             </Text>
-            <View style={styles.timeRow}>
-              {withMinutes ? nudgeButton(-1) : null}
-              <Text
-                variant="display"
-                color="accentText"
-                align="center"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={MIN_LABEL_SCALE}
-                accessibilityLiveRegion="polite"
-                style={styles.time}
-              >
-                {formatTime(hour, minute)}
+
+            <View style={styles.timeRow} accessibilityLiveRegion="polite">
+              {fieldBox(
+                'hour',
+                hourLabel(hour),
+                picker.hourBox(formatTime(hour, minute)),
+                picker.hourBoxHint,
+              )}
+              <Text variant="display" color="textSecondary">
+                {copy.time.separator}
               </Text>
-              {withMinutes ? nudgeButton(1) : null}
-            </View>
-
-            {twentyFourHour ? null : (
-              <SegmentedControl
-                options={PERIODS}
-                value={period}
-                onChange={choosePeriod}
-                accessibilityLabel={copy.settings.reminders.timePicker.period}
-              />
-            )}
-
-            <Text variant="label" color="textSecondary">
-              {copy.settings.reminders.timePicker.hours}
-            </Text>
-            <View
-              style={styles.grid}
-              accessibilityRole="radiogroup"
-              accessibilityLabel={copy.settings.reminders.timePicker.hours}
-            >
-              {hours.map((value) => {
-                const selected = value === hour;
-                return (
-                  <Pressable
-                    key={value}
-                    onPress={() => choose(value, minute)}
-                    accessibilityRole="radio"
-                    accessibilityLabel={formatTime(value, minute)}
-                    accessibilityState={{ checked: selected }}
-                    style={({ pressed }) => [
-                      styles.cell,
-                      styles.hourCell,
-                      cellColors(selected, pressed),
-                    ]}
-                  >
-                    <Text variant="label" color={selected ? 'textInverse' : 'textPrimary'}>
-                      {twentyFourHour ? formatTime(value) : copy.time.clockHour(value)}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {withMinutes ? (
-              <>
-                <Text variant="label" color="textSecondary">
-                  {copy.settings.reminders.timePicker.minutes}
-                </Text>
+              {fieldBox(
+                'minute',
+                copy.time.minutes(minute),
+                picker.minuteBox(formatTime(hour, minute)),
+                picker.minuteBoxHint,
+              )}
+              {twentyFourHour ? null : (
                 <View
-                  style={styles.grid}
+                  style={styles.periods}
                   accessibilityRole="radiogroup"
-                  accessibilityLabel={copy.settings.reminders.timePicker.minutes}
+                  accessibilityLabel={picker.period}
                 >
-                  {MINUTES.map((value) => {
-                    const selected = value === minute;
+                  {PERIODS.map((value) => {
+                    const isSelected = value === period;
                     return (
                       <Pressable
                         key={value}
-                        onPress={() => choose(hour, value)}
+                        onPress={() => choosePeriod(value)}
                         accessibilityRole="radio"
-                        accessibilityLabel={formatTime(hour, value)}
-                        accessibilityState={{ checked: selected }}
-                        style={({ pressed }) => [
-                          styles.cell,
-                          styles.minuteCell,
-                          cellColors(selected, pressed),
-                        ]}
+                        accessibilityLabel={copy.time[value]}
+                        accessibilityState={{ checked: isSelected }}
+                        style={({ pressed }) => [styles.period, cellColors(isSelected, pressed)]}
                       >
-                        <Text
-                          variant="label"
-                          color={selected ? 'textInverse' : 'textPrimary'}
-                          numberOfLines={1}
-                          adjustsFontSizeToFit
-                          minimumFontScale={MIN_LABEL_SCALE}
-                        >
-                          {copy.time.minute(value)}
+                        <Text variant="label" color={isSelected ? 'textInverse' : 'textPrimary'}>
+                          {copy.time[value]}
                         </Text>
                       </Pressable>
                     );
                   })}
                 </View>
-              </>
+              )}
+            </View>
+
+            <Text variant="label" color="textSecondary">
+              {field === 'hour' ? picker.hours : picker.minutes}
+            </Text>
+
+            {field === 'hour'
+              ? grid(
+                  hours,
+                  hour,
+                  chooseHour,
+                  hourLabel,
+                  (value) => formatTime(value, minute),
+                  twentyFourHour ? 'six' : 'four',
+                )
+              : grid(
+                  MINUTES,
+                  minute,
+                  chooseMinute,
+                  copy.time.minutes,
+                  (value) => formatTime(hour, value),
+                  'four',
+                )}
+
+            {field === 'minute' ? (
+              <View style={styles.nudges}>
+                <Button
+                  label={picker.oneMinute}
+                  accessibilityLabel={picker.earlier}
+                  leadingIcon="minus"
+                  onPress={() => nudge(-1)}
+                  variant="secondary"
+                  size="sm"
+                />
+                <Button
+                  label={picker.oneMinute}
+                  accessibilityLabel={picker.later}
+                  leadingIcon="plus"
+                  onPress={() => nudge(1)}
+                  variant="secondary"
+                  size="sm"
+                />
+              </View>
             ) : null}
           </ScrollView>
 
@@ -280,16 +326,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  time: {
+  field: {
     flex: 1,
-  },
-  nudge: {
-    width: sizes.minTouchTarget,
-    height: sizes.minTouchTarget,
+    height: sizes.dialog.timeField,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.lg,
+    // The same width chosen or not, so nothing shifts when the box changes.
+    borderWidth: sizes.borderWidthStrong,
+  },
+  periods: {
+    width: sizes.dialog.periodWidth,
+    height: sizes.dialog.timeField,
+    gap: spacing.xs,
+  },
+  period: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
   },
   grid: {
     flexDirection: 'row',
@@ -301,16 +357,13 @@ const styles = StyleSheet.create({
     minHeight: sizes.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
     borderRadius: radius.md,
-    borderWidth: sizes.borderWidth,
   },
-  /** Four to a row: each a little under a quarter, growing to fill it beside the gaps. */
-  hourCell: {
-    flexBasis: sizes.dialog.hourCellBasis,
-  },
-  /** Six to a row, the same way. */
-  minuteCell: {
-    flexBasis: sizes.dialog.minuteCellBasis,
+  nudges: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.sm,
   },
   actions: {
     flexDirection: 'row',

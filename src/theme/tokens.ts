@@ -128,14 +128,18 @@ export const sizes = {
   sheetMaxHeight: '85%',
   /**
    * A dialog over the screen, such as the time picker: its widest and its
-   * tallest (its content scrolls beyond that), and the basis of an hour in
-   * its grid, which fits four to a row, and of a minute, six to a row.
+   * tallest (its content scrolls beyond that). The picker's grid of hours or
+   * minutes fits four to a row, or six for the twenty-four hours of a 24-hour
+   * clock: a cell's basis is a little under its share, growing to fill it
+   * beside the gaps. Its hour and minute boxes are `timeField` tall, beside
+   * an AM / PM pair `periodWidth` wide, each half of it a full touch target.
    */
   dialog: {
     maxWidth: 400,
     maxHeight: '90%',
-    hourCellBasis: '22%',
-    minuteCellBasis: '14%',
+    cellBasis: { four: '22%', six: '14%' },
+    timeField: 104,
+    periodWidth: 72,
   },
   /** The tappable time under a reminder: at least this tall, as it holds two lines. */
   timeRow: 64,
