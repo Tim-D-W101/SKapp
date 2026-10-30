@@ -168,14 +168,6 @@ export const sizes = {
     meter: 8,
     mark: 88,
   },
-  /**
-   * The "Scan my skin" card at the top of Home: the width of its sun mark,
-   * and the round camera badge at its end.
-   */
-  scanCard: {
-    mark: 56,
-    camera: 48,
-  },
   /** Width of the last skeleton line, so the block reads as a paragraph. */
   skeletonShortLine: '60%',
 } as const;

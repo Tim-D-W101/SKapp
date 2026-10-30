@@ -1,20 +1,20 @@
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Button, Card, Icon, LoadingState, SectionTitle, Text } from '@/components/ui';
+import { Button, Card, IconBadge, LoadingState, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatShortDate, formatTime } from '@/lib/dates';
 import { relativeDay, remindersCardState, type RemindersCardState } from '@/lib/nextReminder';
 import { useReminderStore } from '@/stores/useReminderStore';
-import { opacity, sizes, spacing, useColors } from '@/theme/tokens';
+import { opacity, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { ReminderSheet } from './ReminderSheet';
 
 /** Skeleton lines shown until the next reminder is known. */
 const LOADING_LINES = 1;
 
-/** The card's main line for a state it can be tapped in. */
+/** The card's whole message for a state it can be tapped in, as a screen reader hears it. */
 function statusLine(state: RemindersCardState, now: Date): string {
   switch (state.kind) {
     case 'next':
@@ -32,14 +32,14 @@ function statusLine(state: RemindersCardState, now: Date): string {
 }
 
 /**
- * The reminders card on Home, under today's routine: the next reminder the
- * phone has scheduled, or that reminders are off. Tapping it opens the same
- * reminder controls as Settings in a sheet. When only the master switch is
- * off, the tap turns reminders back on as it opens them. It reads the plan
- * the reminder store last scheduled and never makes one of its own; if
- * making it failed, it asks the store to try again each time Home is shown.
- * It's a plain card that carries its coral on the bell badge and the action,
- * so the latest scan stays the one tinted card on Home.
+ * The reminders card on Home, under today's routine: a coral bell, then
+ * the next reminder's day and time large with what it's for under it, or
+ * that reminders are off. The coral "Change" (or "Turn on") pill beside the
+ * first line says what a tap does: the whole card opens the same reminder
+ * controls as Settings, in a sheet. When only the master switch is off, the tap turns reminders back
+ * on as it opens them. It reads the plan the reminder store last scheduled
+ * and never makes one of its own; if making it failed, it asks the store to
+ * try again each time Home is shown.
  */
 export function RemindersCard() {
   const palette = useColors();
@@ -69,7 +69,6 @@ export function RemindersCard() {
     planFailed,
   });
   const tint = palette.tints.coral;
-  const title = <SectionTitle title={copy.home.reminders.title} icon="bell" tint="coral" />;
 
   // Outside the card's states, so it stays open while they change underneath
   // it, as when permission is granted and the plan is being made.
@@ -78,8 +77,7 @@ export function RemindersCard() {
   if (state.kind === 'loading' || state.kind === 'failed') {
     return (
       <>
-        <Card style={styles.card}>
-          {title}
+        <Row>
           {state.kind === 'failed' ? (
             <View style={styles.notice} accessibilityLiveRegion="polite">
               <Text variant="bodySmall" color="textSecondary" style={styles.noticeText}>
@@ -93,9 +91,14 @@ export function RemindersCard() {
               />
             </View>
           ) : (
-            <LoadingState lines={LOADING_LINES} />
+            <View style={styles.text}>
+              <Text variant="label" accessibilityRole="header">
+                {copy.home.reminders.title}
+              </Text>
+              <LoadingState lines={LOADING_LINES} />
+            </View>
           )}
-        </Card>
+        </Row>
         {sheet}
       </>
     );
@@ -123,50 +126,93 @@ export function RemindersCard() {
         }
         style={({ pressed }) => (pressed ? styles.pressed : null)}
       >
-        <Card style={styles.card}>
-          <View style={styles.header}>
-            <View style={styles.title}>{title}</View>
-            <View style={styles.action}>
-              <Text variant="label" tint="coral">
-                {isOff ? copy.home.reminders.turnOn : copy.home.reminders.change}
+        <Row>
+          <View style={styles.text}>
+            <View style={styles.top}>
+              <Text
+                variant={state.kind === 'next' ? 'bodySmall' : 'label'}
+                color={state.kind === 'next' ? 'textSecondary' : 'textPrimary'}
+                style={styles.topLabel}
+              >
+                {state.kind === 'next' ? copy.home.reminders.nextLabel : copy.home.reminders.title}
               </Text>
-              <Icon name="chevronRight" size={sizes.icon.md} tint={tint.text} />
+              <View style={[styles.pill, { backgroundColor: tint.soft }]}>
+                <Text variant="label" tint="coral">
+                  {isOff ? copy.home.reminders.turnOn : copy.home.reminders.change}
+                </Text>
+              </View>
             </View>
+            {state.kind === 'next' ? (
+              <>
+                <Text variant="h3">
+                  {copy.home.reminders.when(
+                    relativeDay(state.date, now),
+                    formatTime(state.date.getHours(), state.date.getMinutes()),
+                    formatShortDate(state.date.toISOString()),
+                  )}
+                </Text>
+                <Text variant="bodySmall" color="textSecondary">
+                  {copy.home.reminders.name(state.name)}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text color={isOff ? 'textSecondary' : 'textPrimary'}>{line}</Text>
+                {state.kind === 'none' ? (
+                  <Text variant="bodySmall" color="textSecondary">
+                    {copy.home.reminders.noneBody}
+                  </Text>
+                ) : null}
+              </>
+            )}
           </View>
-          <Text color={isOff ? 'textSecondary' : 'textPrimary'}>{line}</Text>
-          {state.kind === 'none' ? (
-            <Text variant="bodySmall" color="textSecondary">
-              {copy.home.reminders.noneBody}
-            </Text>
-          ) : null}
-        </Card>
+        </Row>
       </Pressable>
       {sheet}
     </>
   );
 }
 
+/** The card itself: the coral bell, then whatever the state has to say. */
+function Row({ children }: { children: ReactNode }) {
+  return (
+    <Card style={styles.card}>
+      <IconBadge name="bell" size="md" tone="filled" tint="coral" />
+      {children}
+    </Card>
+  );
+}
+
 const styles = StyleSheet.create({
   card: {
-    gap: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
   },
   pressed: {
     opacity: opacity.pressed,
   },
-  header: {
+  text: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  /** The label and the pill share the first line, so the time below gets the card's full width. */
+  top: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  title: {
+  topLabel: {
     flex: 1,
   },
-  action: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
+  pill: {
+    minHeight: sizes.chip,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.full,
   },
   notice: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,

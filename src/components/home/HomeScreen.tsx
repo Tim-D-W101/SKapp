@@ -2,47 +2,33 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import {
-  Button,
-  Card,
-  Disclaimer,
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  Screen,
-  SectionTitle,
-  Text,
-} from '@/components/ui';
+import { Button, Disclaimer, ErrorState, LoadingState, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { nextScanDate } from '@/lib/progress';
 import { useProgressStore } from '@/stores/useProgressStore';
 import { useRoutineStore } from '@/stores/useRoutineStore';
 import { spacing } from '@/theme/tokens';
 
 import { HomeHeader } from './HomeHeader';
-import { LatestScanCard } from './LatestScanCard';
+import { HomeHero } from './HomeHero';
 import { RemindersCard } from './RemindersCard';
-import { ScanCard } from './ScanCard';
 import { TodayRoutine } from './TodayRoutine';
 
-/** Skeleton lines shown until the first load finishes. */
+/** Skeleton lines shown under the hero until the first load finishes. */
 const LOADING_LINES = 4;
 
 /**
- * Where things stand today, under the big "Scan my skin" card that starts a
- * scan: the latest score, today's routine, the next reminder, and when the
- * next weekly scan is suggested. Each card leads to the screen with the detail, and the profile
- * button in the header opens Settings. The header and the scan card show in
+ * Where things stand today, all on the first screen: the date and a
+ * greeting, then the teal hero with the latest score, how it moved and
+ * "Scan my skin", then today's morning and evening routine, then the next
+ * reminder. Each part leads to the screen with the detail, and the profile
+ * button in the header opens Settings. The header and the hero show in
  * every state, so scanning and Settings are always one tap away. It reads
  * the same stores as the Progress tab and the routine and refreshes them on
  * each visit, so all three always agree.
  *
- * Colour is by meaning, and sparing (see TintName): the brand teal scan
- * card, then the latest scan's card in apricot peach as the one tinted card.
- * The other cards are clean white, with their colour on a badge, a row or
- * an action: morning sun and evening dusk rows in the routine, a coral bell
- * on reminders and a mint calendar on the next scan. Never a different tint
- * on every card.
+ * Colour is by meaning, and placed (see TintName): the brand teal hero with
+ * a peach pill for the change in score, the routine's sun and dusk tiles,
+ * and the reminders' coral bell and pill. Everything else is plain.
  */
 export function HomeScreen() {
   const status = useProgressStore((state) => state.status);
@@ -61,31 +47,7 @@ export function HomeScreen() {
   );
 
   const retry = () => void loadProgress();
-
-  if (records.length === 0) {
-    return (
-      <Screen scroll edges={['top', 'right', 'left']} contentStyle={[styles.content, styles.grow]}>
-        <HomeHeader />
-        <ScanCard />
-        <View style={styles.centered}>
-          {status === 'error' ? (
-            <ErrorState message={copy.home.loadFailed} onRetry={retry} />
-          ) : status === 'ready' ? (
-            // The scan card above is the way to the first scan. Peach, as the
-            // latest scan's card will be once there is one.
-            <Card tint="peach">
-              <EmptyState title={copy.progress.noScans.title} body={copy.progress.noScans.body} />
-            </Card>
-          ) : (
-            <LoadingState lines={LOADING_LINES} />
-          )}
-        </View>
-      </Screen>
-    );
-  }
-
-  const latest = records[records.length - 1].result;
-  const next = nextScanDate(latest.createdAt);
+  const hasScans = records.length > 0;
 
   return (
     <Screen scroll edges={['top', 'right', 'left']} contentStyle={styles.content}>
@@ -100,36 +62,26 @@ export function HomeScreen() {
         </View>
       ) : null}
 
-      <ScanCard />
+      <HomeHero records={records} loaded={status === 'ready'} />
 
-      <LatestScanCard latest={latest} />
-
-      <TodayRoutine />
-
-      <RemindersCard />
-
-      <Card style={styles.card}>
-        <SectionTitle title={copy.home.nextScan.title} icon="calendar" tint="mint" />
-        <Text color="textSecondary">
-          {next ? copy.home.nextScan.on(next) : copy.home.nextScan.now}
-        </Text>
-      </Card>
-
-      <Disclaimer />
+      {hasScans ? (
+        <>
+          <TodayRoutine />
+          <RemindersCard />
+          <Disclaimer />
+        </>
+      ) : status === 'error' ? (
+        <ErrorState message={copy.home.loadFailed} onRetry={retry} />
+      ) : status === 'ready' ? null : (
+        <LoadingState lines={LOADING_LINES} />
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   content: {
     gap: spacing.lg,
-  },
-  grow: {
-    flexGrow: 1,
   },
   notice: {
     flexDirection: 'row',
@@ -138,8 +90,5 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     flex: 1,
-  },
-  card: {
-    gap: spacing.sm,
   },
 });
