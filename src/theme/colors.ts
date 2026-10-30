@@ -24,6 +24,14 @@
  * card. Flat colour only: never a gradient, glow or glass effect, and
  * nothing purple.
  *
+ * How a tint is applied matters as much as which: its bright `fill` is the
+ * accent (badges, dots, the camera button), its `soft` is a background that
+ * carries the ordinary ink text, and its deep `text` strength is kept to
+ * small coloured words. Bars, ticks and outlines never use the deep warm
+ * strengths, which read brown at that size; progress is always the brand's
+ * accent. Neutral things (utility sections, the tab that isn't open) sit on
+ * `surfaceMuted`, so teal only marks what's chosen or what to tap.
+ *
  * Contrast (WCAG AA) is checked by colors.test.ts for every text colour on
  * every background below, tinted ones included, and for white text on the
  * teal fill. Run `npm test` after changing a value.
@@ -60,19 +68,22 @@ export type ScoreScale = readonly [string, string, string, string, string];
 
 /**
  * The supporting colours, each used for one kind of thing on every screen:
- * - mint: the brand's own tint, for scores, the trend, the next scan and
- *   anything else without a colour of its own
+ * - mint: the brand's own tint, for scores, the trend, comparisons and the
+ *   first step of "How GlowTrack works"
  * - sun: the morning routine, the sun on Home's scan card, where to focus,
  *   the weekly streak, the subscription
- * - coral: the warm nudges to come back: reminders, and the camera on
- *   Home's scan card
- * - peach: your latest scan, a bright apricot against the teal ring on it
- *   (Home's latest score, Progress' latest score, and "No scans yet")
+ * - coral: the warm nudges to come back: reminders, the camera on Home's
+ *   scan card, and checking in weekly
+ * - peach: your latest scan, a bright apricot beside the teal ring: the
+ *   ring's track and the change chip on Home and the results, and
+ *   Progress' latest score card
  * - dusk: the evening routine, a calm twilight blue beside the morning's sun
  *
- * On Home only the latest scan's card is filled with one (peach), with the
- * morning and evening rows inside the routine card; reminders and the next
- * scan are plain cards that carry their colour on their badge and action.
+ * On Home the teal scan card is the one block of colour; under it, the
+ * latest scan is a plain card with apricot accents, the morning and evening
+ * are tiles in sun and dusk, and reminders carry their coral on the bell.
+ * Settings' utility sections (account, appearance, data, about) have no
+ * colour of their own and use neutral badges.
  */
 export type TintName = 'mint' | 'sun' | 'coral' | 'peach' | 'dusk';
 
@@ -112,6 +123,12 @@ export interface ColorPalette {
   surface: string;
   /** Sheets, inputs, the tab bar and anything floating above a surface. */
   surfaceElevated: string;
+  /**
+   * A quiet neutral fill for things that are there but not chosen: the tab
+   * that isn't open, a segmented control's track, a neutral badge. Takes
+   * every text colour, like the other surfaces.
+   */
+  surfaceMuted: string;
   border: string;
   borderSubtle: string;
   /** Outlines of tick boxes and radio marks. At least 3:1 on every surface. */
@@ -155,6 +172,8 @@ const lightColors: ColorPalette = {
   background: '#F4F7F6',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
+  // A cool, barely-teal grey: neutral beside the white cards, never cream.
+  surfaceMuted: '#E9EFEE',
   border: '#DCE4E2',
   borderSubtle: '#E7EDEB',
   borderStrong: '#4F7C75',
@@ -193,6 +212,7 @@ const darkColors: ColorPalette = {
   background: '#0A1211',
   surface: '#172625',
   surfaceElevated: '#1E2E2C',
+  surfaceMuted: '#2A3C39',
   border: '#2E4440',
   borderSubtle: '#243532',
   borderStrong: '#6C958F',
