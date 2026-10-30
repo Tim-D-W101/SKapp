@@ -5,7 +5,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 import { Button, Card, Disclaimer, ScoreRing, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { ATTRIBUTE_KEYS } from '@/constants/scan';
-import { motion, sizes, spacing } from '@/theme/tokens';
+import { motion, radius, sizes, spacing, typography, useColors } from '@/theme/tokens';
 import type { ScanResult } from '@/types/scan';
 
 import { ResultAttributes } from './ResultAttributes';
@@ -62,6 +62,7 @@ export function ResultView({
   onShare,
 }: ResultViewProps) {
   const [duration] = useState(() => revealDuration(result, previous !== null));
+  const palette = useColors();
   const { clock, done, skip } = useResultReveal(duration, animate);
   const ringProgress = useDerivedValue(() =>
     revealProgress(clock.value, 0, motion.duration.reveal),
@@ -117,24 +118,25 @@ export function ResultView({
         </Reveal>
 
         {result.observations.length > 0 ? (
-          <View style={styles.section}>
-            <Reveal clock={clock} at={timing.observationsAt}>
-              <Text variant="h3" accessibilityRole="header">
-                {copy.results.observationsTitle}
-              </Text>
-            </Reveal>
-            {result.observations.map((observation, index) => (
-              <Reveal
-                key={index}
-                clock={clock}
-                at={timing.observationsAt + index * timing.observationStagger}
-              >
-                <Card elevation="none">
-                  <Text>{observation}</Text>
-                </Card>
-              </Reveal>
-            ))}
-          </View>
+          <Reveal clock={clock} at={timing.observationsAt} style={styles.section}>
+            <Text variant="h3" accessibilityRole="header">
+              {copy.results.observationsTitle}
+            </Text>
+            {/* One card for the list, each point arriving in turn with a mint marker. */}
+            <Card style={styles.observations}>
+              {result.observations.map((observation, index) => (
+                <Reveal
+                  key={index}
+                  clock={clock}
+                  at={timing.observationsAt + index * timing.observationStagger}
+                  style={styles.observation}
+                >
+                  <View style={[styles.marker, { backgroundColor: palette.tints.mint.fill }]} />
+                  <Text style={styles.observationText}>{observation}</Text>
+                </Reveal>
+              ))}
+            </Card>
+          </Reveal>
         ) : null}
 
         {result.focusAreas.length > 0 ? (
@@ -184,5 +186,23 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: spacing.sm,
+  },
+  observations: {
+    gap: spacing.md,
+  },
+  observation: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  /** A round marker centred on the first line of its point. */
+  marker: {
+    width: sizes.listMarker,
+    height: sizes.listMarker,
+    marginTop: (typography.body.lineHeight - sizes.listMarker) / 2,
+    borderRadius: radius.full,
+  },
+  observationText: {
+    flex: 1,
   },
 });

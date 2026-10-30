@@ -5,17 +5,18 @@ import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '@/components/ui';
 import { hapticImpact } from '@/lib/haptics';
 import { useReduceMotion } from '@/lib/useReduceMotion';
-import { layout, motion, radius, sizes, spacing, useColors } from '@/theme/tokens';
+import { layout, motion, radius, shadows, sizes, spacing, useColors } from '@/theme/tokens';
 
 /**
- * The tab bar: two big rounded buttons side by side, one per route, each an
+ * The tab bar: two big pill buttons side by side, one per route, each an
  * icon beside a label. The open tab's button is filled in the brand teal,
- * with a solid icon; the other is a quiet button with a hairline outline and
- * an outlined icon. Scanning starts from Home, not from here.
+ * with a solid icon; the other is a plain raised pill (white in light mode)
+ * with an outlined icon, no outline round it, so it reads as a tab rather
+ * than a form field. Scanning starts from Home, not from here.
  *
  * It sits in the layout below the screens, not over them, so nothing scrolls
  * behind it, and it pads itself clear of the phone's navigation bar or
- * gesture line.
+ * gesture line. No rule across its top: the screen's colour runs under it.
  */
 export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
   const palette = useColors();
@@ -27,7 +28,6 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
         styles.bar,
         {
           backgroundColor: palette.background,
-          borderTopColor: palette.borderSubtle,
           paddingLeft: layout.gutter + insets.left,
           paddingRight: layout.gutter + insets.right,
           paddingBottom: spacing.sm + insets.bottom,
@@ -81,9 +81,9 @@ interface TabButtonProps {
 }
 
 /**
- * One tab, as a big button: filled teal when its tab is open, quiet
- * otherwise. While pressed it darkens a step and dips slightly on a quick
- * spring, unless the phone asks for less motion.
+ * One tab, as a big pill: filled teal when its tab is open, a plain raised
+ * pill otherwise. While pressed it darkens a step and dips slightly on a
+ * quick spring, unless the phone asks for less motion.
  */
 function TabButton({
   label,
@@ -124,10 +124,7 @@ function TabButton({
             : pressed
               ? palette.accentSubtle
               : palette.surface;
-          return [
-            styles.button,
-            { backgroundColor: fill, borderColor: focused ? fill : palette.border },
-          ];
+          return [styles.button, { backgroundColor: fill }, shadows.sm];
         }}
       >
         {icon}
@@ -149,9 +146,8 @@ function TabButton({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.md,
     paddingTop: spacing.sm,
-    borderTopWidth: sizes.borderWidth,
   },
   slot: {
     flex: 1,
@@ -162,11 +158,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     minHeight: sizes.tabBar.button,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    borderRadius: radius.md,
-    // Both buttons have the same border, so they stay the same size whichever is open.
-    borderWidth: sizes.borderWidth,
+    borderRadius: radius.full,
   },
   label: {
     flexShrink: 1,

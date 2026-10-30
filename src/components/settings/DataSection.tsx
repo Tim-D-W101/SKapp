@@ -2,9 +2,9 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 
-import { Button, Card, SectionTitle, Text } from '@/components/ui';
+import { Card, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { logInDevelopment } from '@/lib/errors';
 import { buildDataExport, removeStoredPhotos, shareDataExport } from '@/lib/personalData';
@@ -13,10 +13,16 @@ import { useProgressStore } from '@/stores/useProgressStore';
 import { useScanStore } from '@/stores/useScanStore';
 import { spacing } from '@/theme/tokens';
 
+import { SettingsRow } from './SettingsRow';
+
 type Busy = 'export' | 'photos' | null;
 type Message = { text: string; tone: 'success' | 'danger' } | null;
 
-/** A copy of everything, deleting the photos, and the way to deleting the account. */
+/**
+ * A copy of everything, deleting the photos, and the way to deleting the
+ * account, as rows that each say what they do. The last is in the danger
+ * colour but no louder than the others: it leads to a screen that confirms.
+ */
 export function DataSection() {
   const userId = useAuthStore((state) => state.user?.id ?? null);
   const email = useAuthStore((state) => state.user?.email ?? null);
@@ -78,29 +84,21 @@ export function DataSection() {
     <Card style={styles.card}>
       <SectionTitle title={copy.settings.data.title} icon="list" tint="mint" />
 
-      <View style={styles.item}>
-        <Text color="textSecondary">{copy.settings.data.downloadBody}</Text>
-        <Button
-          label={copy.settings.data.download}
-          onPress={() => void download()}
-          loading={busy === 'export'}
-          disabled={busy !== null}
-          variant="secondary"
-          fullWidth
-        />
-      </View>
+      <SettingsRow
+        label={copy.settings.data.download}
+        description={copy.settings.data.downloadBody}
+        onPress={() => void download()}
+        loading={busy === 'export'}
+        disabled={busy === 'photos'}
+      />
 
-      <View style={styles.item}>
-        <Text color="textSecondary">{copy.settings.data.deletePhotosBody}</Text>
-        <Button
-          label={copy.settings.data.deletePhotos}
-          onPress={confirmDeletePhotos}
-          loading={busy === 'photos'}
-          disabled={busy !== null}
-          variant="secondary"
-          fullWidth
-        />
-      </View>
+      <SettingsRow
+        label={copy.settings.data.deletePhotos}
+        description={copy.settings.data.deletePhotosBody}
+        onPress={confirmDeletePhotos}
+        loading={busy === 'photos'}
+        disabled={busy === 'export'}
+      />
 
       {message ? (
         <Text variant="bodySmall" color={message.tone} accessibilityLiveRegion="polite">
@@ -108,25 +106,20 @@ export function DataSection() {
         </Text>
       ) : null}
 
-      <View style={styles.item}>
-        <Text color="textSecondary">{copy.settings.data.deleteAccountBody}</Text>
-        <Button
-          label={copy.settings.data.deleteAccount}
-          onPress={() => router.push('/delete-account')}
-          disabled={busy !== null}
-          variant="destructive"
-          fullWidth
-        />
-      </View>
+      {/* A way in, not the deletion itself: its own screen explains it and asks to confirm. */}
+      <SettingsRow
+        label={copy.settings.data.deleteAccount}
+        description={copy.settings.data.deleteAccountBody}
+        onPress={() => router.push('/delete-account')}
+        disabled={busy !== null}
+        tone="danger"
+      />
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    gap: spacing.lg,
-  },
-  item: {
     gap: spacing.sm,
   },
 });

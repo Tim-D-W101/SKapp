@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { LegalLink } from '@/components/paywall/LegalLink';
-import { Button, Card, Disclaimer, SectionTitle, Text } from '@/components/ui';
+import { Card, Disclaimer, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { LEGAL_LINKS, SUPPORT_EMAIL } from '@/constants/links';
 import { logInDevelopment } from '@/lib/errors';
 import { spacing } from '@/theme/tokens';
+
+import { SettingsRow } from './SettingsRow';
 
 /** The Privacy Policy and Terms, the full disclaimer, the version and support. */
 export function AboutSection() {
@@ -44,12 +46,7 @@ export function AboutSection() {
       </View>
 
       {SUPPORT_EMAIL ? (
-        <Button
-          label={copy.settings.about.support}
-          onPress={contactSupport}
-          variant="secondary"
-          fullWidth
-        />
+        <SettingsRow label={copy.settings.about.support} onPress={contactSupport} />
       ) : null}
 
       {error ? (

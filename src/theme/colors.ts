@@ -3,26 +3,27 @@
  * of the design tokens live in tokens.ts, which re-exports all of this, so
  * components keep importing from '@/theme/tokens'.
  *
- * The brand is the colour of its icon (`iconColors`): its teal fills the
- * primary buttons, the open tab and Home's "Scan my skin" card, and its mint
- * is the soft tint behind highlights and selections. Text is a deep teal ink
- * in light mode and a pale mint white in dark mode.
+ * The brand is the colour of its icon (`iconColors`): its teal fills Home's
+ * hero panel, the primary buttons and the open tab, and marks what's done
+ * (ticked steps, routine progress); its mint is the soft tint behind
+ * highlights and selections, and the filled part of the score meter. Text is
+ * a deep teal ink in light mode and a pale mint white in dark mode.
  *
  * There are two looks, chosen under Appearance in Settings (or following the
  * phone), each designed in its own right:
  * - Light is fresh and bright: clean white cards on a barely-there cool
  *   white screen, crisp hairlines, and colour where it means something.
- * - Dark is deep spruce ink with raised cards a clear step lighter, the
- *   scan card in the icon's own teal, mint for the primary buttons and the
- *   open tab, and the supporting colours as rich jewel tones, not mud.
+ * - Dark is deep spruce ink with raised cards a clear step lighter, Home's
+ *   hero in the icon's own teal, mint for the primary buttons and the open
+ *   tab, and the supporting colours as rich jewel tones, not mud.
  *
  * Alongside the brand, four friendly supporting colours (`tints`: sun,
  * coral, peach and dusk) give the things that matter their own colour. Each
  * is used by meaning, the same way on every screen (see `TintName`), and
- * sparingly: most cards are plain, and colour comes from badges, rows, bars
- * and one or two tinted cards per screen, never a different tint on every
- * card. Flat colour only: never a gradient, glow or glass effect, and
- * nothing purple.
+ * placed rather than poured: most cards are plain, and colour comes from
+ * pills, discs, tiles and one tinted card at most per screen, never a
+ * different tint on every card. Flat colour only: never a gradient, glow or
+ * glass effect, and nothing purple.
  *
  * Contrast (WCAG AA) is checked by colors.test.ts for every text colour on
  * every background below, tinted ones included, and for white text on the
@@ -60,19 +61,19 @@ export type ScoreScale = readonly [string, string, string, string, string];
 
 /**
  * The supporting colours, each used for one kind of thing on every screen:
- * - mint: the brand's own tint, for scores, the trend, the next scan and
+ * - mint: the brand's own tint, for scores, the trend, selections and
  *   anything else without a colour of its own
- * - sun: the morning routine, the sun on Home's scan card, where to focus,
- *   the weekly streak, the subscription
- * - coral: the warm nudges to come back: reminders, and the camera on
- *   Home's scan card
- * - peach: your latest scan, a bright apricot against the teal ring on it
- *   (Home's latest score, Progress' latest score, and "No scans yet")
+ * - sun: the morning routine, where to focus, the weekly streak, the
+ *   subscription
+ * - coral: the warm nudges to come back: reminders, their times and the
+ *   bell on them
+ * - peach: your latest scan and how it moved: the change pill on Home's
+ *   hero, and Progress' latest score
  * - dusk: the evening routine, a calm twilight blue beside the morning's sun
  *
- * On Home only the latest scan's card is filled with one (peach), with the
- * morning and evening rows inside the routine card; reminders and the next
- * scan are plain cards that carry their colour on their badge and action.
+ * On Home the teal hero holds the latest score with its peach change pill;
+ * the morning and evening tiles are the only tinted surfaces, and reminders
+ * carry their coral on the bell and the time.
  */
 export type TintName = 'mint' | 'sun' | 'coral' | 'peach' | 'dusk';
 
@@ -123,14 +124,24 @@ export interface ColorPalette {
   /** Text on accent or danger fills. */
   textInverse: string;
   /**
-   * Home's "Scan my skin" card: the icon's teal in both looks, so the app's
-   * biggest block of colour is always its own. In dark mode it stays a deep
-   * teal rather than turning mint, so it glows without glaring.
+   * Home's hero panel (the latest score and "Scan my skin"): the icon's teal
+   * in both looks, so the app's biggest block of colour is always its own.
+   * In dark mode it stays a deep teal rather than turning mint, so it glows
+   * without glaring.
    */
   brand: string;
   brandPressed: string;
   /** Text and icons on `brand`. */
   onBrand: string;
+  /** Quieter text on `brand`, such as the line under the score on Home. Meets 4.5:1 on it. */
+  onBrandSecondary: string;
+  /** The empty part of the score meter on `brand`, with the icon's mint for the filled part. */
+  brandTrack: string;
+  /** The button on `brand` ("Scan my skin" on Home): a light pill, so it reads as the next step. */
+  brandAction: string;
+  brandActionPressed: string;
+  /** Its label and icon. Meets 4.5:1 on it, pressed too. */
+  onBrandAction: string;
   /** The primary fill: primary buttons, the open tab, the routine's ring and highlights. */
   accent: string;
   /** Pale mint behind selected and highlighted things, such as the active tab. */
@@ -165,6 +176,11 @@ const lightColors: ColorPalette = {
   brand: iconColors.teal,
   brandPressed: '#154C46',
   onBrand: '#FFFFFF',
+  onBrandSecondary: '#CDEDE7',
+  brandTrack: '#154C46',
+  brandAction: '#FFFFFF',
+  brandActionPressed: '#D9F3EE',
+  onBrandAction: iconColors.teal,
   // The icon's teal, unchanged: white text on it is 6.8:1, so it needs no darker variant.
   accent: iconColors.teal,
   accentSubtle: '#D9F3EE',
@@ -204,6 +220,11 @@ const darkColors: ColorPalette = {
   brand: '#1F6E64',
   brandPressed: '#185A52',
   onBrand: '#FFFFFF',
+  onBrandSecondary: '#CDEDE7',
+  brandTrack: '#134A43',
+  brandAction: '#EEF7F5',
+  brandActionPressed: '#CBE6E0',
+  onBrandAction: '#14524B',
   // The icon's mint, which glows on dark backgrounds; buttons carry dark text on it.
   accent: iconColors.mint,
   accentSubtle: '#11433C',
@@ -217,7 +238,8 @@ const darkColors: ColorPalette = {
   // navy, deep teal), each colour bright and pale on top.
   tints: {
     mint: { soft: '#11433C', fill: iconColors.mint, text: '#A3E1D8', onFill: '#0A1211' },
-    sun: { soft: '#3D3510', fill: '#FFD466', text: '#FFDC7A', onFill: '#0A1211' },
+    // A deep amber gold behind the morning, warm rather than olive.
+    sun: { soft: '#3E2F0C', fill: '#FFD466', text: '#FFDC7A', onFill: '#0A1211' },
     coral: { soft: '#5A2A26', fill: '#FF9A87', text: '#FFBCB0', onFill: '#0A1211' },
     peach: { soft: '#55301F', fill: '#FFB98A', text: '#FFCFAD', onFill: '#0A1211' },
     dusk: { soft: '#1C2C52', fill: '#A3BAEC', text: '#BCCCF5', onFill: '#0A1211' },
@@ -279,9 +301,9 @@ export const sunMarkColors = {
   light: { sun: iconColors.teal, arcs: iconColors.mint },
   dark: { sun: iconColors.cream, arcs: iconColors.mint },
   /**
-   * On the brand fill, Home's "Scan my skin" card, which is the icon's teal
-   * in both looks: the sun rises in sun yellow over the icon's mint arcs,
-   * the first warm colour on Home.
+   * On the brand fill, Home's hero panel, which is the icon's teal in both
+   * looks: the sun rises in sun yellow over the icon's mint arcs, as it does
+   * before the first scan.
    */
   onBrand: {
     light: { sun: lightColors.tints.sun.fill, arcs: iconColors.mint },

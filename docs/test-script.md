@@ -22,11 +22,12 @@ comes last, because it wipes everything.
 - If the app was installed before: uninstall it first, so this is a fresh
   install.
 
-The bar along the bottom has two big buttons, **Home** and **Progress**. A
-new scan starts from the large **Scan my skin** card at the top of Home.
-**Settings** opens from the round profile button at the top right of Home,
-**the routine** from "Today's routine" on Home, and **reminders** from the
-Reminders card under it (or from Settings → Reminders).
+The bar along the bottom has two big pill buttons, **Home** and
+**Progress**. A new scan starts from **Scan my skin** on the teal panel at
+the top of Home. **Settings** opens from the round profile button at the top
+right of Home, **the routine** from the Morning and Evening tiles under
+"Today's routine", and **reminders** from the Reminders card under them (or
+from Settings → Reminders).
 
 Mark each step `[x]` as it passes.
 
@@ -278,12 +279,13 @@ feel check, it sits apart from the numbered sections so their step numbers
 don't move.
 
 1. [ ] **The bottom bar.**
-       Pass: two big rounded buttons side by side, **Home** and
+       Pass: two big pill-shaped buttons side by side, **Home** and
        **Progress**, filling the width of the screen, each an icon beside
-       its label, and nothing between them: no round or raised button. The
-       open one is filled teal with white text and a solid white icon; the
-       other is warm cream with a thin outline, teal text and the same icon
-       outlined in teal. Home is a house with a rounded roof and a door;
+       its label, and nothing between them: no round or raised Scan button.
+       The open one is filled teal with white text and a solid white icon;
+       the other is a white pill with a soft shadow and no outline, teal
+       text and the same icon outlined in teal. No line runs across the top
+       of the bar. Home is a house with a rounded roof and a door;
        Progress is a rounded square with three rising bars. Each icon is
        centred beside its label and the same size whether solid or
        outlined, so nothing jumps when the tab changes. The bar clears the phone's
@@ -292,19 +294,21 @@ don't move.
 2. [ ] **Tap Progress, then Home.**
        Pass: each opens, and the teal fill moves to the button you tapped.
 3. [ ] **Find Scan my skin on Home.**
-       Pass: a large teal card at the top, under the title and the profile
-       button, with the sun mark, "Scan my skin", a short line under it and a
-       yellow camera badge. It shows before the first scan too (fresh
-       install), and when the latest scan didn't load.
+       Pass: a white pill button with a camera at the bottom of the teal
+       panel, under the date, the greeting and the latest score, with "Next
+       scan suggested for …" (or "Your weekly scan is ready") under it. It
+       shows before the first scan too (fresh install), and when the latest
+       scan didn't load.
 4. [ ] **Tap Scan my skin.**
        Pass: it opens the camera, or the plans once the free scan is used
        without a subscription, exactly as **Take a scan** on Progress does.
        Closing it comes back to Home.
 5. [ ] **Look at "Today's routine" on Home, then tap Evening.**
-       Pass: Home shows how many steps are done today, and a Morning and an
-       Evening row, each with a count and a progress bar. Evening opens the
-       routine with the evening steps showing and a **Back** button at the
-       top. Tick a step and tap Back: the Evening row shows one more done.
+       Pass: Home shows how many steps are done today beside the heading,
+       and two tiles side by side, Morning (yellow) and Evening (blue), each
+       with a count and a teal progress bar. Evening opens the routine with
+       the evening steps showing and a **Back** button at the top. Tick a
+       step and tap Back: the Evening tile shows one more done.
 6. [ ] **Tap the round profile button at the top right of Home.**
        Pass: Settings opens, with Account, Subscription, Reminders, Your data
        and About, and a **Back** button that stays at the top while you
@@ -317,8 +321,10 @@ don't move.
        support all open as before. After Save my progress, tapping the link
        in the email brings you back to Settings.
 8. [ ] **Before the first scan** (fresh install, before 3.1, or after 9.9).
-       Pass: Home shows Scan my skin, then "No scans yet" with no second scan
-       button, and still has the profile button, so Settings opens before
+       Pass: Home shows the date and greeting, then the teal panel with the
+       sun mark, "Your first scan", a line about the baseline and Scan my
+       skin, with nothing below it: no routine, reminders or second scan
+       button. The profile button is still there, so Settings opens before
        any scan.
 9. [ ] **Android's back button.**
        Pass:
@@ -339,20 +345,21 @@ don't move.
 11. [ ] **TalkBack** (Settings → Accessibility → TalkBack).
         Pass: the two bottom buttons read as "Home, tab, selected" and
         "Progress, tab"; Scan my skin as "Scan my skin, button", with "Opens
-        the camera for a new scan"; the profile button as "Settings and
-        account, button"; a routine row as, for example, "Morning routine, 2
+        the camera for a new scan"; the score on the teal panel as "Your
+        latest scan. Overall 72. From your scan on …, button", with "Opens
+        the results of this scan"; the profile button as "Settings and
+        account, button"; a routine tile as, for example, "Morning routine, 2
         of 4 done, button"; the Reminders card as, for example, "Reminders.
         Next reminder: Weekly scan, Sunday at 7:00 PM, button", with "Opens
         your reminder settings".
 12. [ ] **Largest font.** Set Font size to the largest and look at the
         bottom bar and Home.
         Pass: "Home" and "Progress" aren't cut off (they may shrink a
-        little to fit their buttons), and the buttons stay side by side;
-        the Reminders card's line wraps without overlapping "Change"; on
-        Scan my skin, the title and
-        its line wrap inside the card, beside the mark and the camera badge,
-        without overlapping; the routine rows' text wraps without
-        overlapping. Set the font size back afterwards.
+        little to fit their buttons), and the buttons stay side by side; on
+        the teal panel, the change pill moves under the score if it doesn't
+        fit beside it, and Scan my skin stays one wide button; the routine
+        tiles' text wraps inside them; the Reminders card's time wraps
+        without overlapping "Change". Set the font size back afterwards.
 
 ## Bottom buttons and reminders check (8 minutes)
 
@@ -374,44 +381,46 @@ the numbered sections so their step numbers don't move.
        Reminders sheet fades in (or simply appears) instead of sliding up.
        Turn Remove animations off again afterwards.
 3. [ ] **Find the Reminders card on Home,** under "Today's routine".
-       Pass: a coral card with a bell badge, "Reminders" and "Change" with
-       an arrow at the top right, and a line such as "Next reminder: Weekly
-       scan, Sunday at 7:00 PM". The reminder named is the one due soonest
-       of those switched on in Settings → Reminders, at the day and time
-       set there. The disclaimer is still at the bottom of Home.
+       Pass: a white card with a coral bell, "Next reminder" with a pale
+       coral **Change** beside it, then the reminder's day and time large,
+       such as "Sunday at 7:00 PM", and what it's for under that, such as
+       "Weekly scan". The reminder named is the one due soonest of those
+       switched on in Settings → Reminders, at the day and time set there.
+       The disclaimer is still at the bottom of Home.
 4. [ ] **Tap the card.**
        Pass: a sheet slides up with rounded top corners and a grab bar,
        titled "Reminders", with exactly the controls of Settings →
-       Reminders: Allow reminders, the weekly scan reminder with its day and
-       time, the daily routine reminder, the streak reminder and "At most
-       one reminder a day…", each group separated by a thin line. The seven
-       days sit in one even row (no day wraps onto a second line), and each
-       time shows large, such as "7:00 PM", in its own box with a clock
-       badge and **Change** beside it. Long content scrolls inside the
-       sheet, and **Done** stays at the bottom.
+       Reminders: Allow reminders with "At most one reminder a day…" under
+       it, then the weekly scan reminder with its day and time, the daily
+       routine reminder and the streak reminder, each in its own soft grey
+       panel, with no lines between them. The seven days sit in one even row
+       (no day wraps onto a second line), and each time shows large, such
+       as "7:00 PM", on a pale coral pill with a clock and an arrow, beside
+       the word Time. Long content scrolls inside the sheet, and **Done**
+       stays at the bottom.
 5. [ ] **In the sheet, turn off the streak reminder, set the daily routine
        reminder to Off (if it's available), pick another day for the weekly
        reminder, then tap its time, pick an hour two hours later and tap
        Save. Tap Done.**
-       Pass: the sheet closes and the card shows "Weekly scan" on the new
-       day, two hours later than before: the day's name, or its date when
-       it's more than six days away. It's always at least a week after your
+       Pass: the sheet closes and the card shows the new day, two hours
+       later than before, with "Weekly scan" under it: the day's name, or
+       its date when it's more than six days away. It's always at least a week after your
        last scan, so it may be the week after next. Open Settings →
        Reminders: the same day and time are set there.
 6. [ ] **Morning, then evening.** In the sheet, set the daily routine
        reminder to Morning; the time picker opens straight away. Pick a time
        and Save, tap Done, then do the same with Evening.
        Pass: after Save, the chosen routine's time shows under the choice,
-       at exactly the time you picked. With Morning, the card says "Next
-       reminder: Morning routine, today at …" if that time is still to come
-       today, or "tomorrow at …" if it has passed; the same with Evening.
+       at exactly the time you picked. With Morning, the card says "Today
+       at …" if that time is still to come today, or "Tomorrow at …" if it
+       has passed, with "Morning routine" under it; the same with Evening.
        Two things can change the day, and both are expected: a reminder
        already arrived today (there's at most one a day), or a weekly scan
        or streak reminder is due first and takes the routine reminder's
        place. Set it back to what you had afterwards.
 7. [ ] **In the sheet, turn off Allow reminders and tap Done.**
-       Pass: the card says "Reminders are off", with "Turn on" at the top
-       right.
+       Pass: the card says "Reminders are off", with "Turn on" beside
+       "Reminders".
 8. [ ] **Tap the card.**
        Pass: reminders turn back on and the sheet opens with Allow
        reminders on. Tap Done: the card shows the next reminder again.
@@ -442,11 +451,13 @@ the numbered sections so their step numbers don't move.
 13. [ ] **Dark theme.** Turn on Dark theme and look at the bottom bar, the
         card, the sheet and the time picker.
         Pass: the open button is bright mint with dark text and a solid dark
-        icon, the other a dark button with a thin outline, mint text and an
-        outlined mint icon. The time picker is a dark box with the time in
-        bright mint and the chosen hour and minutes filled mint. The card is
-        a deep, muted brown-coral with light text and a pale coral "Change",
-        and the sheet is dark with every word readable.
+        icon, the other a dark pill a step lighter than the screen, with
+        mint text and an outlined mint icon and no outline. The time picker
+        is a dark box with the time in bright mint, the hours and minutes on
+        darker cells, and the chosen ones filled mint. The card is a raised
+        dark card with a coral bell and a deep rosewood "Change", and the
+        sheet is dark with every word readable; each time sits on a deep
+        rosewood pill.
 
 ## Reminder times check (8 minutes)
 
@@ -475,12 +486,12 @@ pick, to the minute; the weekly scan reminder stays on the hour.
        dimmed area or Android's back button cancels the same way.
 4. [ ] **Tap Morning again. Tap 6, then :30, then + three times, then Save.**
        Pass: the large time goes 6:30, 6:31, 6:32, 6:33 AM while picking.
-       After Save, Morning is chosen and its row shows 6:33 AM. Home's
-       Reminders card says "Next reminder: Morning routine, … at 6:33 AM"
+       After Save, Morning is chosen and its time pill shows 6:33 AM. Home's
+       Reminders card says "… at 6:33 AM" with "Morning routine" under it
        (unless a weekly scan or streak reminder takes that day).
-5. [ ] **Tap the 6:33 AM row, tap − until it reads 6:28 AM, and Save.**
-       Pass: − rolls back across :30 into :29 and :28; the row shows
-       6:28 AM. Tap the row again, tap PM, and Cancel: still 6:28 AM.
+5. [ ] **Tap the 6:33 AM pill, tap − until it reads 6:28 AM, and Save.**
+       Pass: − rolls back across :30 into :29 and :28; the pill shows
+       6:28 AM. Tap it again, tap PM, and Cancel: still 6:28 AM.
 6. [ ] **Tap Evening.**
        Pass: the picker opens for "Evening routine reminder", starting at
        8:00 PM (or the evening time you set before). Pick 9:50 PM and Save:
@@ -504,7 +515,7 @@ pick, to the minute; the weekly scan reminder stays on the hour.
 11. [ ] **Largest font.** Set Font size to the largest and open
         Settings → Reminders and the picker.
         Pass: the day row stays on one line (the day names may shrink a
-        little), times and "Change" don't overlap, the large time and the
+        little), each time pill stays whole beside "Time", the large time and the
         minutes shrink to fit rather than being cut off, and the picker
         scrolls if it's taller than the screen, with Cancel and Save always
         visible.
@@ -527,15 +538,16 @@ again, and Settings and Home's Reminders card can always set one later.
        you pick, "At most one notification a day…", **Yes, set my time** and
        **Not now**. Every word reads warmly and is about routine and care.
 3. [ ] **Tap Yes, set my time.**
-       Pass: "When suits you?" with a coral panel holding Morning / Evening
-       (the one for the time of day it is now already chosen) and a time
-       box with **Change**, plus **Save my reminder** and **Not now**.
-4. [ ] **Choose Evening, tap the time box, pick 9:15 PM and Save. Then tap
+       Pass: "When suits you?" with a white panel holding Morning / Evening
+       (the one for the time of day it is now already chosen) and the time
+       on a pale coral pill beside "Time", plus **Save my reminder** and
+       **Not now**.
+4. [ ] **Choose Evening, tap the time pill, pick 9:15 PM and Save. Then tap
        Save my reminder.**
-       Pass: the box shows 9:15 PM after the picker. Save my reminder goes
+       Pass: the pill shows 9:15 PM after the picker. Save my reminder goes
        on to the screen you were heading for (Home, routine or progress).
-       Home's Reminders card says "Next reminder: Evening routine, … at
-       9:15 PM" (unless a weekly scan or streak reminder takes that day),
+       Home's Reminders card says "… at 9:15 PM" with "Evening routine"
+       under it (unless a weekly scan or streak reminder takes that day),
        and Settings → Reminders shows Evening at 9:15 PM.
 5. [ ] **Take another scan and leave the results.**
        Pass: no reminders question: a daily reminder is already set.
@@ -557,9 +569,9 @@ again, and Settings and Home's Reminders card can always set one later.
        and **Open settings**; after allowing notifications in the phone's
        settings, the time you picked is used.
 9. [ ] **Dark theme and largest font.** Repeat steps 2 and 3.
-       Pass: every word is readable; the coral panel is a deep muted coral
-       with light text; nothing is cut off, and the screen scrolls if
-       needed with the buttons reachable.
+       Pass: every word is readable; the panel is a raised dark card and
+       the time pill a deep rosewood with light text; nothing is cut off,
+       and the screen scrolls if needed with the buttons reachable.
 
 ## Premium preview check (test builds only, 8 minutes)
 
@@ -637,29 +649,32 @@ In GlowTrack, open Settings (the round button at the top of Home) →
        Pass: the email field's outline turns teal while typing. A bad
        address shows its message in a deep pink-red, not teal.
 3. [ ] **Home, as it first opens.**
-       Pass: the screen is a clean, barely-grey white with **white cards**
-       on it (no cream anywhere), and the small sun mark sits beside
-       "Home". Without scrolling, colour shows only where it means
-       something:
-   - Scan my skin is a teal card with a **sun-yellow sun** rising over mint
-     arcs and a **coral** camera badge;
-   - under it, "Your latest scan" is one row on a **bright apricot** card
-     (orange-peach, not skin-coloured), the only coloured card on Home: the
-     teal score ring on a white track beside the date and "See these
-     results ›"; tapping anywhere on it opens that scan's results;
-   - Today's routine is a white card with a **sun-yellow Morning** row and a
-     **dusk-blue Evening** row (a calm twilight blue with a moon), each with
-     a matching badge and a progress bar on a white track. On most phones
-     both rows show without scrolling.
+       Pass: the screen is a clean, barely-grey white (no cream anywhere),
+       with today's date over a greeting ("Good morning", "Good afternoon"
+       or "Good evening") instead of a "Home" title. On most phones
+       everything down to the Reminders card shows without scrolling, and
+       colour shows only where it means something:
+   - the **teal panel** (the icon's teal) holds the latest overall score
+     large in white, with "Overall score · " and the scan's day above it
+     and "See results ›"; a **bright apricot pill** beside the score says
+     how it moved since the scan before, with an arrow ("Up 4 since last
+     scan"); a **mint meter** under it shows where the score sits out of
+     100; then the journey since the first scan, a **white Scan my skin
+     pill** with a camera, and when the next scan is suggested. Tapping
+     the score opens that scan's results;
+   - Today's routine is two tiles side by side: a **sun-yellow Morning**
+     and a **dusk-blue Evening** (a calm twilight blue with a moon), each
+     with a matching badge, its count and a **teal** progress bar;
+   - Reminders is a **white** card with a **coral** bell, the next
+     reminder's day and time large, and a pale coral "Change".
 
-   Scrolling on: Reminders and Your next scan are **white** cards, with a
-   **coral** bell badge and coral "Change ›" on Reminders and a mint
-   calendar badge on the next scan. Colour is flat: no purple, no
-   gradients, no glass effects, nothing glows. At the bottom, the open
-   button (Home) is filled teal and Progress is white with a thin outline.
-   Main buttons are teal pills with white text. Every word is easy to read.
-   - **No scans yet** (a fresh account): under the scan card, "No scans
-     yet" sits on the same apricot card.
+   Colour is flat: no purple, no gradients, no glass effects, nothing
+   glows. At the bottom, the open button (Home) is a teal pill and Progress
+   a white pill with a soft shadow. Main buttons are teal pills with white
+   text. Every word is easy to read.
+   - **No scans yet** (a fresh account): the teal panel shows the sun mark
+     in sun yellow over mint arcs, "Your first scan" and Scan my skin, with
+     nothing under it.
 
 4. [ ] **Camera and tips.**
        Pass: the face oval turns mint at "Looking good". **Why?** opens a
@@ -673,26 +688,32 @@ In GlowTrack, open Settings (the round button at the top of Home) →
 6. [ ] **Results.**
        Pass: the ring and bars run from pale mint (low) to deep teal (high);
        nothing looks red or alarming. The seven scores sit on a white card,
-       "Where to focus" on a sun-yellow panel, and "Since your last scan" on
-       a white card. The full disclaimer, with its info icon, is
+       "What stands out" is one white card with a mint dot before each
+       point, "Where to focus" on a sun-yellow panel, and "Since your last
+       scan" on a white card. The full disclaimer, with its info icon, is
        visible without scrolling past anything collapsed.
 7. [ ] **Share.**
        Pass: the preview is a light mint card with the sun mark beside
        "GlowTrack". The shared image looks the same as the preview.
 8. [ ] **Progress and compare.**
-       Pass: the latest score sits on the apricot card, as on Home, with
-       its ring on a white track, "Over time" (or the locked "Your trend and
-       comparisons") on a white card with a teal chart line and points,
-       "Before and after" on a white card with a teal badge, and the weekly
-       streak on a sun-yellow card. History thumbnails show
-       (or show a mint placeholder). On the "Before and after" screen, there
+       Pass: the latest score's ring sits on an apricot card beside "Up …
+       points in … weeks", on one row, so "Over time" (or the locked "Your
+       trend and comparisons") starts on the first screen: a white card with
+       a teal chart line and points, its score chips scrolling out at the
+       card's edge. "Before and after" is on a white card with a teal badge,
+       and the weekly streak on a sun-yellow card. In the history, each
+       change is a small pill with an arrow and words: mint for "Up 4",
+       quiet grey for "Down 1". History thumbnails show (or show a mint
+       placeholder). On the "Before and after" screen, there
        is no coloured strip down the left edge of the screen.
 9. [ ] **Routine pictures.** Open Morning, then Evening.
        Pass:
    - every step shows a drawing between its tick box and its text, and
      still shows its title and its one-line reason;
+   - at the top, a white card with the teal ring ("2/7") beside "2 of 7
+     done today" and the line about consistency;
    - Morning is a sun-yellow card and Evening a dusk-blue one, each with a
-     matching badge, and ticked boxes in the section's colour;
+     matching badge, and ticked boxes filled **teal** in both;
    - each kind of step is drawn in one of three colours on a tile of the
      same soft colour: sunscreen and face oil yellow; serum, eye cream,
      lip balm and makeup remover coral; cleanser, toner and moisturiser
@@ -718,25 +739,30 @@ In GlowTrack, open Settings (the round button at the top of Home) →
         data and About teal on mint. **Appearance** is second, under
         Account, with three choices in one row: System (a phone), Light (a
         sun) and Dark (a moon), the chosen one filled teal, and a line under
-        them saying what it does. Switches are teal when on.
-        **Delete my account** is a deep pink-red button, clearly different
-        from the teal ones.
+        them saying what it does. Switches are teal when on. Sign out,
+        Manage subscription, Download my data, Delete all my scan photos and
+        Contact support are rows with a teal name, a line saying what they
+        do and an arrow, not big outlined buttons. **Delete my account** is
+        the same kind of row in deep pink-red, clearly different from the
+        teal ones, and opens its own screen to confirm. Reminders are in
+        soft grey panels inside their card, one for each reminder.
 13. [ ] **Error and empty states.** Look back at the offline screens in
         section 8, and at the Progress tab after 9.9.
         Pass: a full-screen error shows a quiet grey badge and an outlined
-        Try again, never red. "No scans yet" shows the sun mark above it.
+        Try again, never red. "No scans yet" on Progress shows the sun mark
+        above it; on Home, the teal panel shows it.
 14. [ ] **Dark look.** In GlowTrack's Settings → Appearance choose
         **Dark**, and repeat 3, 6, 9 and 11 quickly.
         Pass: the whole app turns dark at once, without restarting.
         Backgrounds are a deep spruce ink and cards a clear step lighter.
-        Scan my skin stays the icon's **deep teal** (not mint) with white
-        text, a sun-yellow sun over mint arcs and a glowing coral camera.
-        The open bottom button and main buttons are bright mint with dark
-        text. The sun mark beside "Home" has a cream sun. Coloured cards and
-        rows turn rich and deep (terracotta for the apricot latest scan, gold
-        for sun, rosewood for coral, navy for dusk, deep teal for mint) with
-        their colours bright on top, and are still told apart; nothing
-        looks muddy brown. Every word is readable, and the routine drawings
+        Home's panel stays the icon's **deep teal** (not mint) with white
+        text, the apricot pill and the mint meter, and Scan my skin is a
+        pale mint-white pill with dark teal text. The open bottom button and
+        main buttons are bright mint with dark text. Coloured cards and
+        tiles turn rich and deep (terracotta for the apricot latest score,
+        amber gold for the morning, rosewood for coral, navy for dusk, deep
+        teal for mint) with their colours bright on top, and are still told
+        apart; the morning tile is warm gold, not olive. Every word is readable, and the routine drawings
         show clearly on their dark tiles.
 15. [ ] **Appearance follows the choice, not the phone.**
         Pass for each:

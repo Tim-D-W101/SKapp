@@ -10,7 +10,7 @@ export interface SunMarkProps {
    * sun, and `brand` a sun-yellow sun over mint arcs, for the brand teal
    * fill. Defaults to the app's light or dark look (Appearance in
    * Settings); set it on a surface that doesn't follow the theme, such as
-   * the share card, and to `brand` on Home's "Scan my skin" card.
+   * the share card, and to `brand` on Home's teal hero panel.
    */
   on?: 'light' | 'dark' | 'brand';
 }

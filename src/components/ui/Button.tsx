@@ -18,7 +18,8 @@ import {
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+/** `onBrand` is the main action on a brand-teal panel, such as "Scan my skin" on Home's hero. */
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'onBrand';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps {
@@ -87,6 +88,11 @@ function variantColors(variant: ButtonVariant, pressed: boolean, palette: ColorP
       background: palette.danger,
       border: 'transparent',
       text: 'textInverse',
+    },
+    onBrand: {
+      background: pressed ? palette.brandActionPressed : palette.brandAction,
+      border: 'transparent',
+      text: 'onBrandAction',
     },
   };
   return map[variant];

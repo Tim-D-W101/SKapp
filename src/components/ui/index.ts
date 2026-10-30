@@ -1,5 +1,6 @@
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, type CardProps } from './Card';
+export { ChangePill, type ChangePillProps } from './ChangePill';
 export { Chip, type ChipProps } from './Chip';
 export { Disclaimer, type DisclaimerProps } from './Disclaimer';
 export { EmptyState, type EmptyStateAction, type EmptyStateProps } from './EmptyState';

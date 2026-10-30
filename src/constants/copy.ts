@@ -75,6 +75,29 @@ const REMINDER_NAMES: Record<ReminderName, string> = {
   evening: 'Evening routine',
 };
 
+/** "Today", "Tomorrow", "Sunday", "3 Nov 2026": a reminder's day, where a line starts with it. */
+function reminderDay(day: RelativeDay, date: string): string {
+  switch (day.kind) {
+    case 'today':
+      return 'Today';
+    case 'tomorrow':
+      return 'Tomorrow';
+    case 'weekday': {
+      const weekday = WEEKDAYS.find((entry) => entry.value === day.weekday);
+      return weekday ? weekday.name : date;
+    }
+    case 'later':
+      return date;
+  }
+}
+
+/** How the latest overall score moved since the scan before it: "Up 4 since last scan". */
+function sinceLastScan(points: number): string {
+  if (points > 0) return `Up ${points} since last scan`;
+  if (points < 0) return `Down ${-points} since last scan`;
+  return 'Same as last scan';
+}
+
 /** "today at 8:00 am", "Sunday at 7:00 pm", "3 Nov 2026 at 7:00 pm". */
 function reminderWhen(day: RelativeDay, time: string, date: string): string {
   switch (day.kind) {
@@ -475,7 +498,6 @@ export const copy = {
     },
     history: {
       title: 'Scan history',
-      delta: (points: number) => (points > 0 ? `+${points}` : `${points}`),
       baseline: 'Baseline',
       thumbnail: 'Scan photo',
       row: (date: string, score: number, change: string) => `${date}, overall ${score}, ${change}`,
@@ -682,26 +704,47 @@ export const copy = {
   },
 
   home: {
-    title: 'Home',
-    /** The large card at the top of Home that starts a scan. */
+    /** The greeting at the top of Home, by the time of day, under today's date. */
+    greeting: {
+      morning: 'Good morning',
+      afternoon: 'Good afternoon',
+      evening: 'Good evening',
+    },
+    /** The button on Home's hero panel that starts a scan. */
     scan: {
       title: 'Scan my skin',
       body: 'A quick photo, then your cosmetic scores for today.',
       hint: 'Opens the camera for a new scan',
     },
     latestDate: (date: string) => `From your scan on ${date}`,
-    seeResults: 'See these results',
-    /** The latest score's card, under the scan card. Tapping it opens that scan's results. */
-    latest: {
-      title: 'Your latest scan',
-      /** Screen reader name for the card: "Your latest scan. Overall 72. From your scan on 21 Oct 2026". */
-      label: (score: number, date: string) => `Your latest scan. Overall ${score}. ${date}`,
-      hint: 'Opens the results of this scan',
+    /** The teal panel at the top of Home: the latest score, how it moved, and the next scan. */
+    hero: {
+      /** Above the score: "Overall score · 27 Oct", the day of the scan it's from. */
+      scoreLabel: (date: string) => `Overall score · ${date}`,
+      /** Beside the label. The score and its meter open that scan's results. */
+      seeResults: 'See results',
+      /** The pill beside the score: how it moved since the scan before. */
+      change: sinceLastScan,
+      /** Under the meter: "Up 11 points in 5 weeks since your first scan". */
+      journey: (journey: string) => `${journey} since your first scan`,
+      oneScan: 'Your next scan shows your first change.',
+      /** Before the first scan, in place of a score. */
+      firstTitle: 'Your first scan',
+      firstBody: 'It sets the baseline everything else is compared with.',
+      /** Under the scan button. */
+      nextScan: (date: string) => `Next scan suggested for ${date}`,
+      due: 'Your weekly scan is ready',
     },
-    nextScan: {
-      title: 'Your next scan',
-      on: (date: string) => `Suggested for ${date}, a week after your last one.`,
-      now: 'Your next scan is ready whenever you are. Tap Scan my skin at the top.',
+    /** The latest score on the hero. Tapping it opens that scan's results. */
+    latest: {
+      /**
+       * Screen reader name for the score, then what the hero says about it:
+       * "Your latest scan. Overall 72. From your scan on 21 Oct 2026. Up 4
+       * since last scan. Up 11 points in 5 weeks since your first scan".
+       */
+      label: (score: number, date: string, ...details: string[]) =>
+        [`Your latest scan. Overall ${score}. ${date}`, ...details].join('. '),
+      hint: 'Opens the results of this scan',
     },
     routine: {
       title: "Today's routine",
@@ -717,6 +760,13 @@ export const copy = {
      */
     reminders: {
       title: 'Reminders',
+      /** Above the next reminder's day and time. */
+      nextLabel: 'Next reminder',
+      /** The card's large line: "Tomorrow at 8:15 AM". */
+      when: (day: RelativeDay, time: string, date: string) =>
+        `${reminderDay(day, date)} at ${time}`,
+      /** Under it: what the reminder is for. */
+      name: (name: ReminderName) => REMINDER_NAMES[name],
       /**
        * "Next reminder: Morning routine, tomorrow at 8:00 am". `time` and
        * `date` are the reminder's, written the way the phone writes them.

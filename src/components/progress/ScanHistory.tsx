@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Card, Text } from '@/components/ui';
+import { describeChange } from '@/components/scan/ResultChange';
+import { Card, ChangePill, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatShortDate } from '@/lib/dates';
 import type { ScanRecord } from '@/lib/progress';
-import { opacity, radius, sizes, spacing } from '@/theme/tokens';
+import { opacity, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 import { ScanPhoto } from './ScanPhoto';
 
@@ -20,8 +21,13 @@ function describeDelta(delta: number): string {
   return copy.progress.history.changeSame;
 }
 
-/** Every scan, newest first, each opening its full results. */
+/**
+ * Every scan, newest first, each opening its full results. The change since
+ * the scan before is a pill with an arrow and words: mint when it went up,
+ * quiet otherwise, as a drop is information, not a warning.
+ */
 export function ScanHistory({ records }: ScanHistoryProps) {
+  const palette = useColors();
   const rows = records
     .map((record, index) => ({
       record,
@@ -49,11 +55,18 @@ export function ScanHistory({ records }: ScanHistoryProps) {
             <ScanPhoto path={record.imagePath} style={styles.thumbnail} />
             <View style={styles.details}>
               <Text variant="label">{date}</Text>
-              <Text variant="bodySmall" color="textSecondary">
-                {delta === null
-                  ? copy.progress.history.baseline
-                  : copy.progress.history.delta(delta)}
-              </Text>
+              {delta === null ? (
+                <Text variant="bodySmall" color="textSecondary">
+                  {copy.progress.history.baseline}
+                </Text>
+              ) : (
+                <ChangePill
+                  points={delta}
+                  label={describeChange(delta).text}
+                  background={delta > 0 ? palette.accentSubtle : palette.background}
+                  ink={delta > 0 ? palette.accentText : palette.textSecondary}
+                />
+              )}
             </View>
             <Text variant="h3">{result.overall}</Text>
           </Pressable>
@@ -84,6 +97,7 @@ const styles = StyleSheet.create({
   },
   details: {
     flex: 1,
+    alignItems: 'flex-start',
     gap: spacing.xs,
   },
 });

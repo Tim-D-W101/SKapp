@@ -22,8 +22,9 @@ export interface RoutineSectionProps {
 
 /**
  * Morning or evening: a header that opens and closes the section, and its
- * steps to tick off. Each section is in its own colour (sun or dusk),
- * and so are its ticks; each step's drawing is in the colour of its kind.
+ * steps to tick off. Each section is in its own colour (sun or dusk), and
+ * each step's drawing is in the colour of its kind; a ticked step is filled
+ * in the brand teal, the colour of what's done everywhere in the app.
  */
 export function RoutineSection({
   slot,
@@ -79,7 +80,7 @@ export function RoutineSection({
                   style={[
                     styles.box,
                     isDone
-                      ? { backgroundColor: tint.text, borderColor: tint.text }
+                      ? { backgroundColor: palette.accent, borderColor: palette.accent }
                       : {
                           backgroundColor: palette.surfaceElevated,
                           borderColor: palette.borderStrong,
