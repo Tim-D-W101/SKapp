@@ -43,6 +43,30 @@ export function formatShortDate(iso: string): string {
   });
 }
 
+/** A day and month without the year, such as "27 Oct", for a recent date where the year goes without saying. */
+export function formatDayMonth(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
+
+/** Today in full, the way the phone's language writes it, such as "Thursday 30 October". */
+export function formatLongDay(date: Date = new Date()): string {
+  return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+export type PartOfDay = 'morning' | 'afternoon' | 'evening';
+
+/** Where Home's greeting turns: morning from 4 AM, afternoon from noon, evening from 6 PM. */
+const GREETING_MORNING_FROM_HOUR = 4;
+const GREETING_AFTERNOON_FROM_HOUR = 12;
+const GREETING_EVENING_FROM_HOUR = 18;
+
+/** Which greeting fits the time: the small hours still count as the evening before. */
+export function partOfDay(date: Date = new Date()): PartOfDay {
+  const hour = date.getHours();
+  if (hour < GREETING_MORNING_FROM_HOUR || hour >= GREETING_EVENING_FROM_HOUR) return 'evening';
+  return hour < GREETING_AFTERNOON_FROM_HOUR ? 'morning' : 'afternoon';
+}
+
 let twentyFourHour: boolean | null = null;
 
 /**

@@ -76,17 +76,51 @@ describe('palette contrast', () => {
       });
     }
 
-    // The "Scan my skin" card's title and line (brand, and brandPressed while pressed).
+    // Home's hero panel: the score and its lines (brand, and brandPressed while pressed).
     for (const fill of ['brand', 'brandPressed'] as const) {
-      it(`${scheme}: scan card text on ${fill} meets ${TEXT}:1`, () => {
-        const ratio = contrast(palette.onBrand, palette[fill]);
+      for (const text of ['onBrand', 'onBrandSecondary'] as const) {
+        it(`${scheme}: hero ${text} on ${fill} meets ${TEXT}:1`, () => {
+          const ratio = contrast(palette[text], palette[fill]);
+          assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
+        });
+      }
+    }
+
+    it(`${scheme}: the hero panel stands off the screen (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(palette.brand, palette.background);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
+
+    // "Scan my skin" on the hero: its label, pressed too, and the pill against the panel.
+    for (const fill of ['brandAction', 'brandActionPressed'] as const) {
+      it(`${scheme}: the hero button's label on ${fill} meets ${TEXT}:1`, () => {
+        const ratio = contrast(palette.onBrandAction, palette[fill]);
         assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
       });
     }
 
-    it(`${scheme}: the scan card stands off the screen (${GRAPHIC}:1)`, () => {
-      const ratio = contrast(palette.brand, palette.background);
+    it(`${scheme}: the hero button stands off the panel (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(palette.brandAction, palette.brand);
       assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
+
+    // The meter under the score: the icon's mint, on the panel and on its own track.
+    for (const behind of ['brand', 'brandTrack'] as const) {
+      it(`${scheme}: the score meter shows on ${behind} (${GRAPHIC}:1)`, () => {
+        const ratio = contrast(palette.tints.mint.fill, palette[behind]);
+        assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+      });
+    }
+
+    it(`${scheme}: the peach change pill stands off the hero panel (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(palette.tints.peach.fill, palette.brand);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
+
+    // A ticked routine step is filled in the brand teal on every screen.
+    it(`${scheme}: a tick on a ticked box meets ${TEXT}:1`, () => {
+      const ratio = contrast(palette.textInverse, palette.accent);
+      assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
     });
 
     for (const graphic of ['accent', 'borderStrong'] as const) {
@@ -148,11 +182,6 @@ describe('supporting colours', () => {
         assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
       });
 
-      it(`${scheme}: a tick on a ${name} tick box meets ${TEXT}:1`, () => {
-        const ratio = contrast(palette.textInverse, tint.text);
-        assert.ok(ratio >= TEXT, `${ratio.toFixed(2)}:1`);
-      });
-
       // Unticked boxes, switches, chips and outlined buttons sit on tinted cards too.
       for (const graphic of ['accent', 'borderStrong'] as const) {
         it(`${scheme}: ${graphic} on the ${name} card meets ${GRAPHIC}:1`, () => {
@@ -161,12 +190,18 @@ describe('supporting colours', () => {
         });
       }
 
-      // The track is the plain surface, white in light mode (TodayRoutine).
-      it(`${scheme}: a ${name} progress bar shows on its track (${GRAPHIC}:1)`, () => {
+      // Chart lines and chevrons in this colour sit on plain cards, white in light mode.
+      it(`${scheme}: a ${name} line or chevron shows on a plain card (${GRAPHIC}:1)`, () => {
         const ratio = contrast(tint.text, palette.surface);
         assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
       });
     }
+
+    // Home's routine tiles: the teal progress bar on its white track.
+    it(`${scheme}: a routine tile's progress shows on its track (${GRAPHIC}:1)`, () => {
+      const ratio = contrast(palette.accent, palette.surface);
+      assert.ok(ratio >= GRAPHIC, `${ratio.toFixed(2)}:1`);
+    });
 
     it(`${scheme}: mint is the brand's own tint`, () => {
       assert.equal(palette.tints.mint.soft, palette.accentSubtle);
@@ -249,12 +284,12 @@ describe('palette and app icon', () => {
     assert.equal(background.toUpperCase(), iconColors.teal);
   });
 
-  it("uses the icon's teal for the light scan card, unchanged", () => {
+  it("uses the icon's teal for the light hero panel, unchanged", () => {
     assert.equal(colors.light.brand, iconColors.teal);
   });
 
   for (const scheme of SCHEMES) {
-    it(`${scheme}: the sun mark on Home's scan card meets ${GRAPHIC}:1`, () => {
+    it(`${scheme}: the sun mark on Home's hero meets ${GRAPHIC}:1`, () => {
       for (const color of Object.values(sunMarkColors.onBrand[scheme])) {
         const ratio = contrast(color, colors[scheme].brand);
         assert.ok(ratio >= GRAPHIC, `${color}: ${ratio.toFixed(2)}:1`);

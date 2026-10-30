@@ -139,6 +139,8 @@ export const sizes = {
   },
   /** The tappable time under a reminder: at least this tall, as it holds two lines. */
   timeRow: 64,
+  /** The round marker before each point in a list, such as what stands out in a scan. */
+  listMarker: 10,
   /** Scan photo thumbnails, in the photos' 3:4 shape. */
   thumbnail: { width: 48, height: 64 },
   skeletonLine: 14,
@@ -147,16 +149,24 @@ export const sizes = {
   /** Height of the morning and evening progress bars on Home. */
   routineProgress: 6,
   /**
-   * The tab bar's two big buttons: their least height (they grow with large
-   * text), and the smallest their label shrinks to, as a fraction, before it
-   * would be cut off at the largest text sizes. Their icons are a size up
-   * from the small icons elsewhere, on a sturdier line.
+   * The tab bar's two big pill buttons: their least height (they grow with
+   * large text), and the smallest their label shrinks to, as a fraction,
+   * before it would be cut off at the largest text sizes. Their icons are a
+   * size up from the small icons elsewhere, on a sturdier line.
    */
   tabBar: {
-    button: 56,
+    button: 60,
     minLabelScale: 0.8,
     icon: 26,
     iconStroke: 2,
+  },
+  /**
+   * Home's teal hero panel: the height of the meter under the score, and the
+   * width of the sun mark it shows before the first scan.
+   */
+  hero: {
+    meter: 8,
+    mark: 88,
   },
   /**
    * The "Scan my skin" card at the top of Home: the width of its sun mark,
@@ -306,7 +316,16 @@ export const fontFamilies = {
 } as const;
 
 export type TypographyVariant =
-  'display' | 'h1' | 'h2' | 'h3' | 'body' | 'bodySmall' | 'caption' | 'label' | 'labelLarge';
+  | 'score'
+  | 'display'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'body'
+  | 'bodySmall'
+  | 'caption'
+  | 'label'
+  | 'labelLarge';
 
 export interface TypographyStyle {
   fontFamily: string;
@@ -319,6 +338,14 @@ export interface TypographyStyle {
 
 /** Bold, rounded-feeling headings over a plain, comfortable body size. */
 export const typography: Record<TypographyVariant, TypographyStyle> = {
+  /** The latest overall score on Home's hero: the one number the screen is about. */
+  score: {
+    fontFamily: fontFamilies.bold,
+    fontSize: 64,
+    lineHeight: 70,
+    fontWeight: '700',
+    letterSpacing: -1.5,
+  },
   display: {
     fontFamily: fontFamilies.bold,
     fontSize: 44,
