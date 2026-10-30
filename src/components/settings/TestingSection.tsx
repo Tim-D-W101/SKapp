@@ -21,7 +21,7 @@ export function TestingSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.testing.title} icon="settings" tint="mint" />
+      <SectionTitle title={copy.settings.testing.title} icon="settings" />
       <Text color="textSecondary">{copy.settings.testing.intro}</Text>
       <SwitchRow
         label={copy.settings.testing.premiumPreview}

@@ -12,7 +12,8 @@ export interface IconBadgeProps {
   size?: 'sm' | 'md' | 'lg';
   /**
    * `filled` is a teal disc with a white icon, `soft` a mint disc with a
-   * teal icon, and `neutral` a quiet one for calm, recoverable moments.
+   * teal icon, and `neutral` a quiet grey one, for calm, recoverable moments
+   * and for sections without a colour of their own.
    */
   tone?: IconBadgeTone;
   /**
@@ -26,7 +27,7 @@ export interface IconBadgeProps {
 const TONES: Record<IconBadgeTone, { background: ColorName; icon: ColorName }> = {
   filled: { background: 'accent', icon: 'textInverse' },
   soft: { background: 'accentSubtle', icon: 'accentText' },
-  neutral: { background: 'surface', icon: 'textSecondary' },
+  neutral: { background: 'surfaceMuted', icon: 'textSecondary' },
 };
 
 const ICON_SIZES = {
@@ -56,7 +57,6 @@ export function IconBadge({ name, size = 'sm', tone = 'soft', tint }: IconBadgeP
           width: diameter,
           height: diameter,
           backgroundColor: background,
-          borderColor: tone === 'neutral' ? palette.border : 'transparent',
         },
       ]}
     >
@@ -70,6 +70,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidth,
   },
 });

@@ -28,6 +28,8 @@ export interface ReminderInputs {
     weekday: number;
     /** Local hour, 0-23. */
     hour: number;
+    /** Minutes past the hour, 0-59. */
+    minute: number;
   };
   streakEnabled: boolean;
   routine: RoutineReminderSlot;
@@ -60,13 +62,13 @@ function atLocal(date: Date, offset: number, hour: number, minute = 0): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + offset, hour, minute);
 }
 
-/** The first moment at or after `from` that falls on `weekday` at `hour`:00. */
-function nextWeekday(from: Date, weekday: number, hour: number): Date {
+/** The first moment at or after `from` that falls on `weekday` at `hour`:`minute`. */
+function nextWeekday(from: Date, weekday: number, hour: number, minute: number): Date {
   for (let offset = 0; offset <= 7; offset += 1) {
-    const candidate = atLocal(from, offset, hour);
+    const candidate = atLocal(from, offset, hour, minute);
     if (candidate.getDay() === weekday && candidate.getTime() >= from.getTime()) return candidate;
   }
-  return atLocal(from, 7, hour);
+  return atLocal(from, 7, hour, minute);
 }
 
 /** Varies the weekly message from week to week, the same way every time it's planned. */
@@ -79,15 +81,15 @@ function weeklyCandidates(inputs: ReminderInputs): PlannedReminder[] {
   const { now, weekly, scanDates } = inputs;
   const lastScan = scanDates[scanDates.length - 1];
   if (!weekly.enabled || !lastScan) return [];
-  // A week after the last scan, on the chosen day and hour; if that has
-  // passed without a scan, the next time that day and hour come round.
+  // A week after the last scan, on the chosen day and time; if that has
+  // passed without a scan, the next time that day and time come round.
   const due = atLocal(new Date(lastScan), SUGGESTED_SCAN_INTERVAL_DAYS, 0);
-  let first = nextWeekday(due, weekly.weekday, weekly.hour);
+  let first = nextWeekday(due, weekly.weekday, weekly.hour, weekly.minute);
   if (first.getTime() <= now.getTime()) {
-    first = nextWeekday(new Date(now.getTime() + 1), weekly.weekday, weekly.hour);
+    first = nextWeekday(new Date(now.getTime() + 1), weekly.weekday, weekly.hour, weekly.minute);
   }
   // A second one a week later, in case the first passes unanswered.
-  const second = atLocal(first, 7, weekly.hour);
+  const second = atLocal(first, 7, weekly.hour, weekly.minute);
   return [first, second].map((date) => ({ kind: 'weekly', date, ...weeklyMessage(date) }));
 }
 

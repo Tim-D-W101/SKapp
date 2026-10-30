@@ -3,18 +3,22 @@ import Svg, { Circle } from 'react-native-svg';
 
 import { Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { sizes, spacing, useColors } from '@/theme/tokens';
+import { sizes, useColors } from '@/theme/tokens';
 
 export interface CompletionRingProps {
   done: number;
   total: number;
 }
 
-/** Today's routine as a ring that fills step by step, with the count in the middle. */
+/**
+ * Today's routine as a small ring that fills step by step, with the count in
+ * the middle. It sits beside the routine's title, which says the same in
+ * words, so the steps start high on the screen.
+ */
 export function CompletionRing({ done, total }: CompletionRingProps) {
   const palette = useColors();
-  const size = sizes.scoreRing.md;
-  const stroke = sizes.scoreRingStroke.md;
+  const size = sizes.completionRing.size;
+  const stroke = sizes.completionRing.stroke;
   const center = size / 2;
   const ringRadius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * ringRadius;
@@ -22,7 +26,7 @@ export function CompletionRing({ done, total }: CompletionRingProps) {
 
   return (
     <View
-      style={styles.container}
+      style={{ width: size, height: size }}
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={copy.routine.title}
@@ -33,45 +37,38 @@ export function CompletionRing({ done, total }: CompletionRingProps) {
         text: copy.routine.completion(done, total),
       }}
     >
-      <View style={{ width: size, height: size }}>
-        <Svg width={size} height={size}>
+      <Svg width={size} height={size}>
+        <Circle
+          cx={center}
+          cy={center}
+          r={ringRadius}
+          stroke={palette.surfaceMuted}
+          strokeWidth={stroke}
+          fill="none"
+        />
+        {fraction > 0 ? (
           <Circle
             cx={center}
             cy={center}
             r={ringRadius}
-            stroke={palette.borderSubtle}
+            stroke={palette.accent}
             strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={circumference * (1 - fraction)}
             fill="none"
+            transform={`rotate(-90 ${center} ${center})`}
           />
-          {fraction > 0 ? (
-            <Circle
-              cx={center}
-              cy={center}
-              r={ringRadius}
-              stroke={palette.accent}
-              strokeWidth={stroke}
-              strokeLinecap="round"
-              strokeDasharray={`${circumference} ${circumference}`}
-              strokeDashoffset={circumference * (1 - fraction)}
-              fill="none"
-              transform={`rotate(-90 ${center} ${center})`}
-            />
-          ) : null}
-        </Svg>
-        <View style={[StyleSheet.absoluteFill, styles.center]}>
-          <Text variant="h2">{copy.routine.ringValue(done, total)}</Text>
-        </View>
+        ) : null}
+      </Svg>
+      <View style={[StyleSheet.absoluteFill, styles.center]}>
+        <Text variant="label">{copy.routine.ringValue(done, total)}</Text>
       </View>
-      <Text color="textSecondary">{copy.routine.completion(done, total)}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
   center: {
     alignItems: 'center',
     justifyContent: 'center',

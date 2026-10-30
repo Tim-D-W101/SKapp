@@ -10,15 +10,19 @@ export interface SectionTitleProps {
   title: string;
   /** Shown on a badge in the section's colour, before the title. */
   icon: IconName;
-  /** The section's colour (see TintName). */
-  tint: TintName;
+  /**
+   * The section's colour (see TintName), for a section that has one by
+   * meaning. Without one, the badge is a quiet neutral, as for Settings'
+   * utility sections, so colour stays where it means something.
+   */
+  tint?: TintName;
 }
 
-/** A card's or a section's title, with an icon badge in its colour beside it. */
+/** A card's or a section's title, with an icon badge in its colour (or a neutral one) beside it. */
 export function SectionTitle({ title, icon, tint }: SectionTitleProps) {
   return (
     <View style={styles.row}>
-      <IconBadge name={icon} size="md" tone="filled" tint={tint} />
+      <IconBadge name={icon} size="md" tone={tint ? 'filled' : 'neutral'} tint={tint} />
       <Text variant="h3" accessibilityRole="header" style={styles.title}>
         {title}
       </Text>

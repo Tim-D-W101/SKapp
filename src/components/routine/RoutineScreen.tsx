@@ -100,11 +100,13 @@ export function RoutineScreen({ openSlot }: RoutineScreenProps) {
     <Screen padded={false}>
       <BackBar />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text variant="h1" accessibilityRole="header">
-          {copy.routine.title}
-        </Text>
-
-        <View style={styles.ring}>
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            <Text variant="h1" accessibilityRole="header">
+              {copy.routine.title}
+            </Text>
+            <Text color="textSecondary">{copy.routine.completion(done, routine.steps.length)}</Text>
+          </View>
           <CompletionRing done={done} total={routine.steps.length} />
         </View>
 
@@ -158,7 +160,13 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     padding: layout.gutter,
   },
-  ring: {
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.md,
+  },
+  headerText: {
+    flex: 1,
+    gap: spacing.xs,
   },
 });

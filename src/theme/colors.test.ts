@@ -43,6 +43,7 @@ const BACKGROUNDS: readonly ColorName[] = [
   'background',
   'surface',
   'surfaceElevated',
+  'surfaceMuted',
   'accentSubtle',
 ];
 const TEXT_COLORS: readonly ColorName[] = [

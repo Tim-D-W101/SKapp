@@ -151,9 +151,13 @@ export function ReminderControls() {
                 <ReminderTimeRow
                   label={copy.settings.reminders.time}
                   pickerTitle={copy.settings.reminders.weeklyTimeTitle}
-                  time={{ hour, minute: 0 }}
-                  withMinutes={false}
-                  onChange={(next) => void saveWeekly({ reminder_hour: next.hour })}
+                  time={{ hour, minute: settings.weeklyMinute }}
+                  onChange={(next) => {
+                    // The hour is the account's; the minute is kept on this phone.
+                    if (next.minute !== settings.weeklyMinute)
+                      update({ weeklyMinute: next.minute });
+                    if (next.hour !== hour) void saveWeekly({ reminder_hour: next.hour });
+                  }}
                 />
               </>
             ) : null}

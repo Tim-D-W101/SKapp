@@ -75,20 +75,25 @@ const REMINDER_NAMES: Record<ReminderName, string> = {
   evening: 'Evening routine',
 };
 
-/** "today at 8:00 am", "Sunday at 7:00 pm", "3 Nov 2026 at 7:00 pm". */
-function reminderWhen(day: RelativeDay, time: string, date: string): string {
+/** "today", "tomorrow", "Sunday", "3 Nov 2026". */
+function reminderDay(day: RelativeDay, date: string): string {
   switch (day.kind) {
     case 'today':
-      return `today at ${time}`;
+      return 'today';
     case 'tomorrow':
-      return `tomorrow at ${time}`;
+      return 'tomorrow';
     case 'weekday': {
       const weekday = WEEKDAYS.find((entry) => entry.value === day.weekday);
-      return `${weekday ? weekday.name : date} at ${time}`;
+      return weekday ? weekday.name : date;
     }
     case 'later':
-      return `${date} at ${time}`;
+      return date;
   }
+}
+
+/** "today at 8:00 am", "Sunday at 7:00 pm", "3 Nov 2026 at 7:00 pm". */
+function reminderWhen(day: RelativeDay, time: string, date: string): string {
+  return `${reminderDay(day, date)} at ${time}`;
 }
 
 export const copy = {
@@ -119,8 +124,12 @@ export const copy = {
     },
     /** An hour as it reads on a 12-hour clock face, for the time picker: 0 and 12 are "12". */
     clockHour: (hour: number) => clockHour(hour),
-    /** Minutes past the hour, for the time picker: ":05". */
-    minute: (minute: number) => `:${String(minute).padStart(2, '0')}`,
+    /** An hour on a 24-hour clock, for the time picker: "07". */
+    clockHour24: (hour: number) => String(hour).padStart(2, '0'),
+    /** The minutes alone, for the time picker's minute box: "05". */
+    minutes: (minute: number) => String(minute).padStart(2, '0'),
+    /** Between the time picker's hour and minute boxes. */
+    separator: ':',
   },
 
   onboarding: {
@@ -394,6 +403,15 @@ export const copy = {
       down: (points: number) => `Down ${points}`,
       same: 'No change',
     },
+    /**
+     * The change beside the overall score, on the results and on Home: a
+     * chip ("Up 5") with this after it, and the two together for screen
+     * readers ("Up 5 since last scan").
+     */
+    sinceLast: 'since last scan',
+    sinceLastFull: (change: string) => `${change} since last scan`,
+    /** The same chip on a first scan, which has nothing before it. */
+    baseline: 'Your baseline',
     lowScoreNote: 'Room to improve. That is exactly what your routine is for.',
     tapToSkip: 'Tap to skip',
     buildRoutine: 'Build my routine',
@@ -682,26 +700,39 @@ export const copy = {
   },
 
   home: {
-    title: 'Home',
+    /** The top of Home, in place of a title: a greeting for the time of day, and the date. */
+    greeting: (hour: number) =>
+      hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening',
     /** The large card at the top of Home that starts a scan. */
     scan: {
       title: 'Scan my skin',
+      /** Under the title before the first scan. */
       body: 'A quick photo, then your cosmetic scores for today.',
+      /** Under the title once there's a scan: when the next weekly one is suggested. */
+      next: (date: string) => `Next scan suggested for ${date}`,
+      due: 'Your weekly scan is ready whenever you are.',
       hint: 'Opens the camera for a new scan',
     },
-    latestDate: (date: string) => `From your scan on ${date}`,
     seeResults: 'See these results',
     /** The latest score's card, under the scan card. Tapping it opens that scan's results. */
     latest: {
       title: 'Your latest scan',
-      /** Screen reader name for the card: "Your latest scan. Overall 72. From your scan on 21 Oct 2026". */
-      label: (score: number, date: string) => `Your latest scan. Overall ${score}. ${date}`,
+      /** Screen reader name for the card: "Your latest scan. Overall 72. 21 Oct 2026. Up 5 since last scan". */
+      label: (score: number, date: string, change: string) =>
+        `Your latest scan. Overall ${score}. ${date}. ${change}`,
       hint: 'Opens the results of this scan',
     },
-    nextScan: {
-      title: 'Your next scan',
-      on: (date: string) => `Suggested for ${date}, a week after your last one.`,
-      now: 'Your next scan is ready whenever you are. Tap Scan my skin at the top.',
+    /** Before the first scan, under the scan card: what happens from here. */
+    howItWorks: {
+      title: 'How GlowTrack works',
+      steps: [
+        { title: 'Take a scan', body: 'A photo in good light sets your baseline scores.' },
+        {
+          title: 'Follow your routine',
+          body: 'A few simple morning and evening steps, made from your scan.',
+        },
+        { title: 'Check in weekly', body: 'A scan each week shows how your skin looks over time.' },
+      ],
     },
     routine: {
       title: "Today's routine",
@@ -723,7 +754,11 @@ export const copy = {
        */
       next: (name: ReminderName, day: RelativeDay, time: string, date: string) =>
         `Next reminder: ${REMINDER_NAMES[name]}, ${reminderWhen(day, time, date)}`,
+      /** Under the next reminder's time: what it's for, and its day. "Morning routine · tomorrow". */
+      detail: (name: ReminderName, day: RelativeDay, date: string) =>
+        `${REMINDER_NAMES[name]} · ${reminderDay(day, date)}`,
       off: 'Reminders are off',
+      offBody: 'Turn them on for a nudge at a time you choose.',
       none: 'No reminders coming up',
       noneBody: 'Choose a weekly scan reminder, or one for your routine.',
       loadFailed: "Your next reminder didn't load. Check your connection and try again.",
@@ -820,7 +855,13 @@ export const copy = {
         /** Above the hours and the minutes, and their screen reader names. */
         hours: 'Hour',
         minutes: 'Minutes',
-        /** The round buttons either side of the time, for the minutes between the ones listed. */
+        /** Screen reader names for the hour and minute boxes, with the whole time: "Hour, 7:30 AM". */
+        hourBox: (value: string) => `Hour, ${value}`,
+        minuteBox: (value: string) => `Minutes, ${value}`,
+        hourBoxHint: 'Shows the hours to choose from',
+        minuteBoxHint: 'Shows the minutes to choose from',
+        /** The buttons under the minutes, for the ones between those listed: "1 min" beside a minus or a plus. */
+        oneMinute: '1 min',
         earlier: 'One minute earlier',
         later: 'One minute later',
       },

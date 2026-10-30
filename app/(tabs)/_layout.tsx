@@ -8,7 +8,7 @@ import { useColors } from '@/theme/tokens';
 
 /**
  * A tab's icon, in the colour TabBar gives it: solid white (dark ink in dark
- * mode) on the open tab's teal button, outlined teal on the other.
+ * mode) on the open tab's teal button, outlined ink on the other.
  */
 function tabIcon(name: TabIconName) {
   return function TabBarIcon(props: { focused: boolean; color: ColorValue; size: number }) {

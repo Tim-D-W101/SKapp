@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Icon, IconBadge, Text } from '@/components/ui';
+import { IconBadge, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatTime } from '@/lib/dates';
 import type { ReminderTime } from '@/lib/reminderPlan';
@@ -16,23 +16,16 @@ export interface ReminderTimeRowProps {
   pickerTitle: string;
   /** The reminder's local time. */
   time: ReminderTime;
-  /** Whether the picker offers minutes too. Off for a reminder that is only ever on the hour. */
-  withMinutes?: boolean;
   onChange: (time: ReminderTime) => void;
 }
 
 /**
- * A reminder's time, large and easy to read, with "Change" beside it so it's
- * plain that it can be changed. Tapping anywhere on it opens the time picker;
- * the new time is passed on only when it's saved there.
+ * A reminder's time, large and easy to read, with a "Change" pill beside it
+ * (as on Home's reminders card) so it's plain that it can be changed.
+ * Tapping anywhere on it opens the time picker; the new time is passed on
+ * only when it's saved there.
  */
-export function ReminderTimeRow({
-  label,
-  pickerTitle,
-  time,
-  withMinutes = true,
-  onChange,
-}: ReminderTimeRowProps) {
+export function ReminderTimeRow({ label, pickerTitle, time, onChange }: ReminderTimeRowProps) {
   const palette = useColors();
   const [picking, setPicking] = useState(false);
   const shown = formatTime(time.hour, time.minute);
@@ -57,19 +50,19 @@ export function ReminderTimeRow({
           <Text variant="caption" color="textSecondary">
             {label}
           </Text>
-          <Text variant="h3">{shown}</Text>
+          <Text variant="h2">{shown}</Text>
         </View>
-        <Text variant="label" color="accentText">
-          {copy.settings.reminders.change}
-        </Text>
-        <Icon name="chevronRight" size={sizes.icon.md} color="accentText" />
+        <View style={[styles.pill, { backgroundColor: palette.surfaceMuted }]}>
+          <Text variant="label" color="accentText">
+            {copy.settings.reminders.change}
+          </Text>
+        </View>
       </Pressable>
 
       {picking ? (
         <TimePickerDialog
           title={pickerTitle}
           time={time}
-          withMinutes={withMinutes}
           onCancel={() => setPicking(false)}
           onSave={(next) => {
             setPicking(false);
@@ -89,10 +82,17 @@ const styles = StyleSheet.create({
     minHeight: sizes.timeRow,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     borderWidth: sizes.borderWidth,
   },
   text: {
     flex: 1,
+  },
+  /** Not a button of its own: the whole row is. It only says what a tap does. */
+  pill: {
+    justifyContent: 'center',
+    minHeight: sizes.control.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.full,
   },
 });

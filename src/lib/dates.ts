@@ -43,6 +43,11 @@ export function formatShortDate(iso: string): string {
   });
 }
 
+/** A day in full, the way the phone's language writes it, such as "Thursday 30 October". */
+export function formatLongDate(date: Date): string {
+  return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
 let twentyFourHour: boolean | null = null;
 
 /**

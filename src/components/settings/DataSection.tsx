@@ -76,7 +76,7 @@ export function DataSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.data.title} icon="list" tint="mint" />
+      <SectionTitle title={copy.settings.data.title} icon="list" />
 
       <View style={styles.item}>
         <Text color="textSecondary">{copy.settings.data.downloadBody}</Text>
@@ -114,7 +114,7 @@ export function DataSection() {
           label={copy.settings.data.deleteAccount}
           onPress={() => router.push('/delete-account')}
           disabled={busy !== null}
-          variant="destructive"
+          variant="destructiveOutline"
           fullWidth
         />
       </View>

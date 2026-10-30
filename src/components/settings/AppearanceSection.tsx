@@ -31,7 +31,7 @@ export function AppearanceSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.appearance.title} icon="contrast" tint="mint" />
+      <SectionTitle title={copy.settings.appearance.title} icon="contrast" />
       <SegmentedControl
         options={OPTIONS}
         value={preference}

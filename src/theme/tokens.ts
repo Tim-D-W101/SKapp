@@ -111,8 +111,12 @@ export const sizes = {
   borderWidthStrong: 2,
   scoreRing: { sm: 64, md: 128, lg: 188 },
   scoreRingStroke: { sm: 7, md: 12, lg: 16 },
+  /** Today's routine ring, beside the routine's title. */
+  completionRing: { size: 76, stroke: 8 },
   /** Height of an attribute score bar. */
   scoreBar: 10,
+  /** The dot before each line of "What stands out" in the results. */
+  observationDot: 8,
   /** The tick box on a routine step, and its border. */
   checkbox: 28,
   checkboxBorder: 2,
@@ -128,14 +132,18 @@ export const sizes = {
   sheetMaxHeight: '85%',
   /**
    * A dialog over the screen, such as the time picker: its widest and its
-   * tallest (its content scrolls beyond that), and the basis of an hour in
-   * its grid, which fits four to a row, and of a minute, six to a row.
+   * tallest (its content scrolls beyond that). The picker's grid of hours or
+   * minutes fits four to a row, or six for the twenty-four hours of a 24-hour
+   * clock: a cell's basis is a little under its share, growing to fill it
+   * beside the gaps. Its hour and minute boxes are `timeField` tall, beside
+   * an AM / PM pair `periodWidth` wide, each half of it a full touch target.
    */
   dialog: {
     maxWidth: 400,
     maxHeight: '90%',
-    hourCellBasis: '22%',
-    minuteCellBasis: '14%',
+    cellBasis: { four: '22%', six: '14%' },
+    timeField: 104,
+    periodWidth: 72,
   },
   /** The tappable time under a reminder: at least this tall, as it holds two lines. */
   timeRow: 64,
