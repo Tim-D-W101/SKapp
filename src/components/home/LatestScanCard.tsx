@@ -1,49 +1,49 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { ChangeChip, changeChipText } from '@/components/scan/ChangeChip';
 import { Card, Icon, ScoreRing, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { formatShortDate } from '@/lib/dates';
-import { opacity, sizes, spacing, useColors } from '@/theme/tokens';
+import { opacity, sizes, spacing } from '@/theme/tokens';
 import type { ScanResult } from '@/types/scan';
 
 export interface LatestScanCardProps {
   latest: ScanResult;
+  /** The scan before it, for the change since then. Null on a first scan. */
+  previous: ScanResult | null;
 }
 
 /**
- * The latest overall score on Home, on a bright apricot card beside the teal
- * ring: the only tinted card on Home. The ring on one side, when it was
- * taken and the way to its results on the other. Kept to one row, so the
- * morning and evening routine show on the first screen too. Tapping
- * anywhere opens that scan's results.
+ * The latest overall score on Home, answering the question the app is for:
+ * is it moving? The teal ring sits on the latest scan's apricot track, with
+ * the date and the change since the scan before (or that this is the
+ * baseline) beside it. Peach stays an accent here, on a plain card, so the
+ * scan card above remains the one block of colour. Tapping anywhere opens
+ * that scan's results.
  */
-export function LatestScanCard({ latest }: LatestScanCardProps) {
-  const palette = useColors();
-  const date = copy.home.latestDate(formatShortDate(latest.createdAt));
+export function LatestScanCard({ latest, previous }: LatestScanCardProps) {
+  const date = formatShortDate(latest.createdAt);
+  const delta = previous ? latest.overall - previous.overall : null;
 
   return (
     <Pressable
       onPress={() => router.push(`/progress/${latest.scanId}`)}
       accessibilityRole="button"
-      accessibilityLabel={copy.home.latest.label(latest.overall, date)}
+      accessibilityLabel={copy.home.latest.label(latest.overall, date, changeChipText(delta))}
       accessibilityHint={copy.home.latest.hint}
       style={({ pressed }) => (pressed ? styles.pressed : null)}
     >
-      <Card tint="peach" style={styles.card}>
-        <ScoreRing score={latest.overall} label={copy.results.overall} trackColor="surface" />
+      <Card style={styles.card}>
+        <ScoreRing score={latest.overall} label={copy.results.overall} trackTint="peach" />
         <View style={styles.text}>
-          <Text variant="label" tint="peach">
-            {copy.home.latest.title}
-          </Text>
-          <Text variant="bodySmall" color="textSecondary">
-            {date}
-          </Text>
+          <Text variant="h3">{date}</Text>
+          <ChangeChip delta={delta} />
           <View style={styles.action}>
-            <Text variant="label" tint="peach" style={styles.actionLabel}>
+            <Text variant="label" color="accentText" style={styles.actionLabel}>
               {copy.home.seeResults}
             </Text>
-            <Icon name="chevronRight" size={sizes.icon.md} tint={palette.tints.peach.text} />
+            <Icon name="chevronRight" size={sizes.icon.md} color="accentText" />
           </View>
         </View>
       </Card>
@@ -58,17 +58,17 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.lg,
   },
   text: {
     flex: 1,
-    gap: spacing.xs,
+    alignItems: 'flex-start',
+    gap: spacing.sm,
   },
   action: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: spacing.xs,
   },
   actionLabel: {
     flexShrink: 1,

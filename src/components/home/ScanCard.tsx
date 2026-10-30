@@ -6,14 +6,22 @@ import { startScan } from '@/lib/access';
 import { hapticImpact } from '@/lib/haptics';
 import { layout, motion, radius, shadows, sizes, spacing, useColors } from '@/theme/tokens';
 
+export interface ScanCardProps {
+  /**
+   * The line under the title: when the next weekly scan is suggested, once
+   * there's been a scan. Without it, what a scan gives.
+   */
+  note?: string;
+}
+
 /**
- * The big "Scan my skin" card at the top of Home: the app's mark on the
- * icon's teal (in dark mode too, where it glows without glaring), its sun
- * rising in sun yellow, with a coral camera badge.
- * It starts a scan the same way every other scan button does, so once the
- * free scan is used it opens the plans instead.
+ * The big "Scan my skin" card at the top of Home, and the one block of brand
+ * colour on it: the app's mark on the icon's teal (in dark mode too, where it
+ * glows without glaring), its sun rising in sun yellow, with a coral camera
+ * button. It starts a scan the same way every other scan button does, so
+ * once the free scan is used it opens the plans instead.
  */
-export function ScanCard() {
+export function ScanCard({ note }: ScanCardProps) {
   const palette = useColors();
   const camera = palette.tints.coral;
 
@@ -43,7 +51,7 @@ export function ScanCard() {
           {copy.home.scan.title}
         </Text>
         <Text variant="bodySmall" color="onBrand">
-          {copy.home.scan.body}
+          {note ?? copy.home.scan.body}
         </Text>
       </View>
       <View style={[styles.camera, { backgroundColor: camera.fill }]}>
