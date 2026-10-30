@@ -3,14 +3,17 @@ import Svg, { Circle } from 'react-native-svg';
 
 import { Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
-import { sizes, spacing, useColors } from '@/theme/tokens';
+import { sizes, useColors } from '@/theme/tokens';
 
 export interface CompletionRingProps {
   done: number;
   total: number;
 }
 
-/** Today's routine as a ring that fills step by step, with the count in the middle. */
+/**
+ * Today's routine as a ring that fills step by step, with the count in the
+ * middle. The routine screen says the same in words beside it.
+ */
 export function CompletionRing({ done, total }: CompletionRingProps) {
   const palette = useColors();
   const size = sizes.scoreRing.md;
@@ -62,7 +65,6 @@ export function CompletionRing({ done, total }: CompletionRingProps) {
           <Text variant="h2">{copy.routine.ringValue(done, total)}</Text>
         </View>
       </View>
-      <Text color="textSecondary">{copy.routine.completion(done, total)}</Text>
     </View>
   );
 }
@@ -70,7 +72,6 @@ export function CompletionRing({ done, total }: CompletionRingProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: spacing.sm,
   },
   center: {
     alignItems: 'center',

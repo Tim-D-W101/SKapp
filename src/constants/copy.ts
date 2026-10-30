@@ -498,7 +498,6 @@ export const copy = {
     },
     history: {
       title: 'Scan history',
-      delta: (points: number) => (points > 0 ? `+${points}` : `${points}`),
       baseline: 'Baseline',
       thumbnail: 'Scan photo',
       row: (date: string, score: number, change: string) => `${date}, overall ${score}, ${change}`,

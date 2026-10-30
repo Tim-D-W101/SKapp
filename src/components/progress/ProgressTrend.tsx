@@ -8,7 +8,7 @@ import type { ProgressMetric } from '@/constants/progress';
 import { ATTRIBUTE_KEYS } from '@/constants/scan';
 import { formatShortDate } from '@/lib/dates';
 import type { ScanRecord } from '@/lib/progress';
-import { spacing } from '@/theme/tokens';
+import { layout, spacing } from '@/theme/tokens';
 import type { ScanResult } from '@/types/scan';
 
 import { TrendChart } from './TrendChart';
@@ -55,16 +55,12 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
 
   return (
     <Card style={styles.card}>
-      <View style={styles.header}>
-        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
-        <Text variant="bodySmall" color="textSecondary">
-          {metricLabel}
-        </Text>
-      </View>
+      <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.chipScroller}
         contentContainerStyle={styles.chips}
         accessibilityRole="radiogroup"
         accessibilityLabel={copy.progress.chart.filterLabel}
@@ -126,11 +122,13 @@ const styles = StyleSheet.create({
   card: {
     gap: spacing.md,
   },
-  header: {
-    gap: spacing.xs,
+  /** Runs to the card's edges, so the chips scroll out of sight there rather than at its padding. */
+  chipScroller: {
+    marginHorizontal: -layout.cardPadding,
   },
   chips: {
     gap: spacing.sm,
+    paddingHorizontal: layout.cardPadding,
   },
   readout: {
     flexDirection: 'row',

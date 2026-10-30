@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Button, Card, ScoreRing, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
@@ -13,26 +13,35 @@ export interface ProgressHeroProps {
 }
 
 /**
- * The latest overall score and the journey since the first scan, on the
- * latest scan's peach, as on Home. With one scan, an encouraging note that
- * the second is where change shows up.
+ * The latest overall score beside the journey since the first scan, on the
+ * latest scan's peach. Kept to one row, so the trend below shows on the
+ * first screen too; the change since the scan before is on Home's hero and
+ * in the history. With one scan, an encouraging note that the second is
+ * where change shows up.
  */
 export function ProgressHero({ records }: ProgressHeroProps) {
   const first = records[0].result;
   const latest = records[records.length - 1].result;
+  const ring = (
+    <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="surface" />
+  );
 
   if (records.length === 1) {
     const next = nextScanDate(latest.createdAt);
     return (
       <Card style={styles.card} tint="peach">
-        <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="surface" />
-        <Text variant="h3" align="center" accessibilityRole="header">
-          {copy.progress.oneScan.title}
-        </Text>
-        <Text color="textSecondary" align="center">
-          {copy.progress.oneScan.body}
-        </Text>
-        <Text variant="label" align="center">
+        <View style={styles.row}>
+          {ring}
+          <View style={styles.text}>
+            <Text variant="h3" accessibilityRole="header">
+              {copy.progress.oneScan.title}
+            </Text>
+            <Text variant="bodySmall" color="textSecondary">
+              {copy.progress.oneScan.body}
+            </Text>
+          </View>
+        </View>
+        <Text variant="label">
           {next ? copy.progress.oneScan.nextScan(next) : copy.progress.oneScan.nextScanNow}
         </Text>
         {next ? null : <Button label={copy.progress.oneScan.cta} onPress={startScan} fullWidth />}
@@ -43,20 +52,33 @@ export function ProgressHero({ records }: ProgressHeroProps) {
   const days = calendarDaysBetween(first.createdAt, latest.createdAt);
   return (
     <Card style={styles.card} tint="peach">
-      <ScoreRing score={latest.overall} label={copy.progress.latest} trackColor="surface" />
-      <Text variant="h3" align="center">
-        {copy.progress.journey(latest.overall - first.overall, copy.progress.journeySpan(days))}
-      </Text>
-      <Text variant="bodySmall" color="textSecondary" align="center">
-        {copy.progress.sinceFirst}
-      </Text>
+      <View style={styles.row}>
+        {ring}
+        <View style={styles.text}>
+          <Text variant="h2">
+            {copy.progress.journey(latest.overall - first.overall, copy.progress.journeySpan(days))}
+          </Text>
+          <Text variant="bodySmall" color="textSecondary">
+            {copy.progress.sinceFirst}
+          </Text>
+        </View>
+      </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    gap: spacing.md,
+  },
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.md,
+  },
+  text: {
+    flex: 1,
+    alignItems: 'flex-start',
     gap: spacing.sm,
   },
 });

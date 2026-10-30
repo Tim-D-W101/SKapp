@@ -3,7 +3,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { BackBar } from '@/components/navigation/BackBar';
-import { Disclaimer, EmptyState, ErrorState, LoadingState, Screen, Text } from '@/components/ui';
+import {
+  Card,
+  Disclaimer,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Screen,
+  Text,
+} from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { EVENING_FROM_HOUR, MIDNIGHT_GRACE_MS } from '@/constants/routine';
 import { startScan } from '@/lib/access';
@@ -29,10 +37,11 @@ function currentSlot(): RoutineSlot {
 }
 
 /**
- * Today's routine: morning and evening steps to tick off, with the section
- * for the time of day open, or the one picked on Home. Ticks show at once and
- * save in the background, offline too. The day starts afresh at local
- * midnight. It opens from Home's routine section and from a first scan.
+ * Today's routine: how much is done, beside why it's worth keeping up, then
+ * the morning and evening steps to tick off, with the section for the time
+ * of day open, or the one picked on Home. Ticks show at once and save in the
+ * background, offline too. The day starts afresh at local midnight. It opens
+ * from Home's routine tiles and from a first scan.
  */
 export function RoutineScreen({ openSlot }: RoutineScreenProps) {
   const status = useRoutineStore((state) => state.status);
@@ -104,9 +113,15 @@ export function RoutineScreen({ openSlot }: RoutineScreenProps) {
           {copy.routine.title}
         </Text>
 
-        <View style={styles.ring}>
+        <Card style={styles.summary}>
           <CompletionRing done={done} total={routine.steps.length} />
-        </View>
+          <View style={styles.summaryText}>
+            <Text variant="h3">{copy.routine.completion(done, routine.steps.length)}</Text>
+            <Text variant="bodySmall" color="textSecondary">
+              {copy.routine.consistency}
+            </Text>
+          </View>
+        </Card>
 
         {notice ? (
           <Text
@@ -138,10 +153,6 @@ export function RoutineScreen({ openSlot }: RoutineScreenProps) {
           onToggleStep={toggle}
         />
 
-        <Text variant="bodySmall" color="textSecondary" align="center">
-          {copy.routine.consistency}
-        </Text>
-
         <Disclaimer />
       </ScrollView>
     </Screen>
@@ -158,7 +169,13 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     padding: layout.gutter,
   },
-  ring: {
+  summary: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.md,
+  },
+  summaryText: {
+    flex: 1,
+    gap: spacing.xs,
   },
 });
