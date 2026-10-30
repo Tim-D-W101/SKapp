@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking';
 import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Button, Card, LoadingState, SectionTitle, Text } from '@/components/ui';
+import { Card, LoadingState, SectionTitle, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { PLAY_SUBSCRIPTIONS_URL } from '@/constants/links';
 import { formatShortDate } from '@/lib/dates';
@@ -10,6 +10,8 @@ import { logInDevelopment } from '@/lib/errors';
 import type { SubscriptionDetails } from '@/lib/purchases';
 import { useSubscriptionStore } from '@/stores/useSubscriptionStore';
 import { spacing } from '@/theme/tokens';
+
+import { SettingsRow } from './SettingsRow';
 
 /** What the next date means: a renewal, the end, or the end of a free trial. */
 function dateLine(details: SubscriptionDetails): string | null {
@@ -75,12 +77,10 @@ export function SubscriptionSection() {
       <SectionTitle title={copy.settings.subscription.title} icon="sparkle" tint="sun" />
       {body}
       {details || entitlement === 'lapsed' ? (
-        <Button
+        <SettingsRow
           label={copy.settings.subscription.manage}
           accessibilityHint={copy.settings.subscription.manageHint}
           onPress={manage}
-          variant="secondary"
-          fullWidth
         />
       ) : null}
       {error ? (

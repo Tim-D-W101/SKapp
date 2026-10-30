@@ -7,6 +7,8 @@ import { copy } from '@/constants/copy';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { spacing } from '@/theme/tokens';
 
+import { SettingsRow } from './SettingsRow';
+
 /** The linked email and signing out, or the prompt to save an anonymous account. */
 export function AccountSection() {
   const email = useAuthStore((state) => state.user?.email);
@@ -42,12 +44,10 @@ export function AccountSection() {
       ) : (
         <>
           <Text color="textSecondary">{copy.settings.account.signedInAs(email ?? '')}</Text>
-          <Button
+          <SettingsRow
             label={copy.auth.signOut}
             onPress={() => void handleSignOut()}
             loading={signingOut}
-            variant="secondary"
-            fullWidth
           />
           {error ? (
             <Text variant="bodySmall" color="danger" accessibilityLiveRegion="polite">
