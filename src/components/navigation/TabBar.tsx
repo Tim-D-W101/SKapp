@@ -8,14 +8,15 @@ import { useReduceMotion } from '@/lib/useReduceMotion';
 import { layout, motion, radius, sizes, spacing, useColors } from '@/theme/tokens';
 
 /**
- * The tab bar: two big rounded buttons side by side, one per route, each an
+ * The tab bar: two big pill buttons side by side, one per route, each an
  * icon beside a label. The open tab's button is filled in the brand teal,
- * with a solid icon; the other is a quiet button with a hairline outline and
- * an outlined icon. Scanning starts from Home, not from here.
+ * with a solid icon; the other is a quiet neutral pill with an outlined icon
+ * in ink, so the teal one alone says where you are. Scanning starts from
+ * Home, not from here.
  *
- * It sits in the layout below the screens, not over them, so nothing scrolls
- * behind it, and it pads itself clear of the phone's navigation bar or
- * gesture line.
+ * It sits on its own raised surface below the screens, not over them, so
+ * nothing scrolls behind it, and it pads itself clear of the phone's
+ * navigation bar or gesture line.
  */
 export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
   const palette = useColors();
@@ -26,7 +27,7 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
       style={[
         styles.bar,
         {
-          backgroundColor: palette.background,
+          backgroundColor: palette.surfaceElevated,
           borderTopColor: palette.borderSubtle,
           paddingLeft: layout.gutter + insets.left,
           paddingRight: layout.gutter + insets.right,
@@ -59,7 +60,7 @@ export function TabBar({ state, descriptors, navigation, insets }: BottomTabBarP
             focused={focused}
             icon={options.tabBarIcon?.({
               focused,
-              color: focused ? palette.textInverse : palette.accentText,
+              color: focused ? palette.textInverse : palette.textPrimary,
               size: sizes.tabBar.icon,
             })}
             onPress={onPress}
@@ -81,9 +82,9 @@ interface TabButtonProps {
 }
 
 /**
- * One tab, as a big button: filled teal when its tab is open, quiet
- * otherwise. While pressed it darkens a step and dips slightly on a quick
- * spring, unless the phone asks for less motion.
+ * One tab, as a big pill: filled teal when its tab is open, a quiet neutral
+ * fill otherwise. While pressed it takes a step of colour and dips slightly
+ * on a quick spring, unless the phone asks for less motion.
  */
 function TabButton({
   label,
@@ -123,17 +124,14 @@ function TabButton({
               : palette.accent
             : pressed
               ? palette.accentSubtle
-              : palette.surface;
-          return [
-            styles.button,
-            { backgroundColor: fill, borderColor: focused ? fill : palette.border },
-          ];
+              : palette.surfaceMuted;
+          return [styles.button, { backgroundColor: fill }];
         }}
       >
         {icon}
         <Text
           variant="labelLarge"
-          color={focused ? 'textInverse' : 'accentText'}
+          color={focused ? 'textInverse' : 'textPrimary'}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={sizes.tabBar.minLabelScale}
@@ -162,11 +160,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     minHeight: sizes.tabBar.button,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    borderRadius: radius.md,
-    // Both buttons have the same border, so they stay the same size whichever is open.
-    borderWidth: sizes.borderWidth,
+    borderRadius: radius.full,
   },
   label: {
     flexShrink: 1,
