@@ -29,7 +29,7 @@ export function AboutSection() {
 
   return (
     <Card style={styles.card}>
-      <SectionTitle title={copy.settings.about.title} icon="info" tint="mint" />
+      <SectionTitle title={copy.settings.about.title} icon="info" />
 
       <View style={styles.links}>
         <LegalLink label={copy.settings.about.privacy} url={LEGAL_LINKS.privacy} onFail={failed} />

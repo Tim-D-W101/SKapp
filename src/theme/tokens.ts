@@ -111,8 +111,12 @@ export const sizes = {
   borderWidthStrong: 2,
   scoreRing: { sm: 64, md: 128, lg: 188 },
   scoreRingStroke: { sm: 7, md: 12, lg: 16 },
+  /** Today's routine ring, beside the routine's title. */
+  completionRing: { size: 76, stroke: 8 },
   /** Height of an attribute score bar. */
   scoreBar: 10,
+  /** The dot before each line of "What stands out" in the results. */
+  observationDot: 8,
   /** The tick box on a routine step, and its border. */
   checkbox: 28,
   checkboxBorder: 2,

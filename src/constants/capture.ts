@@ -5,6 +5,8 @@
 
 /** Longest edge of the photo that gets uploaded. */
 export const PHOTO_LONG_EDGE = 1024;
+/** Width over height of a portrait photo from the 4:3 capture sizes the camera is set to. */
+export const PHOTO_PORTRAIT_ASPECT = 3 / 4;
 /** JPEG quality of the uploaded photo (0-1). */
 export const PHOTO_JPEG_QUALITY = 0.85;
 

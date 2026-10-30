@@ -5,9 +5,11 @@ import { useDerivedValue } from 'react-native-reanimated';
 import { Button, Card, Disclaimer, ScoreRing, Screen, Text } from '@/components/ui';
 import { copy } from '@/constants/copy';
 import { ATTRIBUTE_KEYS } from '@/constants/scan';
-import { motion, sizes, spacing } from '@/theme/tokens';
+import { formatShortDate } from '@/lib/dates';
+import { motion, radius, sizes, spacing, typography, useColors } from '@/theme/tokens';
 import type { ScanResult } from '@/types/scan';
 
+import { ChangeChip } from './ChangeChip';
 import { ResultAttributes } from './ResultAttributes';
 import { ResultChange } from './ResultChange';
 import { ResultFocus } from './ResultFocus';
@@ -49,9 +51,11 @@ export interface ResultViewProps {
 }
 
 /**
- * A scan's results, revealed in order: the overall score, the headline, the
- * seven attributes, what stands out, where to focus, and the change since
- * last time. Tapping anywhere finishes the reveal at once.
+ * A scan's results, revealed in order: the overall score under the scan's
+ * date, the change since last time (or that this is the baseline) with the
+ * headline, the seven attributes, what stands out (one card, a line each),
+ * where to focus, and every score's change since last time. Tapping
+ * anywhere finishes the reveal at once.
  */
 export function ResultView({
   result,
@@ -61,6 +65,7 @@ export function ResultView({
   primaryAction,
   onShare,
 }: ResultViewProps) {
+  const palette = useColors();
   const [duration] = useState(() => revealDuration(result, previous !== null));
   const { clock, done, skip } = useResultReveal(duration, animate);
   const ringProgress = useDerivedValue(() =>
@@ -94,9 +99,14 @@ export function ResultView({
         </View>
 
         <View style={styles.hero}>
-          <Text variant="label" color="textSecondary" accessibilityRole="header">
-            {copy.results.title}
-          </Text>
+          <View style={styles.heading}>
+            <Text variant="h2" align="center" accessibilityRole="header">
+              {copy.results.title}
+            </Text>
+            <Text variant="bodySmall" color="textSecondary" align="center">
+              {formatShortDate(result.createdAt)}
+            </Text>
+          </View>
           <ScoreRing
             score={result.overall}
             size={sizes.scoreRing.lg}
@@ -106,7 +116,8 @@ export function ResultView({
           />
         </View>
 
-        <Reveal clock={clock} at={timing.headlineAt}>
+        <Reveal clock={clock} at={timing.headlineAt} style={styles.headline}>
+          <ChangeChip delta={previous ? result.overall - previous.overall : null} />
           <Text variant="h3" align="center">
             {result.headline}
           </Text>
@@ -117,24 +128,24 @@ export function ResultView({
         </Reveal>
 
         {result.observations.length > 0 ? (
-          <View style={styles.section}>
-            <Reveal clock={clock} at={timing.observationsAt}>
-              <Text variant="h3" accessibilityRole="header">
-                {copy.results.observationsTitle}
-              </Text>
-            </Reveal>
-            {result.observations.map((observation, index) => (
-              <Reveal
-                key={index}
-                clock={clock}
-                at={timing.observationsAt + index * timing.observationStagger}
-              >
-                <Card elevation="none">
-                  <Text>{observation}</Text>
-                </Card>
-              </Reveal>
-            ))}
-          </View>
+          <Reveal clock={clock} at={timing.observationsAt} style={styles.section}>
+            <Text variant="h3" accessibilityRole="header">
+              {copy.results.observationsTitle}
+            </Text>
+            <Card style={styles.observations}>
+              {result.observations.map((observation, index) => (
+                <Reveal
+                  key={index}
+                  clock={clock}
+                  at={timing.observationsAt + index * timing.observationStagger}
+                  style={styles.observation}
+                >
+                  <View style={[styles.dot, { backgroundColor: palette.tints.mint.fill }]} />
+                  <Text style={styles.observationText}>{observation}</Text>
+                </Reveal>
+              ))}
+            </Card>
+          </Reveal>
         ) : null}
 
         {result.focusAreas.length > 0 ? (
@@ -182,7 +193,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
   },
+  heading: {
+    gap: spacing.xs,
+  },
+  headline: {
+    alignItems: 'center',
+    gap: spacing.md,
+  },
   section: {
     gap: spacing.sm,
+  },
+  observations: {
+    gap: spacing.md,
+  },
+  observation: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  /** Sits on the first line of its observation, centred on the text's line height. */
+  dot: {
+    width: sizes.observationDot,
+    height: sizes.observationDot,
+    marginTop: (typography.body.lineHeight - sizes.observationDot) / 2,
+    borderRadius: radius.full,
+  },
+  observationText: {
+    flex: 1,
   },
 });

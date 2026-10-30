@@ -13,7 +13,7 @@ export interface ResultFocusProps {
 /**
  * The one to three attributes to prioritise, set apart from the other scores
  * on a warm sun-yellow panel, and framed as room to improve, never as a
- * shortfall.
+ * shortfall. Each is a white pill with its score on a bright sun badge.
  */
 export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
   const palette = useColors();
@@ -31,17 +31,16 @@ export function ResultFocus({ focusAreas, scores }: ResultFocusProps) {
         {focusAreas.map((key) => (
           <View
             key={key}
-            style={[
-              styles.area,
-              { backgroundColor: palette.surfaceElevated, borderColor: tint.text },
-            ]}
+            style={[styles.area, { backgroundColor: palette.surfaceElevated }]}
             accessible
             accessibilityLabel={`${copy.results.attributes[key]}, ${scores[key]}`}
           >
             <Text variant="label">{copy.results.attributes[key]}</Text>
-            <Text variant="label" tint="sun">
-              {scores[key]}
-            </Text>
+            <View style={[styles.score, { backgroundColor: tint.fill }]}>
+              <Text variant="label" style={{ color: tint.onFill }}>
+                {scores[key]}
+              </Text>
+            </View>
           </View>
         ))}
       </View>
@@ -73,8 +72,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     minHeight: sizes.chip,
-    paddingHorizontal: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
     borderRadius: radius.full,
-    borderWidth: sizes.borderWidthStrong,
+  },
+  score: {
+    minWidth: sizes.iconBadge.sm,
+    minHeight: sizes.iconBadge.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
+    borderRadius: radius.full,
   },
 });

@@ -22,8 +22,10 @@ export interface RoutineSectionProps {
 
 /**
  * Morning or evening: a header that opens and closes the section, and its
- * steps to tick off. Each section is in its own colour (sun or dusk),
- * and so are its ticks; each step's drawing is in the colour of its kind.
+ * steps to tick off. Each section is on its own colour (sun or dusk), and
+ * each step's drawing is in the colour of its kind; a ticked box is the
+ * brand's teal in both, as progress is everywhere, so a sunny morning never
+ * fills with brown.
  */
 export function RoutineSection({
   slot,
@@ -38,7 +40,6 @@ export function RoutineSection({
   const done = steps.filter((step) => ticked[tickKey(step.slot, step.key)]).length;
   const count = copy.routine.sectionCount(done, steps.length);
   const tintName = ROUTINE_SLOT_TINTS[slot];
-  const tint = palette.tints[tintName];
 
   return (
     <Card style={styles.card} tint={tintName}>
@@ -56,7 +57,11 @@ export function RoutineSection({
         <Text variant="bodySmall" color="textSecondary">
           {count}
         </Text>
-        <Icon name={expanded ? 'chevronUp' : 'chevronDown'} size={sizes.icon.md} tint={tint.text} />
+        <Icon
+          name={expanded ? 'chevronUp' : 'chevronDown'}
+          size={sizes.icon.md}
+          color="textSecondary"
+        />
       </Pressable>
 
       {expanded
@@ -79,7 +84,7 @@ export function RoutineSection({
                   style={[
                     styles.box,
                     isDone
-                      ? { backgroundColor: tint.text, borderColor: tint.text }
+                      ? { backgroundColor: palette.accent, borderColor: palette.accent }
                       : {
                           backgroundColor: palette.surfaceElevated,
                           borderColor: palette.borderStrong,

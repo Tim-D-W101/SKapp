@@ -55,12 +55,8 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
 
   return (
     <Card style={styles.card}>
-      <View style={styles.header}>
-        <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
-        <Text variant="bodySmall" color="textSecondary">
-          {metricLabel}
-        </Text>
-      </View>
+      {/* The chosen chip below says which score this is. */}
+      <SectionTitle title={copy.progress.chart.title} icon="chart" tint="mint" />
 
       <ScrollView
         horizontal
@@ -125,9 +121,6 @@ export function ProgressTrend({ records }: ProgressTrendProps) {
 const styles = StyleSheet.create({
   card: {
     gap: spacing.md,
-  },
-  header: {
-    gap: spacing.xs,
   },
   chips: {
     gap: spacing.sm,
