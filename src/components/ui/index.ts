@@ -9,6 +9,7 @@ export { IconBadge, type IconBadgeProps, type IconBadgeTone } from './IconBadge'
 export { LoadingState, type LoadingStateProps } from './LoadingState';
 export { ScoreRing, type ScoreRingProps } from './ScoreRing';
 export { Screen, type ScreenProps } from './Screen';
+export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
 export { SectionTitle, type SectionTitleProps } from './SectionTitle';
 export {
   SegmentedControl,

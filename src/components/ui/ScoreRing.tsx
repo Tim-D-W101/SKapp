@@ -19,6 +19,7 @@ import {
   spacing,
   useColors,
   type ColorName,
+  type TintName,
   type TypographyVariant,
 } from '@/theme/tokens';
 
@@ -47,6 +48,11 @@ export interface ScoreRingProps {
    * mode) keeps it visible against the card's colour.
    */
   trackColor?: ColorName;
+  /**
+   * Draws the empty part in a supporting colour's soft shade instead, as the
+   * latest scan's apricot behind its teal arc on a plain card.
+   */
+  trackTint?: TintName;
 }
 
 function clampScore(score: number): number {
@@ -67,6 +73,7 @@ export function ScoreRing({
   animate = true,
   progress,
   trackColor = 'borderSubtle',
+  trackTint,
 }: ScoreRingProps) {
   const palette = useColors();
   const target = clampScore(score);
@@ -124,7 +131,7 @@ export function ScoreRing({
             cx={center}
             cy={center}
             r={ringRadius}
-            stroke={palette[trackColor]}
+            stroke={trackTint ? palette.tints[trackTint].soft : palette[trackColor]}
             strokeWidth={strokeWidth}
             fill="none"
           />

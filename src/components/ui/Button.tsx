@@ -18,7 +18,14 @@ import {
 import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+/**
+ * `destructiveOutline` is the way to a destructive action that asks again
+ * before it acts, such as Settings' "Delete my account": plain, in the danger
+ * colour, so the rarest action isn't the loudest. The filled `destructive` is
+ * for the final confirmation itself.
+ */
+export type ButtonVariant =
+  'primary' | 'secondary' | 'ghost' | 'destructive' | 'destructiveOutline';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps {
@@ -87,6 +94,11 @@ function variantColors(variant: ButtonVariant, pressed: boolean, palette: ColorP
       background: palette.danger,
       border: 'transparent',
       text: 'textInverse',
+    },
+    destructiveOutline: {
+      background: pressed ? palette.surfaceMuted : 'transparent',
+      border: palette.danger,
+      text: 'danger',
     },
   };
   return map[variant];
